@@ -38,8 +38,7 @@ function useLocalStorage(key: string, initialValue: SessionId | undefined) {
   return [value, setValue] as const;
 }
 
-// Fallback for environments where crypto.randomUUID is unavailable.
-// Like, when accessing dev server via unsecure (HTTP) local network IP.
+// Fall back when crypto.randomUUID is unavailable, such as on an unsecured local network.
 function generateSessionId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -56,7 +55,7 @@ export function ConvexProvider({ children }: { children: ReactNode }) {
     <ConvexProviderPrimitive client={convex}>
       <SessionProvider
         useStorage={useLocalStorage}
-        storageKey="mtwf-session-id"
+        storageKey="ptwf-session-id"
         idGenerator={generateSessionId}
       >
         {children}

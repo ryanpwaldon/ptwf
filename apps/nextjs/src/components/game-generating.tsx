@@ -3,8 +3,8 @@ import { FullScreenLoader } from "./full-screen-loader";
 export function GameGenerating() {
   return (
     <FullScreenLoader
-      title="Get ready..."
-      description="Please wait while we prepare the game for you."
+      title="Paws for a moment..."
+      description="We’re preparing a fresh round of pet-care trivia."
     />
   );
 }

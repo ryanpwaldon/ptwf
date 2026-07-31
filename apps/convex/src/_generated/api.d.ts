@@ -8,10 +8,16 @@
  * @module
  */
 
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
+
 import type * as answers from "../answers.js";
+import type * as fields_animal from "../fields/animal.js";
 import type * as fields_character from "../fields/character.js";
 import type * as fields_gameCode from "../fields/gameCode.js";
-import type * as fields_movie from "../fields/movie.js";
 import type * as fields_quizTheme from "../fields/quizTheme.js";
 import type * as fields_quizTone from "../fields/quizTone.js";
 import type * as gameEngine from "../gameEngine.js";
@@ -21,17 +27,11 @@ import type * as players from "../players.js";
 import type * as questions from "../questions.js";
 import type * as quizmaster from "../quizmaster.js";
 
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
-
 declare const fullApi: ApiFromModules<{
   answers: typeof answers;
+  "fields/animal": typeof fields_animal;
   "fields/character": typeof fields_character;
   "fields/gameCode": typeof fields_gameCode;
-  "fields/movie": typeof fields_movie;
   "fields/quizTheme": typeof fields_quizTheme;
   "fields/quizTone": typeof fields_quizTone;
   gameEngine: typeof gameEngine;

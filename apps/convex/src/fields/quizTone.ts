@@ -25,7 +25,7 @@ export const QUIZ_TONE_OPTIONS = [
   {
     value: "roast",
     label: "Roast",
-    description: "Lovingly roasts the movie, characters, and the player.",
+    description: "Lovingly roasts the questions and the player.",
     posterClassName: "bg-linear-to-t from-orange-600 via-red-500 to-yellow-400",
   },
   {
@@ -35,9 +35,9 @@ export const QUIZ_TONE_OPTIONS = [
     posterClassName: "bg-conic from-lime-400 via-fuchsia-500 to-lime-400",
   },
   {
-    value: "film-bro",
-    label: "Film Bro",
-    description: "Pretentious cinephile who can't stop namedropping directors.",
+    value: "pet-nerd",
+    label: "Pet Nerd",
+    description: "Enthusiastic animal expert who always has one more fun fact.",
     posterClassName:
       "bg-radial-[at_top_right] from-stone-500 via-neutral-800 to-stone-950",
   },

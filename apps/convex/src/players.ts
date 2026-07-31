@@ -145,7 +145,7 @@ export const updateIsReady = mutation({
         p._id === player._id ? true : p.isReady,
       );
       if (!allReady) return;
-      if (!game.quizMovie) throw new ConvexError("No movie selected.");
+      if (!game.quizAnimal) throw new ConvexError("No animal selected.");
 
       // Generate questions.
       await ctx.db.patch(args.gameId, { status: "generating" });

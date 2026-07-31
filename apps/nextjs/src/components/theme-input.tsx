@@ -49,10 +49,10 @@ export function ThemeInput({ value, onChange }: ThemeInputProps) {
           </div>
         </Button>
       </CommandPickerTrigger>
-      <CommandPickerContent title="Select a theme">
-        <CommandPickerInput placeholder="Search themes..." />
+      <CommandPickerContent title="Select a care theme">
+        <CommandPickerInput placeholder="Search care themes..." />
         <CommandPickerList>
-          <CommandPickerEmpty>No themes found.</CommandPickerEmpty>
+          <CommandPickerEmpty>No care themes found.</CommandPickerEmpty>
           <CommandPickerGroup>
             {QUIZ_THEME_OPTIONS.map((option) => (
               <CommandPickerItem

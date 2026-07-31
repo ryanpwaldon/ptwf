@@ -15,9 +15,9 @@ const STRANGER = "stranger" as unknown as SessionId;
 const BASE_GAME = {
   code: GAME_CODE,
   status: "lobby",
-  quizMovie: null,
+  quizAnimal: null,
   quizTone: "standard",
-  quizTheme: "fun-facts",
+  quizTheme: "diet-and-nutrition",
   questionCount: 5,
   timeLimitSeconds: 30,
   currentQuestionIndex: 0,
@@ -173,7 +173,7 @@ describe("players.updateIsReady", () => {
     ).rejects.toThrowError("Player not found.");
   });
 
-  it("throws when all players ready but quizMovie is null", async () => {
+  it("throws when all players are ready but quizAnimal is null", async () => {
     const t = convexTest(schema, modules);
     const { gameId } = await setupLobbyGameWithPlayers(t);
 
@@ -184,14 +184,14 @@ describe("players.updateIsReady", () => {
       isReady: true,
     });
 
-    // Marking session-2 ready satisfies "all ready"; game has quizMovie: null.
+    // Marking session-2 ready satisfies "all ready"; the game has no animal.
     await expect(
       t.mutation(api.players.updateIsReady, {
         sessionId: SESSION_2,
         gameId,
         isReady: true,
       }),
-    ).rejects.toThrowError("No movie selected.");
+    ).rejects.toThrowError("No animal selected.");
   });
 
   it("updates isReady to true", async () => {
@@ -290,12 +290,11 @@ describe("players.updateIsReady", () => {
 
     await t.run((ctx) =>
       ctx.db.patch(gameId, {
-        quizMovie: {
-          id: 1,
-          title: "Test Movie",
-          overview: "A test overview",
-          posterPath: null,
-          releaseDate: "2024-01-01",
+        quizAnimal: {
+          value: "dogs",
+          label: "Dogs",
+          description: "Canine care.",
+          imagePath: "/animals/dogs.webp",
         },
       }),
     );

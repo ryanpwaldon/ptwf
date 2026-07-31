@@ -5,9 +5,9 @@ import { ConvexError, v } from "convex/values";
 
 import type { DataModel, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { animalValidator } from "./fields/animal";
 import { CHARACTER_OPTIONS } from "./fields/character";
 import { gameCodeValidator, generateGameCode } from "./fields/gameCode";
-import { movieValidator } from "./fields/movie";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
 import schema from "./schema";
@@ -35,9 +35,9 @@ export const create = mutation({
     const gameId = await ctx.db.insert("games", {
       code,
       status: "lobby",
-      quizMovie: null,
+      quizAnimal: null,
       quizTone: "standard",
-      quizTheme: "fun-facts",
+      quizTheme: "diet-and-nutrition",
       questionCount: 10,
       timeLimitSeconds: 60,
       roundEndsAt: undefined,
@@ -78,16 +78,16 @@ export const byCode = query({
 // Update
 // ========================================================================================
 
-export const updateQuizMovie = mutation({
+export const updateQuizAnimal = mutation({
   args: {
     ...SessionIdArg,
     gameId: v.id("games"),
-    quizMovie: movieValidator,
+    quizAnimal: animalValidator,
   },
   returns: v.null(),
   handler: async (ctx, args) => {
     await ensureParticipant(ctx, args.gameId, args.sessionId);
-    await ctx.db.patch(args.gameId, { quizMovie: args.quizMovie });
+    await ctx.db.patch(args.gameId, { quizAnimal: args.quizAnimal });
   },
 });
 

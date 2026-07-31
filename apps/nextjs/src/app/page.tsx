@@ -34,7 +34,7 @@ export default function HomePage() {
       <main className="flex flex-1 flex-col items-center px-4 py-24">
         <div className="2xs:w-1/2 aspect-2/3 w-3/4 bg-red-600 px-3 py-3">
           <h1 className="2xs:text-4xl text-3xl leading-none font-extrabold tracking-tight text-white">
-            Movie
+            Pet
             <br />
             Trivia
             <br />
@@ -51,21 +51,21 @@ export default function HomePage() {
             disabled={isCreating}
             className="disabled:opacity-100"
           >
-            {isCreating ? <Loader className="size-6" /> : "Create a game"}
+            {isCreating ? <Loader className="size-6" /> : "Create a pet quiz"}
           </Button>
           <Button
             size="xl"
             variant="ghost"
             onClick={() => router.push("/join")}
           >
-            Join a game
+            Join a pet quiz
           </Button>
         </div>
       </main>
       <footer className="flex h-16 items-center justify-end gap-4 px-1.5 text-sm">
         <Button variant="link" asChild>
-          <Link href="https://github.com/ryanpwaldon/mtwf" target="_blank">
-            Github <ArrowUpRightIcon />
+          <Link href="https://github.com/ryanpwaldon/ptwf" target="_blank">
+            GitHub <ArrowUpRightIcon />
           </Link>
         </Button>
       </footer>

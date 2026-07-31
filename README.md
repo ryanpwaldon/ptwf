@@ -1,15 +1,17 @@
-# Movie Trivia with Friends (MTWF)
+# Pet Trivia With Friends (PTWF)
 
-Movie Trivia with Friends is a real-time multiplayer trivia game centred around film. Players join a shared lobby, select a movie to quiz on, and choose from several themes that influence how questions are written and presented. An LLM then generates a fresh set of multiple-choice questions for the group to answer, with timed rounds, live vote tallies, and a final leaderboard.
+Pet Trivia With Friends is a real-time multiplayer game about responsible pet care. Players join a shared lobby, choose an animal and a care theme, then answer a fresh set of multiple-choice questions together. Each game includes timed rounds, live answer tallies, and a final leaderboard.
 
-The app is built on Next.js with Convex as the serverless backend, providing a real-time database and live synchronisation across all connected clients. Question generation is handled by Gemini via OpenRouter, with a curated movie catalogue and poster assets bundled into the app.
+The initial animal catalogue includes dogs, cats, birds, and fish. Care themes cover diet and nutrition, grooming and bathing, health and wellbeing, behaviour and communication, training and enrichment, homes and habitats, and safety and first aid.
+
+The app is built on Next.js with Convex as the serverless backend, providing a real-time database and live synchronisation across all connected clients. Pet-care question generation is handled by Gemini via OpenRouter, with a curated animal catalogue and original illustrations bundled into the app.
 
 <table>
   <tr>
-    <td><img src="assets/screenshot-1.png" alt="Lobby" width="100%"></td>
-    <td><img src="assets/screenshot-2.png" alt="Movie picker" width="100%"></td>
-    <td><img src="assets/screenshot-3.png" alt="Question" width="100%"></td>
-    <td><img src="assets/screenshot-4.png" alt="Leaderboard" width="100%"></td>
+    <td><img src="apps/nextjs/public/animals/dogs.webp" alt="Dogs" width="100%"></td>
+    <td><img src="apps/nextjs/public/animals/cats.webp" alt="Cats" width="100%"></td>
+    <td><img src="apps/nextjs/public/animals/birds.webp" alt="Birds" width="100%"></td>
+    <td><img src="apps/nextjs/public/animals/fish.webp" alt="Fish" width="100%"></td>
   </tr>
 </table>
 

@@ -3,18 +3,19 @@ import { describe, expect, it } from "vitest";
 import { QUIZ_THEME_OPTIONS } from "./fields/quizTheme";
 import { buildPrompt, labelAt, transformQuestions } from "./quizmaster";
 
-const FUN_FACTS_THEME = QUIZ_THEME_OPTIONS[0];
+const DIET_THEME = QUIZ_THEME_OPTIONS[0];
 
-const BASE_MOVIE = {
-  title: "Inception",
-  overview: "A thief who steals corporate secrets through dream-sharing.",
-  releaseDate: "2010-07-16",
+const BASE_ANIMAL = {
+  value: "dogs",
+  label: "Dogs",
+  description: "Canine nutrition, grooming, training, and wellbeing.",
+  imagePath: "/animals/dogs.webp",
 };
 
 const BASE_CONFIG = {
   questionCount: 5,
-  quizMovie: BASE_MOVIE,
-  quizThemeValue: FUN_FACTS_THEME.value,
+  quizAnimal: BASE_ANIMAL,
+  quizThemeValue: DIET_THEME.value,
   quizToneValue: "standard" as const,
 };
 
@@ -37,9 +38,9 @@ describe("transformQuestions", () => {
     const input = {
       questions: [
         {
-          question: "What is the name of the main character?",
-          choices: ["Alice", "Bob", "Carol", "Dave"],
-          correctIndex: 2 as const,
+          question: "Which activity gives a dog mental enrichment?",
+          choices: ["Foraging", "Overfeeding", "Isolation", "Inactivity"],
+          correctIndex: 0 as const,
         },
       ],
     };
@@ -48,46 +49,27 @@ describe("transformQuestions", () => {
 
     expect(result).toEqual([
       {
-        text: "What is the name of the main character?",
+        text: "Which activity gives a dog mental enrichment?",
         choices: [
-          { label: "A", text: "Alice" },
-          { label: "B", text: "Bob" },
-          { label: "C", text: "Carol" },
-          { label: "D", text: "Dave" },
+          { label: "A", text: "Foraging" },
+          { label: "B", text: "Overfeeding" },
+          { label: "C", text: "Isolation" },
+          { label: "D", text: "Inactivity" },
         ],
-        correctLabel: "C",
+        correctLabel: "A",
       },
     ]);
   });
 });
 
 describe("buildPrompt", () => {
-  it("includes movie title, release year, and plot", () => {
+  it("includes the animal label and care scope", () => {
     const prompt = buildPrompt(BASE_CONFIG);
 
-    expect(prompt).toContain("Inception");
-    expect(prompt).toContain("2010");
+    expect(prompt).toContain("Dogs");
     expect(prompt).toContain(
-      "A thief who steals corporate secrets through dream-sharing.",
+      "Canine nutrition, grooming, training, and wellbeing.",
     );
-  });
-
-  it("falls back to 'Unknown' when overview is empty", () => {
-    const prompt = buildPrompt({
-      ...BASE_CONFIG,
-      quizMovie: { ...BASE_MOVIE, overview: "" },
-    });
-
-    expect(prompt).toContain("Plot: Unknown");
-  });
-
-  it("falls back to 'Unknown' for release year when releaseDate is empty", () => {
-    const prompt = buildPrompt({
-      ...BASE_CONFIG,
-      quizMovie: { ...BASE_MOVIE, releaseDate: "" },
-    });
-
-    expect(prompt).toContain("Release Year: Unknown");
   });
 
   it("includes the question count", () => {
@@ -99,7 +81,7 @@ describe("buildPrompt", () => {
   it("includes the theme label and instructions", () => {
     const prompt = buildPrompt(BASE_CONFIG);
 
-    expect(prompt).toContain(FUN_FACTS_THEME.label);
-    expect(prompt).toContain(FUN_FACTS_THEME.instructions);
+    expect(prompt).toContain(DIET_THEME.label);
+    expect(prompt).toContain(DIET_THEME.instructions);
   });
 });

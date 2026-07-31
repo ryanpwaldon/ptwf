@@ -45,10 +45,10 @@ export default function JoinPage() {
       <main className="flex-1 px-4">
         <div className="mt-8">
           <h1 className="text-2xl font-extrabold tracking-tight">
-            Join a game
+            Join a pet quiz
           </h1>
           <p className="text-muted-foreground">
-            Enter the game code to join a game.
+            Enter the game code your friend shared.
           </p>
         </div>
         <Card className="mt-6 w-full">

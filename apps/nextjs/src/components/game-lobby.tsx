@@ -20,8 +20,8 @@ import { FieldError } from "@acme/ui/field";
 
 import { Header } from "~/components/header";
 import { InviteCodeField } from "~/components/invite-code-field";
+import { AnimalInput } from "./animal-input";
 import { AvatarInput } from "./avatar-input";
-import { MovieInput } from "./movie-input";
 import { PageShell } from "./page-shell";
 import { PlayerGroup } from "./player-group";
 import { ThemeInput } from "./theme-input";
@@ -37,7 +37,7 @@ interface GameLobbyProps {
 }
 
 export function GameLobby({ game, players, me }: GameLobbyProps) {
-  const updateQuizMovie = useSessionMutation(api.games.updateQuizMovie);
+  const updateQuizAnimal = useSessionMutation(api.games.updateQuizAnimal);
   const updateQuizTheme = useSessionMutation(api.games.updateQuizTheme);
   const updateCharacter = useSessionMutation(api.players.updateCharacter);
   const updateIsReady = useSessionMutation(api.players.updateIsReady);
@@ -47,10 +47,10 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   const readyByCharacter = new Map(players.map((p) => [p.character, p.isReady])); // prettier-ignore
 
   const [hasAttemptedReady, setHasAttemptedReady] = useState(false);
-  const isMovieInvalid = hasAttemptedReady && !game.quizMovie;
+  const isAnimalInvalid = hasAttemptedReady && !game.quizAnimal;
 
   async function handleReadyToggle() {
-    if (!game.quizMovie) {
+    if (!game.quizAnimal) {
       setHasAttemptedReady(true);
       return;
     }
@@ -67,9 +67,11 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
       <Header />
       <main className="flex-1 px-4 pb-16">
         <div className="mt-8">
-          <h1 className="text-2xl font-extrabold tracking-tight">Quiz lobby</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Pet trivia lobby
+          </h1>
           <p className="text-muted-foreground">
-            Configure your quiz, and invite your friends!
+            Pick an animal and care theme, then invite your friends.
           </p>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -100,27 +102,29 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </div>
         <Card className="mt-4">
           <CardHeader className="border-b">
-            <CardTitle>Movie</CardTitle>
-            <CardDescription>Select a movie for this quiz</CardDescription>
+            <CardTitle>Animal</CardTitle>
+            <CardDescription>Choose a pet to quiz on</CardDescription>
           </CardHeader>
           <CardContent className="flex h-full flex-col gap-2">
-            <MovieInput
-              value={game.quizMovie}
-              invalid={isMovieInvalid || undefined}
-              onChange={(movie) => {
-                void updateQuizMovie({
+            <AnimalInput
+              value={game.quizAnimal}
+              invalid={isAnimalInvalid || undefined}
+              onChange={(animal) => {
+                void updateQuizAnimal({
                   gameId: game._id,
-                  quizMovie: movie,
+                  quizAnimal: animal,
                 });
               }}
             />
-            {isMovieInvalid && <FieldError>Please select a movie.</FieldError>}
+            {isAnimalInvalid && (
+              <FieldError>Please select an animal.</FieldError>
+            )}
           </CardContent>
         </Card>
         <Card className="mt-4">
           <CardHeader className="border-b">
-            <CardTitle>Theme</CardTitle>
-            <CardDescription>Select a question category</CardDescription>
+            <CardTitle>Care theme</CardTitle>
+            <CardDescription>Choose what the questions cover</CardDescription>
           </CardHeader>
           <CardContent className="flex h-full items-center">
             <ThemeInput

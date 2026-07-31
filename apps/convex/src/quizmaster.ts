@@ -26,7 +26,7 @@ export const generateQuestions = internalAction({
 
       const prompt = buildPrompt({
         questionCount: gameConfig.questionCount,
-        quizMovie: gameConfig.quizMovie,
+        quizAnimal: gameConfig.quizAnimal,
         quizThemeValue: gameConfig.quizTheme,
         quizToneValue: gameConfig.quizTone,
       });
@@ -102,42 +102,39 @@ function buildQuestionSchema(questionCount: number) {
 
 export function buildPrompt(config: {
   questionCount: number;
-  quizMovie: {
-    title: string;
-    overview: string;
-    releaseDate: string;
+  quizAnimal: {
+    value: string;
+    label: string;
+    description: string;
+    imagePath: string;
   };
   quizThemeValue: QuizTheme;
   quizToneValue: QuizTone;
 }): string {
-  const { quizMovie, quizThemeValue, questionCount } = config;
-  const movieTitle = quizMovie.title;
-  const rawYear = quizMovie.releaseDate.split("-")[0];
-  const movieReleaseYear =
-    rawYear !== undefined && rawYear !== "" ? rawYear : "Unknown";
-  const moviePlot = quizMovie.overview || "Unknown";
+  const { quizAnimal, quizThemeValue, questionCount } = config;
   const quizTheme = getQuizThemeByValue(quizThemeValue);
 
   return [
-    `You are a movie trivia quiz generator.`,
+    `You are a pet-care trivia quiz generator.`,
     ``,
-    `## Movie`,
-    `- Title: ${movieTitle}`,
-    `- Release Year: ${movieReleaseYear}`,
-    `- Plot: ${moviePlot}`,
+    `## Animal`,
+    `- Type: ${quizAnimal.label}`,
+    `- Scope: ${quizAnimal.description}`,
     ``,
-    `## Category: ${quizTheme.label}`,
+    `## Care theme: ${quizTheme.label}`,
     `${quizTheme.instructions}`,
     ``,
     `## Task`,
-    `Generate exactly ${questionCount} multiple-choice trivia questions about the movie above.`,
+    `Generate exactly ${questionCount} multiple-choice pet-care trivia questions about ${quizAnimal.label.toLocaleLowerCase()}.`,
     ``,
     `## Rules`,
-    `- Every question must be specifically about "${movieTitle}" (${movieReleaseYear}).`,
-    `- Every question must fall within the "${quizTheme.label}" category.`,
-    `- Do not mention the movie title by name in any question. Phrase questions so they assume the reader already knows which movie is being discussed.`,
-    `- Do not reference the plot summary provided above in your questions.`,
-    `- Do not reference any source in a question (e.g. do not write "according to IMDb Trivia" or similar).`,
+    `- Every question must be specifically about caring for ${quizAnimal.label.toLocaleLowerCase()}.`,
+    `- Every question must fall within the "${quizTheme.label}" care theme.`,
+    `- Focus on practical, educational knowledge that helps people understand responsible pet care.`,
+    `- Use broadly accepted guidance from reputable veterinary and animal-welfare sources.`,
+    `- Do not diagnose illness, prescribe treatment, or imply that trivia can replace advice from a qualified veterinarian.`,
+    `- When care needs vary by species, breed, age, health, or location, avoid presenting one narrow recommendation as universal.`,
+    `- Do not reference any source in a question (e.g. do not write "according to a veterinary website" or similar).`,
     `- Do not repeat questions or ask the same question worded differently.`,
     `- Write every question in your own words. Do not copy questions verbatim from any source. Questions must be clearly and simply worded — avoid awkward or confusing phrasing.`,
     `- Every question and every answer choice must be factually accurate and verifiable. Do not fabricate or guess any facts.`,

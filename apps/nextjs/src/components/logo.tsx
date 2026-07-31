@@ -46,7 +46,9 @@ function LogoContent() {
     >
       <path
         fill="#fff"
-        d="M0 0h3.127L6.43 14.781h.14L9.873 0H13v22h-2.46V7.68h-.099L7.337 21.894H5.663L2.559 7.627h-.1V22H0V0Z"
+        fillRule="evenodd"
+        d="M0 0h6.5C10.7 0 13 2.4 13 6.5S10.7 13 6.5 13H3v9H0V0Zm3 3v7h3.2c2.5 0 3.8-1.2 3.8-3.5S8.7 3 6.2 3H3Z"
+        clipRule="evenodd"
       />
     </svg>
   );
