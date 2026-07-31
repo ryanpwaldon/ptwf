@@ -17,7 +17,7 @@ export default function GlobalError({
 
   return (
     <html lang="en">
-      <body className="text-foreground bg-muted font-sans antialiased">
+      <body className="text-foreground bg-background dark:bg-muted font-sans antialiased">
         <ErrorFallbackCard onRetry={reset} />
       </body>
     </html>

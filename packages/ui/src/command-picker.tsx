@@ -68,7 +68,10 @@ function CommandPickerContent({
       <DialogTitle className="sr-only">{title}</DialogTitle>
       <div className="mx-auto flex h-full min-h-0 w-full max-w-xl min-w-0 flex-col sm:p-4">
         <Command
-          className={cn("bg-background! rounded-none! p-0!", className)}
+          className={cn(
+            "bg-card! dark:bg-background! rounded-none! p-0!",
+            className,
+          )}
           {...commandProps}
         >
           {children}

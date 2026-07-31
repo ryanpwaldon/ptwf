@@ -74,7 +74,7 @@ export default function JoinPage() {
                           name={field.name}
                           placeholder="Enter game code"
                           aria-invalid={hasError || undefined}
-                          className="h-12 bg-white font-mono text-base! uppercase placeholder:normal-case"
+                          className="h-12 font-mono text-base! uppercase placeholder:normal-case"
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => {
