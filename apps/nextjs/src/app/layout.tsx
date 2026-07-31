@@ -34,10 +34,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={cn(
-          "text-foreground bg-muted font-sans antialiased",
-          inter.variable,
-        )}
+        className={cn("text-foreground font-sans antialiased", inter.variable)}
       >
         <ConvexProvider>
           <TooltipProvider>
