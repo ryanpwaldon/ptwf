@@ -29,6 +29,11 @@ pnpm format:fix       # Fix formatting
 pnpm ui-add           # Add shadcn/ui components interactively
 ```
 
+## Codex Tooling
+
+- The repository pins Node.js in `.nvmrc` and pnpm in `package.json`. In Codex, run pnpm commands as `fnm exec --using=.nvmrc corepack pnpm ...` so fresh shells do not use stale global versions.
+- Run Codex shell commands with login-shell initialization disabled (`login: false`). This prevents fnm from trying to create sandboxed multishell cache symlinks.
+
 ## Architecture
 
 This is a Turborepo monorepo using pnpm workspaces.
