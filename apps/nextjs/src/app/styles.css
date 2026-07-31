@@ -1,0 +1,31 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@acme/tailwind-config/theme";
+
+@source "../../../../packages/ui/src/*.{ts,tsx}";
+@source "../../../../apps/convex/src/**/*.ts";
+
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
+@custom-variant auto (&:where(.auto, .auto *));
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+  @media (hover: none) {
+    &:active {
+      @slot;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
