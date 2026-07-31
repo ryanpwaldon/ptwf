@@ -8,12 +8,6 @@
  * @module
  */
 
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
-
 import type * as answers from "../answers.js";
 import type * as fields_animal from "../fields/animal.js";
 import type * as fields_character from "../fields/character.js";
@@ -26,6 +20,12 @@ import type * as migrations from "../migrations.js";
 import type * as players from "../players.js";
 import type * as questions from "../questions.js";
 import type * as quizmaster from "../quizmaster.js";
+
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
 
 declare const fullApi: ApiFromModules<{
   answers: typeof answers;

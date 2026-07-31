@@ -2,5 +2,5 @@ pre-commit:
   commands:
     format:
       glob: "*.{ts,tsx,js,jsx,mjs,cjs,json,md,mdx,css}"
-      run: pnpm exec prettier --write {staged_files}
+      run: pnpm exec prettier --write --ignore-path apps/convex/.prettierignore {staged_files}
       stage_fixed: true
