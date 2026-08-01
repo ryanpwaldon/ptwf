@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Pet Trivia With Friends";
+export const alt = "Who Knows Pets?";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -34,10 +34,9 @@ export default async function Image() {
             color: "white",
           }}
         >
-          <span>Pet</span>
-          <span>Trivia</span>
-          <span>With</span>
-          <span>Friends</span>
+          <span>Who</span>
+          <span>Knows</span>
+          <span>Pets?</span>
         </div>
       </div>
     ),

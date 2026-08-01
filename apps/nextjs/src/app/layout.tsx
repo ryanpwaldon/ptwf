@@ -13,9 +13,8 @@ import { ConvexProvider } from "~/components/convex-provider";
 import { UncaughtErrorToastListener } from "~/components/uncaught-error-toast-listener";
 
 export const metadata: Metadata = {
-  title: "Pet Trivia With Friends",
-  description:
-    "Put your pet-care knowledge to the test with friends in a live trivia game.",
+  title: "Who Knows Pets?",
+  description: "Put your pet-care know-how to the test with friends.",
 };
 
 export const viewport: Viewport = {

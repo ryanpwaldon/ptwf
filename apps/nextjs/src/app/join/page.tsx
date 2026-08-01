@@ -45,10 +45,10 @@ export default function JoinPage() {
       <main className="flex-1 px-4">
         <div className="mt-8">
           <h1 className="text-2xl font-extrabold tracking-tight">
-            Join a pet quiz
+            Join a game
           </h1>
           <p className="text-muted-foreground">
-            Enter the game code your friend shared.
+            Enter the code your friend shared.
           </p>
         </div>
         <Card className="mt-6 w-full">
@@ -72,7 +72,7 @@ export default function JoinPage() {
                         <Input
                           id={field.name}
                           name={field.name}
-                          placeholder="Enter game code"
+                          placeholder="Enter your code"
                           aria-invalid={hasError || undefined}
                           className="h-12 font-mono text-base! uppercase placeholder:normal-case"
                           value={field.state.value}

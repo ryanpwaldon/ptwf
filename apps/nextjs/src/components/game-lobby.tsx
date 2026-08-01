@@ -68,17 +68,19 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
       <main className="flex-1 px-4 pb-16">
         <div className="mt-8">
           <h1 className="text-2xl font-extrabold tracking-tight">
-            Pet trivia lobby
+            Get ready to play
           </h1>
           <p className="text-muted-foreground">
-            Pick an animal and care theme, then invite your friends.
+            Choose a pet and topic, then invite your friends.
           </p>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card className="w-full sm:col-span-2">
             <CardHeader className="border-b">
-              <CardTitle>Invite friends</CardTitle>
-              <CardDescription>Share the game code</CardDescription>
+              <CardTitle>Invite your friends</CardTitle>
+              <CardDescription>
+                Share this code so they can join.
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center">
               <InviteCodeField code={game.code} />
@@ -86,8 +88,8 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </Card>
           <Card className="sm:col-span-1">
             <CardHeader className="border-b">
-              <CardTitle>Avatar</CardTitle>
-              <CardDescription>Select your color</CardDescription>
+              <CardTitle>Your player</CardTitle>
+              <CardDescription>Choose your colour.</CardDescription>
             </CardHeader>
             <CardContent className="flex h-full items-center justify-center">
               <AvatarInput
@@ -102,8 +104,10 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </div>
         <Card className="mt-4">
           <CardHeader className="border-b">
-            <CardTitle>Animal</CardTitle>
-            <CardDescription>Choose a pet to quiz on</CardDescription>
+            <CardTitle>Choose a pet</CardTitle>
+            <CardDescription>
+              Which pet should the questions be about?
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex h-full flex-col gap-2">
             <AnimalInput
@@ -117,14 +121,16 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               }}
             />
             {isAnimalInvalid && (
-              <FieldError>Please select an animal.</FieldError>
+              <FieldError>
+                Choose a pet before marking yourself ready.
+              </FieldError>
             )}
           </CardContent>
         </Card>
         <Card className="mt-4">
           <CardHeader className="border-b">
-            <CardTitle>Care theme</CardTitle>
-            <CardDescription>Choose what the questions cover</CardDescription>
+            <CardTitle>Choose a topic</CardTitle>
+            <CardDescription>What should the questions cover?</CardDescription>
           </CardHeader>
           <CardContent className="flex h-full items-center">
             <ThemeInput
@@ -162,7 +168,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           onClick={() => void handleReadyToggle()}
           variant={me.isReady ? "outline" : "default"}
         >
-          {me.isReady ? "Waiting..." : "Start"}
+          {me.isReady ? "Ready ✓" : "I’m ready"}
         </Button>
       </div>
     </PageShell>

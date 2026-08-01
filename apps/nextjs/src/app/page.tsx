@@ -34,16 +34,17 @@ export default function HomePage() {
       <main className="flex flex-1 flex-col items-center px-4 py-24">
         <div className="2xs:w-1/2 aspect-2/3 w-3/4 bg-red-600 px-3 py-3">
           <h1 className="2xs:text-4xl text-3xl leading-none font-extrabold tracking-tight text-white">
-            Pet
+            Who
             <br />
-            Trivia
+            Knows
             <br />
-            With
-            <br />
-            Friends
+            Pets?
           </h1>
         </div>
-        <div className="2xs:w-1/2 flex w-3/4 flex-col gap-3 pt-12">
+        <p className="2xs:w-1/2 text-muted-foreground w-3/4 pt-6 text-center text-sm">
+          Put your pet-care know-how to the test with friends.
+        </p>
+        <div className="2xs:w-1/2 flex w-3/4 flex-col gap-3 pt-8">
           <Button
             size="xl"
             variant="default"
@@ -51,14 +52,14 @@ export default function HomePage() {
             disabled={isCreating}
             className="disabled:opacity-100"
           >
-            {isCreating ? <Loader className="size-6" /> : "Create a pet quiz"}
+            {isCreating ? <Loader className="size-6" /> : "Start a game"}
           </Button>
           <Button
             size="xl"
             variant="ghost"
             onClick={() => router.push("/join")}
           >
-            Join a pet quiz
+            Join with a code
           </Button>
         </div>
       </main>

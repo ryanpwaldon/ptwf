@@ -1,8 +1,8 @@
-# Pet Trivia With Friends (PTWF)
+# Who Knows Pets?
 
-Pet Trivia With Friends is a real-time multiplayer game about responsible pet care. Players join a shared lobby, choose an animal and a care theme, then answer a fresh set of multiple-choice questions together. Each game includes timed rounds, live answer tallies, and a final leaderboard.
+Who Knows Pets? is a real-time multiplayer game about responsible pet care. Players join a shared game, choose a pet and care topic, then answer a fresh set of multiple-choice questions together. Each game includes timed rounds, live answer tallies, and a final leaderboard.
 
-The initial animal catalogue includes dogs, cats, birds, and fish. Care themes cover diet and nutrition, grooming and bathing, health and wellbeing, behaviour and communication, training and enrichment, homes and habitats, and safety and first aid.
+The initial pet catalogue includes dogs, cats, birds, and fish. Care topics cover diet and nutrition, grooming and bathing, health and wellbeing, behaviour and communication, training and enrichment, homes and habitats, and safety and first aid.
 
 The app is built on Next.js with Convex as the serverless backend, providing a real-time database and live synchronisation across all connected clients. Pet-care question generation is handled by Gemini via OpenRouter, with a curated animal catalogue and original illustrations bundled into the app.
 
