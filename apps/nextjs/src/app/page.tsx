@@ -1,15 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import { ArrowUpRightIcon } from "lucide-react";
+import { KeyRoundIcon, PawPrintIcon } from "lucide-react";
 
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 
-import { Header } from "~/components/header";
 import { Loader } from "~/components/loader";
 import { PageShell } from "~/components/page-shell";
 
@@ -30,46 +28,47 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      <Header />
-      <main className="flex flex-1 flex-col items-center px-4 py-24">
-        <div className="2xs:w-1/2 aspect-2/3 w-3/4 bg-red-600 px-3 py-3">
-          <h1 className="2xs:text-4xl text-3xl leading-none font-extrabold tracking-tight text-white">
-            Who
-            <br />
-            Knows
-            <br />
-            Pets?
+      <main className="flex flex-1 items-center px-4 py-16">
+        <div className="flex w-full -translate-y-4 flex-col items-center text-center">
+          <h1 className="text-6xl leading-[0.95] font-medium tracking-[-0.07em] text-balance sm:whitespace-nowrap">
+            Who knows
+            <br className="sm:hidden" /> pets?
           </h1>
-        </div>
-        <p className="2xs:w-1/2 text-muted-foreground w-3/4 pt-6 text-center text-sm">
-          Put your pet-care know-how to the test with friends.
-        </p>
-        <div className="2xs:w-1/2 flex w-3/4 flex-col gap-3 pt-8">
-          <Button
-            size="xl"
-            variant="default"
-            onClick={handleCreate}
-            disabled={isCreating}
-            className="disabled:opacity-100"
-          >
-            {isCreating ? <Loader className="size-6" /> : "Start a game"}
-          </Button>
-          <Button
-            size="xl"
-            variant="ghost"
-            onClick={() => router.push("/join")}
-          >
-            Join with a code
-          </Button>
+
+          <p className="text-muted-foreground mt-8 max-w-md text-lg leading-relaxed sm:text-xl">
+            Put your pet-care know-how to the test with friends. See who really
+            knows pets best.
+          </p>
+
+          <div className="mt-10 flex w-full max-w-md flex-col gap-3 sm:flex-row">
+            <Button
+              size="xl"
+              variant="default"
+              onClick={handleCreate}
+              disabled={isCreating}
+              className="flex-none disabled:opacity-100 sm:flex-1"
+            >
+              {isCreating ? (
+                <Loader className="size-6" />
+              ) : (
+                <>
+                  <PawPrintIcon />
+                  Start a game
+                </>
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              size="xl"
+              onClick={() => router.push("/join")}
+              className="flex-none sm:flex-1"
+            >
+              <KeyRoundIcon />
+              Join with a code
+            </Button>
+          </div>
         </div>
       </main>
-      <footer className="flex h-16 items-center justify-end gap-4 px-1.5 text-sm">
-        <Button variant="link" asChild>
-          <Link href="https://github.com/ryanpwaldon/ptwf" target="_blank">
-            GitHub <ArrowUpRightIcon />
-          </Link>
-        </Button>
-      </footer>
     </PageShell>
   );
 }
