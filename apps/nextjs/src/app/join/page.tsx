@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { useSessionMutation } from "convex-helpers/react/sessions";
 import { ConvexError } from "convex/values";
+import { LoaderCircleIcon } from "lucide-react";
 import { z } from "zod";
 
 import { api, gameCodeZodSchema } from "@acme/convex";
@@ -14,7 +15,6 @@ import { Field, FieldError, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 
 import { Header } from "~/components/header";
-import { Loader } from "~/components/loader";
 import { PageShell } from "~/components/page-shell";
 
 export default function JoinPage() {
@@ -91,7 +91,7 @@ export default function JoinPage() {
                               className="disabled:opacity-100"
                             >
                               {isSubmitting ? (
-                                <Loader className="size-6" />
+                                <LoaderCircleIcon className="animate-spin" />
                               ) : (
                                 "Join"
                               )}

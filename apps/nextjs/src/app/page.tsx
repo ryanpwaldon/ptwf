@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import { KeyRoundIcon, PawPrintIcon } from "lucide-react";
+import { KeyRoundIcon, LoaderCircleIcon, PawPrintIcon } from "lucide-react";
 
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 
-import { Loader } from "~/components/loader";
 import { PageShell } from "~/components/page-shell";
 
 export default function HomePage() {
@@ -49,7 +48,7 @@ export default function HomePage() {
               className="flex-none disabled:opacity-100 sm:flex-1"
             >
               {isCreating ? (
-                <Loader className="size-6" />
+                <LoaderCircleIcon className="animate-spin" />
               ) : (
                 <>
                   <PawPrintIcon />
