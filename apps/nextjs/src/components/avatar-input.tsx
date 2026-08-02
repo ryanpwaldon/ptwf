@@ -57,10 +57,10 @@ export function AvatarInput({
           </Avatar>
         </Button>
       </CommandPickerTrigger>
-      <CommandPickerContent title="Choose an avatar">
-        <CommandPickerInput placeholder="Search avatars..." />
+      <CommandPickerContent title="Choose a pet">
+        <CommandPickerInput placeholder="Search pets..." />
         <CommandPickerList>
-          <CommandPickerEmpty>No avatars found.</CommandPickerEmpty>
+          <CommandPickerEmpty>No pets found.</CommandPickerEmpty>
           <CommandPickerGroup>
             {CHARACTER_OPTIONS.map((option) => (
               <CommandPickerItem

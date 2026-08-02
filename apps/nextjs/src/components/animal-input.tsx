@@ -69,15 +69,17 @@ export function AnimalInput({ value, onChange }: AnimalInputProps) {
         </Button>
       </CommandPickerTrigger>
 
-      <CommandPickerContent title="Choose a pet" shouldFilter={false}>
+      <CommandPickerContent title="Choose an animal" shouldFilter={false}>
         <CommandPickerInput
-          placeholder="Search pets..."
+          placeholder="Search animals..."
           value={search}
           onValueChange={setSearch}
         />
         <CommandPickerList>
-          <CommandPickerEmpty>No pets found.</CommandPickerEmpty>
-          <CommandPickerGroup heading={search ? undefined : "Available pets"}>
+          <CommandPickerEmpty>No animals found.</CommandPickerEmpty>
+          <CommandPickerGroup
+            heading={search ? undefined : "Available animals"}
+          >
             {filteredAnimals.map((animal) => (
               <CommandPickerItem
                 key={animal.value}

@@ -1,6 +1,6 @@
 # Who Knows Pets?
 
-Who Knows Pets? is a real-time multiplayer game about responsible pet care. Players join a shared game, choose a pet and care topic, then answer a fresh set of multiple-choice questions together. Each game includes timed rounds, live answer tallies, and a final leaderboard.
+Who Knows Pets? is a real-time multiplayer game about responsible pet care. Players join a shared game, choose pet avatars, then answer a fresh set of multiple-choice questions about a selected animal and care topic. Each game includes timed rounds, live answer tallies, and a final leaderboard.
 
 The initial pet catalogue includes dogs, cats, birds, and fish. Care topics cover diet and nutrition, grooming and bathing, health and wellbeing, behaviour and communication, training and enrichment, homes and habitats, and safety and first aid.
 
