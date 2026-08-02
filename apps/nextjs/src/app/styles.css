@@ -29,3 +29,89 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes paw-loader-step-1 {
+  0%,
+  37.5%,
+  100% {
+    opacity: 0;
+  }
+
+  50%,
+  87.5% {
+    opacity: 1;
+  }
+}
+
+@keyframes paw-loader-step-2 {
+  0%,
+  25%,
+  87.5%,
+  100% {
+    opacity: 0;
+  }
+
+  37.5%,
+  75% {
+    opacity: 1;
+  }
+}
+
+@keyframes paw-loader-step-3 {
+  0%,
+  12.5%,
+  75%,
+  100% {
+    opacity: 0;
+  }
+
+  25%,
+  62.5% {
+    opacity: 1;
+  }
+}
+
+@keyframes paw-loader-step-4 {
+  0%,
+  62.5%,
+  100% {
+    opacity: 0;
+  }
+
+  12.5%,
+  50% {
+    opacity: 1;
+  }
+}
+
+@layer components {
+  .paw-loader-step {
+    animation-duration: 1.2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    opacity: 0;
+  }
+
+  .paw-loader-step:nth-child(1) {
+    animation-name: paw-loader-step-1;
+  }
+
+  .paw-loader-step:nth-child(2) {
+    animation-name: paw-loader-step-2;
+  }
+
+  .paw-loader-step:nth-child(3) {
+    animation-name: paw-loader-step-3;
+  }
+
+  .paw-loader-step:nth-child(4) {
+    animation-name: paw-loader-step-4;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .paw-loader-step {
+      animation: none;
+      opacity: 1;
+    }
+  }
+}
