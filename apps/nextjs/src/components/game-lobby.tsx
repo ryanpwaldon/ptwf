@@ -154,7 +154,14 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           onClick={() => void handleReadyToggle()}
           variant={me.isReady ? "outline" : "default"}
         >
-          {me.isReady ? "Ready ✓" : "I’m ready"}
+          {me.isReady ? (
+            <>
+              Ready
+              <CheckIcon data-icon="inline-end" aria-hidden="true" />
+            </>
+          ) : (
+            "I’m ready"
+          )}
         </Button>
       </div>
     </PageShell>
