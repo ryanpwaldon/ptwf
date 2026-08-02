@@ -33,7 +33,7 @@ function Avatar({
   return (
     <Tooltip disableHoverableContent>
       <TooltipTrigger asChild>{avatar}</TooltipTrigger>
-      <TooltipContent>{tooltip}</TooltipContent>
+      <TooltipContent className="pointer-events-none">{tooltip}</TooltipContent>
     </Tooltip>
   );
 }
