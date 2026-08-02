@@ -1,6 +1,6 @@
 import type { Character } from "@acme/convex";
 import { cn } from "@acme/ui";
-import { Avatar, AvatarFallback } from "@acme/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Badge } from "@acme/ui/badge";
 import {
   Table,
@@ -49,7 +49,14 @@ export function Leaderboard({
                   {i + 1}.
                 </span>
                 <Avatar size="2xs" tooltip={entry.character.label}>
-                  <AvatarFallback className={entry.character.color} />
+                  <AvatarImage
+                    src={entry.character.image}
+                    alt={`${entry.character.label} avatar`}
+                    className="object-cover"
+                  />
+                  <AvatarFallback>
+                    {entry.character.label.slice(0, 2)}
+                  </AvatarFallback>
                 </Avatar>
                 <span>{entry.character.label}</span>
                 {myCharacterValue === entry.character.value && (

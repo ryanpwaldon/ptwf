@@ -2,12 +2,12 @@ import type { ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
 import type { Character } from "@acme/convex";
-import { cn } from "@acme/ui";
 import {
   Avatar,
   AvatarFallback,
   AvatarGroup,
   AvatarGroupCount,
+  AvatarImage,
 } from "@acme/ui/avatar";
 
 type AvatarSize = "2xs" | "xs" | "default" | "sm" | "lg";
@@ -41,7 +41,12 @@ export function PlayerGroup({
             tooltip={character.label}
             className={animateEntrance ? "ring-background ring-2" : undefined}
           >
-            <AvatarFallback className={cn(character.color)} />
+            <AvatarImage
+              src={character.image}
+              alt={`${character.label} avatar`}
+              className="object-cover"
+            />
+            <AvatarFallback>{character.label.slice(0, 2)}</AvatarFallback>
             <AnimatePresence>
               {badge && (
                 <motion.div

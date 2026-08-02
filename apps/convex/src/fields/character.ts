@@ -2,89 +2,54 @@ import { v } from "convex/values";
 
 export const CHARACTER_OPTIONS = [
   {
-    value: "red",
-    label: "Red",
-    color: "bg-red-500",
+    value: "apricot",
+    label: "Apricot",
+    image: "/players/apricot.png",
   },
   {
-    value: "orange",
-    label: "Orange",
-    color: "bg-orange-500",
+    value: "aqua",
+    label: "Aqua",
+    image: "/players/aqua.png",
   },
   {
-    value: "amber",
-    label: "Amber",
-    color: "bg-amber-500",
+    value: "coral",
+    label: "Coral",
+    image: "/players/coral.png",
   },
   {
-    value: "yellow",
-    label: "Yellow",
-    color: "bg-yellow-500",
+    value: "lavender",
+    label: "Lavender",
+    image: "/players/lavender.png",
+  },
+  {
+    value: "lemon",
+    label: "Lemon",
+    image: "/players/lemon.png",
   },
   {
     value: "lime",
     label: "Lime",
-    color: "bg-lime-500",
+    image: "/players/lime.png",
   },
   {
-    value: "green",
-    label: "Green",
-    color: "bg-green-500",
+    value: "mint",
+    label: "Mint",
+    image: "/players/mint.png",
   },
   {
-    value: "emerald",
-    label: "Emerald",
-    color: "bg-emerald-500",
-  },
-  {
-    value: "teal",
-    label: "Teal",
-    color: "bg-teal-500",
-  },
-  {
-    value: "cyan",
-    label: "Cyan",
-    color: "bg-cyan-500",
-  },
-  {
-    value: "sky",
-    label: "Sky",
-    color: "bg-sky-500",
-  },
-  {
-    value: "blue",
-    label: "Blue",
-    color: "bg-blue-500",
-  },
-  {
-    value: "indigo",
-    label: "Indigo",
-    color: "bg-indigo-500",
-  },
-  {
-    value: "violet",
-    label: "Violet",
-    color: "bg-violet-500",
-  },
-  {
-    value: "purple",
-    label: "Purple",
-    color: "bg-purple-500",
-  },
-  {
-    value: "fuchsia",
-    label: "Fuchsia",
-    color: "bg-fuchsia-500",
-  },
-  {
-    value: "pink",
-    label: "Pink",
-    color: "bg-pink-500",
+    value: "peach",
+    label: "Peach",
+    image: "/players/peach.png",
   },
   {
     value: "rose",
     label: "Rose",
-    color: "bg-rose-500",
+    image: "/players/rose.png",
+  },
+  {
+    value: "violet",
+    label: "Violet",
+    image: "/players/violet.png",
   },
 ] as const;
 

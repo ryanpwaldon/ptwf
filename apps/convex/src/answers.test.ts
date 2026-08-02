@@ -28,13 +28,13 @@ async function setupActiveGameWithPlayers(t: ReturnType<typeof convexTest>) {
     const playerId = await ctx.db.insert("players", {
       gameId,
       sessionId: SESSION_1,
-      character: "red",
+      character: "apricot",
       isReady: true,
     });
     await ctx.db.insert("players", {
       gameId,
       sessionId: SESSION_2,
-      character: "blue",
+      character: "aqua",
       isReady: true,
     });
     await ctx.db.insert("questions", {

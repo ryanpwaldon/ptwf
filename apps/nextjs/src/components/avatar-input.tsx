@@ -5,7 +5,12 @@ import { Pencil } from "lucide-react";
 
 import type { CharacterValue } from "@acme/convex";
 import { CHARACTER_OPTIONS, getCharacterByValue } from "@acme/convex";
-import { Avatar, AvatarBadge, AvatarFallback } from "@acme/ui/avatar";
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarFallback,
+  AvatarImage,
+} from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import {
   CommandPicker,
@@ -40,17 +45,22 @@ export function AvatarInput({
           className="size-auto cursor-pointer rounded-full p-0"
         >
           <Avatar size="lg" tooltip={character.label}>
-            <AvatarFallback className={character.color} />
+            <AvatarImage
+              src={character.image}
+              alt={`${character.label} avatar`}
+              className="object-cover"
+            />
+            <AvatarFallback>{character.label.slice(0, 2)}</AvatarFallback>
             <AvatarBadge>
               <Pencil />
             </AvatarBadge>
           </Avatar>
         </Button>
       </CommandPickerTrigger>
-      <CommandPickerContent title="Choose a colour">
-        <CommandPickerInput placeholder="Search colours..." />
+      <CommandPickerContent title="Choose an avatar">
+        <CommandPickerInput placeholder="Search avatars..." />
         <CommandPickerList>
-          <CommandPickerEmpty>No colours found.</CommandPickerEmpty>
+          <CommandPickerEmpty>No avatars found.</CommandPickerEmpty>
           <CommandPickerGroup>
             {CHARACTER_OPTIONS.map((option) => (
               <CommandPickerItem
@@ -63,10 +73,14 @@ export function AvatarInput({
                   setOpen(false);
                 }}
               >
-                <div
-                  aria-hidden
-                  className={`size-6 shrink-0 rounded-full ${option.color}`}
-                />
+                <Avatar size="sm">
+                  <AvatarImage
+                    src={option.image}
+                    alt=""
+                    className="object-cover"
+                  />
+                  <AvatarFallback>{option.label.slice(0, 2)}</AvatarFallback>
+                </Avatar>
                 <span className="text-sm font-medium">{option.label}</span>
               </CommandPickerItem>
             ))}

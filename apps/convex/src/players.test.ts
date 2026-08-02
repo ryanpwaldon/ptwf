@@ -38,13 +38,13 @@ async function setupLobbyGameWithPlayers(t: ReturnType<typeof convexTest>) {
     const player1Id = await ctx.db.insert("players", {
       gameId,
       sessionId: SESSION_1,
-      character: "red",
+      character: "apricot",
       isReady: false,
     });
     await ctx.db.insert("players", {
       gameId,
       sessionId: SESSION_2,
-      character: "blue",
+      character: "aqua",
       isReady: false,
     });
     return { gameId, player1Id };
