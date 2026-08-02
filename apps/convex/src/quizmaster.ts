@@ -5,10 +5,12 @@ import { generateText, Output } from "ai";
 import { v } from "convex/values";
 import { z } from "zod";
 
+import type { QuizAnimal } from "./fields/quizAnimal";
 import type { QuizTheme } from "./fields/quizTheme";
 import type { QuizTone } from "./fields/quizTone";
 import { internal } from "./_generated/api";
 import { internalAction } from "./_generated/server";
+import { getQuizAnimalByValue } from "./fields/quizAnimal";
 import { getQuizThemeByValue } from "./fields/quizTheme";
 
 const openrouter = createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
@@ -26,7 +28,7 @@ export const generateQuestions = internalAction({
 
       const prompt = buildPrompt({
         questionCount: gameConfig.questionCount,
-        quizAnimal: gameConfig.quizAnimal,
+        quizAnimalValue: gameConfig.quizAnimal,
         quizThemeValue: gameConfig.quizTheme,
         quizToneValue: gameConfig.quizTone,
       });
@@ -102,16 +104,12 @@ function buildQuestionSchema(questionCount: number) {
 
 export function buildPrompt(config: {
   questionCount: number;
-  quizAnimal: {
-    value: string;
-    label: string;
-    description: string;
-    imagePath: string;
-  };
+  quizAnimalValue: QuizAnimal;
   quizThemeValue: QuizTheme;
   quizToneValue: QuizTone;
 }): string {
-  const { quizAnimal, quizThemeValue, questionCount } = config;
+  const { quizAnimalValue, quizThemeValue, questionCount } = config;
+  const quizAnimal = getQuizAnimalByValue(quizAnimalValue);
   const quizTheme = getQuizThemeByValue(quizThemeValue);
 
   return [

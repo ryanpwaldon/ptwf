@@ -16,7 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
-import { FieldError } from "@acme/ui/field";
 
 import { Header } from "~/components/header";
 import { InviteCodeField } from "~/components/invite-code-field";
@@ -46,14 +45,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   const takenCharacterValues = players.filter((p) => p.character !== me.character).map((p) => p.character); // prettier-ignore
   const readyByCharacter = new Map(players.map((p) => [p.character, p.isReady])); // prettier-ignore
 
-  const [hasAttemptedReady, setHasAttemptedReady] = useState(false);
-  const isAnimalInvalid = hasAttemptedReady && !game.quizAnimal;
-
   async function handleReadyToggle() {
-    if (!game.quizAnimal) {
-      setHasAttemptedReady(true);
-      return;
-    }
     setIsUpdatingReady(true);
     try {
       await updateIsReady({ gameId: game._id, isReady: !me.isReady });
@@ -109,22 +101,16 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               Which pet should the questions be about?
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex h-full flex-col gap-2">
+          <CardContent className="flex h-full items-center">
             <AnimalInput
               value={game.quizAnimal}
-              invalid={isAnimalInvalid || undefined}
-              onChange={(animal) => {
+              onChange={(quizAnimal) => {
                 void updateQuizAnimal({
                   gameId: game._id,
-                  quizAnimal: animal,
+                  quizAnimal,
                 });
               }}
             />
-            {isAnimalInvalid && (
-              <FieldError>
-                Choose a pet before marking yourself ready.
-              </FieldError>
-            )}
           </CardContent>
         </Card>
         <Card className="mt-4">

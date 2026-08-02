@@ -2,7 +2,7 @@ import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { internalMutation, internalQuery } from "./_generated/server";
-import { animalValidator } from "./fields/animal";
+import { quizAnimalValidator } from "./fields/quizAnimal";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
 
@@ -10,14 +10,13 @@ export const getGameConfig = internalQuery({
   args: { gameId: v.id("games") },
   returns: v.object({
     questionCount: v.number(),
-    quizAnimal: animalValidator,
+    quizAnimal: quizAnimalValidator,
     quizTheme: quizThemeValidator,
     quizTone: quizToneValidator,
   }),
   handler: async (ctx, args) => {
     const game = await ctx.db.get(args.gameId);
     if (!game) throw new Error("Game not found.");
-    if (!game.quizAnimal) throw new Error("No animal selected.");
     return {
       questionCount: game.questionCount,
       quizAnimal: game.quizAnimal,

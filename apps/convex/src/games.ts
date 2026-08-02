@@ -5,9 +5,9 @@ import { ConvexError, v } from "convex/values";
 
 import type { DataModel, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-import { animalValidator } from "./fields/animal";
 import { CHARACTER_OPTIONS } from "./fields/character";
 import { gameCodeValidator, generateGameCode } from "./fields/gameCode";
+import { quizAnimalValidator } from "./fields/quizAnimal";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
 import schema from "./schema";
@@ -35,7 +35,7 @@ export const create = mutation({
     const gameId = await ctx.db.insert("games", {
       code,
       status: "lobby",
-      quizAnimal: null,
+      quizAnimal: "dogs",
       quizTone: "standard",
       quizTheme: "diet-and-nutrition",
       questionCount: 10,
@@ -82,7 +82,7 @@ export const updateQuizAnimal = mutation({
   args: {
     ...SessionIdArg,
     gameId: v.id("games"),
-    quizAnimal: animalValidator,
+    quizAnimal: quizAnimalValidator,
   },
   returns: v.null(),
   handler: async (ctx, args) => {

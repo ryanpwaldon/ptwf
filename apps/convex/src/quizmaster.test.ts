@@ -1,20 +1,14 @@
 import { describe, expect, it } from "vitest";
 
+import { QUIZ_ANIMAL_OPTIONS } from "./fields/quizAnimal";
 import { QUIZ_THEME_OPTIONS } from "./fields/quizTheme";
 import { buildPrompt, labelAt, transformQuestions } from "./quizmaster";
 
 const DIET_THEME = QUIZ_THEME_OPTIONS[0];
 
-const BASE_ANIMAL = {
-  value: "dogs",
-  label: "Dogs",
-  description: "Canine nutrition, grooming, training, and wellbeing.",
-  imagePath: "/animals/dogs.webp",
-};
-
 const BASE_CONFIG = {
   questionCount: 5,
-  quizAnimal: BASE_ANIMAL,
+  quizAnimalValue: "dogs" as const,
   quizThemeValue: DIET_THEME.value,
   quizToneValue: "standard" as const,
 };
@@ -66,10 +60,8 @@ describe("buildPrompt", () => {
   it("includes the animal label and care scope", () => {
     const prompt = buildPrompt(BASE_CONFIG);
 
-    expect(prompt).toContain("Dogs");
-    expect(prompt).toContain(
-      "Canine nutrition, grooming, training, and wellbeing.",
-    );
+    expect(prompt).toContain(QUIZ_ANIMAL_OPTIONS[0].label);
+    expect(prompt).toContain(QUIZ_ANIMAL_OPTIONS[0].description);
   });
 
   it("includes the question count", () => {

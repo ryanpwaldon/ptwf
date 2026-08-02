@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { PawPrint, Search } from "lucide-react";
+import { PawPrint } from "lucide-react";
 
+import type { QuizAnimal } from "@acme/convex";
+import { getQuizAnimalByValue, QUIZ_ANIMAL_OPTIONS } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 import {
   CommandPicker,
@@ -15,28 +17,26 @@ import {
   CommandPickerTrigger,
 } from "@acme/ui/command-picker";
 
-import type { Animal } from "~/lib/animals";
 import { ImageWithFallback } from "~/components/image-with-fallback";
-import { animals } from "~/lib/animals";
 
 interface AnimalInputProps {
-  value: Animal | null;
-  onChange: (value: Animal) => void;
-  invalid?: boolean;
+  value: QuizAnimal;
+  onChange: (value: QuizAnimal) => void;
 }
 
-export function AnimalInput({ value, onChange, invalid }: AnimalInputProps) {
+export function AnimalInput({ value, onChange }: AnimalInputProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const selected = getQuizAnimalByValue(value);
 
   const normalizedSearch = search.trim().toLocaleLowerCase();
   const filteredAnimals = normalizedSearch
-    ? animals.filter((animal) =>
+    ? QUIZ_ANIMAL_OPTIONS.filter((animal) =>
         `${animal.label} ${animal.description}`
           .toLocaleLowerCase()
           .includes(normalizedSearch),
       )
-    : animals;
+    : QUIZ_ANIMAL_OPTIONS;
 
   return (
     <CommandPicker
@@ -46,41 +46,28 @@ export function AnimalInput({ value, onChange, invalid }: AnimalInputProps) {
         if (nextOpen) setSearch("");
       }}
     >
-      {value ? (
-        <CommandPickerTrigger asChild>
-          <Button
-            variant="outline"
-            className="h-22 w-full cursor-pointer justify-start gap-0 overflow-hidden p-0 whitespace-normal transition-colors!"
-          >
-            <ImageWithFallback
-              fill
-              alt={`${value.label} illustration`}
-              src={value.imagePath}
-              icon={<PawPrint className="text-muted-foreground size-1/3" />}
-              containerClassName="aspect-2/3 h-full shrink-0"
-            />
-            <div className="min-w-0 px-3">
-              <div className="truncate text-left font-medium">
-                {value.label}
-              </div>
-              <p className="text-muted-foreground line-clamp-2 text-left text-sm font-normal">
-                {value.description}
-              </p>
+      <CommandPickerTrigger asChild>
+        <Button
+          variant="outline"
+          className="h-22 w-full cursor-pointer justify-start gap-0 overflow-hidden p-0 whitespace-normal transition-colors!"
+        >
+          <ImageWithFallback
+            fill
+            alt={`${selected.label} illustration`}
+            src={selected.imagePath}
+            icon={<PawPrint className="text-muted-foreground size-1/3" />}
+            containerClassName="aspect-2/3 h-full shrink-0"
+          />
+          <div className="min-w-0 px-3">
+            <div className="truncate text-left font-medium">
+              {selected.label}
             </div>
-          </Button>
-        </CommandPickerTrigger>
-      ) : (
-        <CommandPickerTrigger asChild>
-          <Button
-            variant="outline"
-            aria-invalid={invalid}
-            className="text-muted-foreground h-22 w-full cursor-pointer border-dashed"
-          >
-            <Search className="size-5" />
-            <span className="text-sm font-medium">Choose a pet</span>
-          </Button>
-        </CommandPickerTrigger>
-      )}
+            <p className="text-muted-foreground line-clamp-2 text-left text-sm font-normal">
+              {selected.description}
+            </p>
+          </div>
+        </Button>
+      </CommandPickerTrigger>
 
       <CommandPickerContent title="Choose a pet" shouldFilter={false}>
         <CommandPickerInput
@@ -95,9 +82,9 @@ export function AnimalInput({ value, onChange, invalid }: AnimalInputProps) {
               <CommandPickerItem
                 key={animal.value}
                 value={animal.value}
-                data-checked={value?.value === animal.value}
+                data-checked={value === animal.value}
                 onSelect={() => {
-                  onChange(animal);
+                  onChange(animal.value);
                   setOpen(false);
                 }}
               >

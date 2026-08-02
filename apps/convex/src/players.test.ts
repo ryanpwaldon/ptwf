@@ -15,7 +15,7 @@ const STRANGER = "stranger" as unknown as SessionId;
 const BASE_GAME = {
   code: GAME_CODE,
   status: "lobby",
-  quizAnimal: null,
+  quizAnimal: "dogs",
   quizTone: "standard",
   quizTheme: "diet-and-nutrition",
   questionCount: 5,
@@ -173,27 +173,6 @@ describe("players.updateIsReady", () => {
     ).rejects.toThrowError("Player not found.");
   });
 
-  it("throws when all players are ready but quizAnimal is null", async () => {
-    const t = convexTest(schema, modules);
-    const { gameId } = await setupLobbyGameWithPlayers(t);
-
-    // Mark session-1 ready first.
-    await t.mutation(api.players.updateIsReady, {
-      sessionId: SESSION_1,
-      gameId,
-      isReady: true,
-    });
-
-    // Marking session-2 ready satisfies "all ready"; the game has no animal.
-    await expect(
-      t.mutation(api.players.updateIsReady, {
-        sessionId: SESSION_2,
-        gameId,
-        isReady: true,
-      }),
-    ).rejects.toThrowError("No animal selected.");
-  });
-
   it("updates isReady to true", async () => {
     const t = convexTest(schema, modules);
     const { gameId, player1Id } = await setupLobbyGameWithPlayers(t);
@@ -287,17 +266,6 @@ describe("players.updateIsReady", () => {
   it("schedules generateQuestions and sets status to generating when last player marks ready", async () => {
     const t = convexTest(schema, modules);
     const { gameId } = await setupLobbyGameWithPlayers(t);
-
-    await t.run((ctx) =>
-      ctx.db.patch(gameId, {
-        quizAnimal: {
-          value: "dogs",
-          label: "Dogs",
-          description: "Canine care.",
-          imagePath: "/animals/dogs.webp",
-        },
-      }),
-    );
 
     // Intercept the 0ms scheduler timer before it fires.
     vi.useFakeTimers();

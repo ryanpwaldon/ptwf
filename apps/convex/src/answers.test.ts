@@ -17,7 +17,7 @@ async function setupActiveGameWithPlayers(t: ReturnType<typeof convexTest>) {
       code: "XXXXXX",
       status: "active",
       phase: "answering",
-      quizAnimal: null,
+      quizAnimal: "dogs",
       quizTone: "standard",
       quizTheme: "diet-and-nutrition",
       questionCount: 5,

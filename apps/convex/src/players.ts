@@ -145,8 +145,6 @@ export const updateIsReady = mutation({
         p._id === player._id ? true : p.isReady,
       );
       if (!allReady) return;
-      if (!game.quizAnimal) throw new ConvexError("No animal selected.");
-
       // Generate questions.
       await ctx.db.patch(args.gameId, { status: "generating" });
       await ctx.scheduler.runAfter(0, internal.quizmaster.generateQuestions, {
