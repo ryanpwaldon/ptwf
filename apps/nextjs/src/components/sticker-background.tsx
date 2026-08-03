@@ -40,7 +40,6 @@ export interface StickerBackgroundSettings {
   jitter: number;
   edgeBleed: number;
   centerClearance: number;
-  blur: number;
   opacity: number;
   shadowX: number;
   shadowY: number;
@@ -90,12 +89,11 @@ export const stickerBackgroundDefaults: StickerBackgroundSettings = {
   jitter: 58,
   edgeBleed: 56,
   centerClearance: 45,
-  blur: 0,
   opacity: 100,
   shadowX: 0,
   shadowY: 10,
-  shadowBlur: 0,
-  shadowOpacity: 0,
+  shadowBlur: 26,
+  shadowOpacity: 24,
   showGuides: false,
 };
 
@@ -243,7 +241,6 @@ export function StickerBackground({
   jitter = stickerBackgroundDefaults.jitter,
   edgeBleed = stickerBackgroundDefaults.edgeBleed,
   centerClearance = stickerBackgroundDefaults.centerClearance,
-  blur = stickerBackgroundDefaults.blur,
   opacity = stickerBackgroundDefaults.opacity,
   shadowX = stickerBackgroundDefaults.shadowX,
   shadowY = stickerBackgroundDefaults.shadowY,
@@ -264,7 +261,6 @@ export function StickerBackground({
       jitter,
       edgeBleed,
       centerClearance,
-      blur,
       opacity,
       shadowX,
       shadowY,
@@ -280,7 +276,6 @@ export function StickerBackground({
       jitter,
       edgeBleed,
       centerClearance,
-      blur,
       opacity,
       shadowX,
       shadowY,
@@ -330,10 +325,7 @@ export function StickerBackground({
         : [],
     [activeSeed, layoutSize, settings],
   );
-  const filter =
-    settings.blur === 0 && settings.shadowOpacity === 0
-      ? "none"
-      : `blur(${settings.blur}px) drop-shadow(${settings.shadowX}px ${settings.shadowY}px ${settings.shadowBlur}px rgb(0 0 0 / ${settings.shadowOpacity / 100}))`;
+  const filter = `drop-shadow(${settings.shadowX}px ${settings.shadowY}px ${settings.shadowBlur}px rgb(0 0 0 / ${settings.shadowOpacity / 100}))`;
 
   const updateSetting = useCallback(
     <Key extends keyof StickerBackgroundSettings>(
@@ -498,15 +490,6 @@ export function StickerBackground({
                   max={100}
                   suffix="%"
                   onChange={(value) => updateSetting("opacity", value)}
-                />
-                <RangeControl
-                  label="Blur"
-                  value={settings.blur}
-                  min={0}
-                  max={8}
-                  step={0.5}
-                  suffix="px"
-                  onChange={(value) => updateSetting("blur", value)}
                 />
                 <RangeControl
                   label="Shadow X"
