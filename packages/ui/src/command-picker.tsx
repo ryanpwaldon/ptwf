@@ -12,8 +12,10 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandItemEnd,
   CommandList,
   CommandLoading,
+  CommandShortcut,
 } from "@acme/ui/command";
 import {
   Dialog,
@@ -145,6 +147,8 @@ export {
   CommandPickerList,
   CommandPickerGroup,
   CommandPickerItem,
+  CommandItemEnd,
   CommandPickerEmpty,
   CommandPickerLoading,
+  CommandShortcut,
 };

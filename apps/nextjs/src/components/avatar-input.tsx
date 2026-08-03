@@ -11,8 +11,10 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@acme/ui/avatar";
+import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import {
+  CommandItemEnd,
   CommandPicker,
   CommandPickerContent,
   CommandPickerEmpty,
@@ -73,7 +75,7 @@ export function AvatarInput({
                   setOpen(false);
                 }}
               >
-                <Avatar size="sm">
+                <Avatar>
                   <AvatarImage
                     src={option.image}
                     alt=""
@@ -82,6 +84,11 @@ export function AvatarInput({
                   <AvatarFallback>{option.label.slice(0, 2)}</AvatarFallback>
                 </Avatar>
                 <span className="text-sm font-medium">{option.label}</span>
+                {takenValues.includes(option.value) ? (
+                  <CommandItemEnd>
+                    <Badge variant="secondary">Taken</Badge>
+                  </CommandItemEnd>
+                ) : null}
               </CommandPickerItem>
             ))}
           </CommandPickerGroup>
