@@ -34,7 +34,7 @@ export function Choice({
       data-show-results={showResults}
       data-correct-answer={isCorrectAnswer}
       className={cn(
-        "group/choice relative",
+        "group/choice bg-card relative",
         "data-[show-results=true]:data-[correct-answer=true]:border-correct data-[show-results=true]:data-[correct-answer=true]:bg-correct/30",
         "data-[show-results=true]:data-[correct-answer=false]:has-data-[state=checked]:border-incorrect data-[show-results=true]:data-[correct-answer=false]:has-data-[state=checked]:bg-incorrect/30",
       )}
