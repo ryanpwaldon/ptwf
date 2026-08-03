@@ -34,7 +34,7 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      <PawTrailBackground showControls />
+      <PawTrailBackground spacing={320} />
       <Header className="relative z-10">
         <HeaderTitle>Who Knows Pets?</HeaderTitle>
         <HeaderMenu>
