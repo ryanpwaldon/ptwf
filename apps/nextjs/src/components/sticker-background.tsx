@@ -176,7 +176,7 @@ function buildPlacements(
 
     const variance = settings.sizeVariance / 100;
     return {
-      id: `${index}-${Math.round(x)}-${Math.round(y)}`,
+      id: `${seed}-${index}`,
       source:
         stickerSources[Math.floor(random() * stickerSources.length)] ??
         stickerSources[0],
@@ -285,10 +285,7 @@ export function StickerBackground({
   const settingsRef = useRef(initialSettings);
   const [activeSeed, setActiveSeed] = useState(seed);
   const [panelOpen, setPanelOpen] = useState(true);
-  const [layoutSize, setLayoutSize] = useState<LayoutSize>({
-    width: 1440,
-    height: 900,
-  });
+  const [layoutSize, setLayoutSize] = useState<LayoutSize | null>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
 
@@ -308,7 +305,7 @@ export function StickerBackground({
   }, []);
 
   const placements = useMemo(
-    () => buildPlacements(layoutSize, settings, activeSeed),
+    () => (layoutSize ? buildPlacements(layoutSize, settings, activeSeed) : []),
     [activeSeed, layoutSize, settings],
   );
   const filter =
@@ -345,7 +342,7 @@ export function StickerBackground({
         )}
         aria-hidden="true"
       >
-        {settings.showGuides ? (
+        {settings.showGuides && layoutSize ? (
           <div className="border-foreground/25 absolute inset-4 z-20 border border-dashed">
             <span className="bg-background text-muted-foreground absolute top-2 left-2 rounded-md px-1.5 py-1 text-[11px] tabular-nums">
               {Math.round(layoutSize.width)} × {Math.round(layoutSize.height)}
