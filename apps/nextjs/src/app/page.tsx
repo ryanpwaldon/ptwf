@@ -8,6 +8,12 @@ import { KeyRoundIcon, LoaderCircleIcon, PawPrintIcon } from "lucide-react";
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 
+import {
+  Header,
+  HeaderMenu,
+  HeaderThemeItem,
+  HeaderTitle,
+} from "~/components/header";
 import { PageShell } from "~/components/page-shell";
 
 export default function HomePage() {
@@ -27,6 +33,12 @@ export default function HomePage() {
 
   return (
     <PageShell>
+      <Header>
+        <HeaderTitle>Who Knows Pets?</HeaderTitle>
+        <HeaderMenu>
+          <HeaderThemeItem />
+        </HeaderMenu>
+      </Header>
       <main className="flex flex-1 items-center px-4 py-16">
         <div className="flex w-full -translate-y-4 flex-col items-center text-center">
           <h1 className="text-6xl leading-[0.95] font-medium tracking-[-0.07em] text-balance sm:whitespace-nowrap">

@@ -7,7 +7,14 @@ import { getCharacterByValue } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
 
-import { Header } from "~/components/header";
+import {
+  Header,
+  HeaderExitGameItem,
+  HeaderMenu,
+  HeaderMenuSeparator,
+  HeaderThemeItem,
+  HeaderTitle,
+} from "~/components/header";
 import { Leaderboard } from "~/components/leaderboard";
 import { QuestionResult } from "~/components/question-result";
 import { PageShell } from "./page-shell";
@@ -80,7 +87,14 @@ export function GameResults({
 
   return (
     <PageShell>
-      <Header />
+      <Header>
+        <HeaderTitle>Game results</HeaderTitle>
+        <HeaderMenu>
+          <HeaderThemeItem />
+          <HeaderMenuSeparator />
+          <HeaderExitGameItem />
+        </HeaderMenu>
+      </Header>
       <main className="flex-1 px-4 pb-16">
         <div className="mt-8">
           <h1 className="text-2xl font-extrabold tracking-tight">
@@ -114,7 +128,7 @@ export function GameResults({
       </main>
       <div className="bg-background/95 sticky bottom-0 mt-4 flex justify-end gap-4 border-t p-4 backdrop-blur">
         <Button size="xl" variant="default" asChild>
-          <Link href="/">Play again</Link>
+          <Link href="/">Return home</Link>
         </Button>
       </div>
     </PageShell>

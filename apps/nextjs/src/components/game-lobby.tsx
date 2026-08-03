@@ -17,7 +17,14 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
-import { Header } from "~/components/header";
+import {
+  Header,
+  HeaderExitGameItem,
+  HeaderMenu,
+  HeaderMenuSeparator,
+  HeaderThemeItem,
+  HeaderTitle,
+} from "~/components/header";
 import { InviteCodeField } from "~/components/invite-code-field";
 import { AnimalInput } from "./animal-input";
 import { AvatarInput } from "./avatar-input";
@@ -57,7 +64,14 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
 
   return (
     <PageShell>
-      <Header />
+      <Header>
+        <HeaderTitle>Game lobby</HeaderTitle>
+        <HeaderMenu>
+          <HeaderThemeItem />
+          <HeaderMenuSeparator />
+          <HeaderExitGameItem />
+        </HeaderMenu>
+      </Header>
       <main className="flex-1 px-4 pb-16">
         <div className="mt-8">
           <h1 className="text-2xl font-extrabold tracking-tight">
