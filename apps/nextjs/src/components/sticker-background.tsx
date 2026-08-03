@@ -94,8 +94,8 @@ export const stickerBackgroundDefaults: StickerBackgroundSettings = {
   opacity: 100,
   shadowX: 0,
   shadowY: 10,
-  shadowBlur: 26,
-  shadowOpacity: 24,
+  shadowBlur: 0,
+  shadowOpacity: 0,
   showGuides: false,
 };
 
@@ -311,7 +311,10 @@ export function StickerBackground({
     () => buildPlacements(layoutSize, settings, activeSeed),
     [activeSeed, layoutSize, settings],
   );
-  const filter = `blur(${settings.blur}px) drop-shadow(${settings.shadowX}px ${settings.shadowY}px ${settings.shadowBlur}px rgb(0 0 0 / ${settings.shadowOpacity / 100}))`;
+  const filter =
+    settings.blur === 0 && settings.shadowOpacity === 0
+      ? "none"
+      : `blur(${settings.blur}px) drop-shadow(${settings.shadowX}px ${settings.shadowY}px ${settings.shadowBlur}px rgb(0 0 0 / ${settings.shadowOpacity / 100}))`;
 
   const updateSetting = useCallback(
     <Key extends keyof StickerBackgroundSettings>(
