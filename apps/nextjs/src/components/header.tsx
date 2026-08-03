@@ -9,6 +9,7 @@ import {
   SunMoonIcon,
 } from "lucide-react";
 
+import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import {
   DropdownMenu,
@@ -19,9 +20,14 @@ import {
 } from "@acme/ui/dropdown-menu";
 import { useTheme } from "@acme/ui/theme";
 
-export function Header({ children }: PropsWithChildren) {
+export function Header({
+  children,
+  className,
+}: PropsWithChildren<{ className?: string }>) {
   return (
-    <header className="flex h-16 items-center justify-between px-4">
+    <header
+      className={cn("flex h-16 items-center justify-between px-4", className)}
+    >
       {children}
     </header>
   );

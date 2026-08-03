@@ -15,6 +15,7 @@ import {
   HeaderTitle,
 } from "~/components/header";
 import { PageShell } from "~/components/page-shell";
+import { PawTrailBackground } from "~/components/paw-trail-background";
 
 export default function HomePage() {
   const router = useRouter();
@@ -33,13 +34,14 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      <Header>
+      <PawTrailBackground />
+      <Header className="relative z-10">
         <HeaderTitle>Who Knows Pets?</HeaderTitle>
         <HeaderMenu>
           <HeaderThemeItem />
         </HeaderMenu>
       </Header>
-      <main className="flex flex-1 items-center px-4 py-16">
+      <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="flex w-full -translate-y-4 flex-col items-center text-center">
           <h1 className="text-6xl leading-[0.95] font-medium tracking-[-0.07em] text-balance sm:whitespace-nowrap">
             Who knows
