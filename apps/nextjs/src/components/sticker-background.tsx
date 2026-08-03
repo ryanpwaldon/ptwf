@@ -111,6 +111,14 @@ function createRandom(seed: number) {
   };
 }
 
+function createSeed() {
+  if (typeof crypto !== "undefined") {
+    return crypto.getRandomValues(new Uint32Array(1))[0] ?? 0;
+  }
+
+  return Math.floor(Math.random() * 4294967296);
+}
+
 function buildPlacements(
   layoutSize: LayoutSize,
   settings: StickerBackgroundSettings,
@@ -243,7 +251,7 @@ export function StickerBackground({
   shadowOpacity = stickerBackgroundDefaults.shadowOpacity,
   showGuides = stickerBackgroundDefaults.showGuides,
   className,
-  seed = 1742,
+  seed,
   showControls = false,
   onSettingsChange,
 }: StickerBackgroundProps) {
@@ -283,11 +291,22 @@ export function StickerBackground({
   );
   const [settings, setSettings] = useState(initialSettings);
   const settingsRef = useRef(initialSettings);
-  const [activeSeed, setActiveSeed] = useState(seed);
+  const generatedSeedRef = useRef<number | null>(null);
+  const [activeSeed, setActiveSeed] = useState<number | null>(seed ?? null);
   const [panelOpen, setPanelOpen] = useState(true);
   const [layoutSize, setLayoutSize] = useState<LayoutSize | null>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme, setTheme } = useTheme();
+
+  useEffect(() => {
+    if (seed !== undefined) {
+      setActiveSeed(seed);
+      return;
+    }
+
+    generatedSeedRef.current ??= createSeed();
+    setActiveSeed(generatedSeedRef.current);
+  }, [seed]);
 
   useEffect(() => {
     const background = backgroundRef.current;
@@ -305,7 +324,10 @@ export function StickerBackground({
   }, []);
 
   const placements = useMemo(
-    () => (layoutSize ? buildPlacements(layoutSize, settings, activeSeed) : []),
+    () =>
+      layoutSize && activeSeed !== null
+        ? buildPlacements(layoutSize, settings, activeSeed)
+        : [],
     [activeSeed, layoutSize, settings],
   );
   const filter =
@@ -524,9 +546,7 @@ export function StickerBackground({
                 <Button
                   variant="outline"
                   className="justify-start text-[11px]"
-                  onClick={() =>
-                    setActiveSeed(Math.floor(Math.random() * 100000))
-                  }
+                  onClick={() => setActiveSeed(createSeed())}
                 >
                   <RefreshCwIcon />
                   Shuffle layout
