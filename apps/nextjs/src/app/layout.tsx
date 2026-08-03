@@ -41,7 +41,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             <ThemeProvider>
               <UncaughtErrorToastListener />
               <StickerBackground showControls={false} />
-              <div className="relative z-10">{props.children}</div>
+              <div className="relative z-30">{props.children}</div>
               <Toaster />
             </ThemeProvider>
           </TooltipProvider>
