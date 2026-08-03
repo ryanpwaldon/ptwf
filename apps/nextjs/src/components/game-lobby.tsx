@@ -44,6 +44,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   const characters = players.map((p) => getCharacterByValue(p.character));
   const takenCharacterValues = players.filter((p) => p.character !== me.character).map((p) => p.character); // prettier-ignore
   const readyByCharacter = new Map(players.map((p) => [p.character, p.isReady])); // prettier-ignore
+  const readyPlayerCount = players.filter((player) => player.isReady).length;
 
   async function handleReadyToggle() {
     setIsUpdatingReady(true);
@@ -154,13 +155,12 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           onClick={() => void handleReadyToggle()}
           variant={me.isReady ? "outline" : "default"}
         >
-          {me.isReady ? (
-            <>
-              Ready
-              <CheckIcon data-icon="inline-end" aria-hidden="true" />
-            </>
+          {players.length === 1 ? (
+            "Play"
           ) : (
-            "I’m ready"
+            <>
+              Ready {readyPlayerCount}/{players.length}
+            </>
           )}
         </Button>
       </div>
