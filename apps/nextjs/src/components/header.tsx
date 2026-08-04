@@ -19,7 +19,7 @@ export function Header({ title }: HeaderProps) {
         <Button
           asChild
           variant="ghost"
-          className="text-muted-foreground hover:text-foreground -ml-2.5 pr-0"
+          className="text-muted-foreground hover:text-foreground -ml-2 px-2"
         >
           <Link href="/">
             <ArrowLeftIcon />
@@ -28,7 +28,7 @@ export function Header({ title }: HeaderProps) {
         </Button>
         <Separator
           orientation="vertical"
-          className="mx-2 data-[orientation=vertical]:h-4"
+          className="mr-3 ml-1 data-[orientation=vertical]:h-4"
         />
         <p className="text-sm font-medium">{title}</p>
       </div>
