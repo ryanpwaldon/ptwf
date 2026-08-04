@@ -1,0 +1,45 @@
+.sticker {
+  --sticker-opacity: 1;
+  --sticker-rise: 90px;
+  --sticker-rotation: 0deg;
+
+  transform-origin: center;
+  animation: sticker-fountain-enter var(--sticker-duration)
+    cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: var(--sticker-delay);
+  will-change: transform, opacity;
+}
+
+@keyframes sticker-fountain-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, calc(-50% + var(--sticker-rise)), 0)
+      rotate(var(--sticker-rotation)) scale(0.94);
+  }
+
+  to {
+    opacity: var(--sticker-opacity);
+    transform: translate3d(-50%, -50%, 0) rotate(var(--sticker-rotation))
+      scale(1);
+  }
+}
+
+@keyframes sticker-fountain-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: var(--sticker-opacity);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sticker {
+    transform: translate3d(-50%, -50%, 0) rotate(var(--sticker-rotation));
+    animation-name: sticker-fountain-fade;
+    animation-duration: 180ms;
+    animation-delay: 0ms;
+    will-change: opacity;
+  }
+}
