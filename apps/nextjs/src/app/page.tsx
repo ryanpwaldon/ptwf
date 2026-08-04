@@ -7,23 +7,20 @@ import {
   GithubIcon,
   KeyRoundIcon,
   LoaderCircleIcon,
-  MoonIcon,
   PawPrintIcon,
-  SunIcon,
 } from "lucide-react";
 
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
-import { useTheme } from "@acme/ui/theme";
 
 import { PageShell } from "~/components/page-shell";
 import { PawTrailBackground } from "~/components/paw-trail-background";
 import { StickerFountain } from "~/components/sticker-fountain";
+import { ThemeToggle } from "~/components/theme-toggle";
 
 export default function HomePage() {
   const router = useRouter();
   const createGame = useSessionMutation(api.games.create);
-  const { setTheme } = useTheme();
   const [isCreating, setIsCreating] = useState(false);
 
   async function handleCreate() {
@@ -34,11 +31,6 @@ export default function HomePage() {
     } catch {
       setIsCreating(false);
     }
-  }
-
-  function toggleTheme() {
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? "light" : "dark");
   }
 
   return (
@@ -96,12 +88,7 @@ export default function HomePage() {
             GitHub
           </a>
         </Button>
-        <Button variant="ghost" size="sm" onClick={toggleTheme}>
-          <SunIcon className="dark:hidden" />
-          <MoonIcon className="hidden dark:block" />
-          <span className="dark:hidden">Light</span>
-          <span className="hidden dark:inline">Dark</span>
-        </Button>
+        <ThemeToggle />
       </footer>
     </PageShell>
   );

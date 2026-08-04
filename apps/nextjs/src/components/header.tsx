@@ -1,19 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeftIcon, MoonIcon, SunIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import { Separator } from "@acme/ui/separator";
-import { useTheme } from "@acme/ui/theme";
+
+import { ThemeToggle } from "~/components/theme-toggle";
 
 interface HeaderProps {
   title: string;
 }
 
 export function Header({ title }: HeaderProps) {
-  const { resolvedTheme, setTheme } = useTheme();
-
   return (
     <header className="bg-background/95 sticky top-0 z-10 flex h-16 items-center justify-between border-b px-4 backdrop-blur">
       <div className="flex items-center">
@@ -33,15 +32,7 @@ export function Header({ title }: HeaderProps) {
         />
         <p className="text-sm font-medium">{title}</p>
       </div>
-      <Button
-        size="icon"
-        variant="ghost"
-        aria-label="Toggle color theme"
-        onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      >
-        <MoonIcon className="dark:hidden" />
-        <SunIcon className="hidden dark:block" />
-      </Button>
+      <ThemeToggle />
     </header>
   );
 }
