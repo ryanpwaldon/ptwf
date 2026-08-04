@@ -3,10 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import { KeyRoundIcon, LoaderCircleIcon, PawPrintIcon } from "lucide-react";
+import {
+  GithubIcon,
+  KeyRoundIcon,
+  LoaderCircleIcon,
+  MoonIcon,
+  PawPrintIcon,
+  SunIcon,
+} from "lucide-react";
 
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
+import { useTheme } from "@acme/ui/theme";
 
 import { PageShell } from "~/components/page-shell";
 import { PawTrailBackground } from "~/components/paw-trail-background";
@@ -14,6 +22,7 @@ import { PawTrailBackground } from "~/components/paw-trail-background";
 export default function HomePage() {
   const router = useRouter();
   const createGame = useSessionMutation(api.games.create);
+  const { setTheme } = useTheme();
   const [isCreating, setIsCreating] = useState(false);
 
   async function handleCreate() {
@@ -24,6 +33,11 @@ export default function HomePage() {
     } catch {
       setIsCreating(false);
     }
+  }
+
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "light" : "dark");
   }
 
   return (
@@ -67,6 +81,24 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+      <footer className="relative z-10 flex justify-center gap-1 px-4 pb-4">
+        <Button asChild variant="ghost" size="sm">
+          <a
+            href="https://github.com/ryanpwaldon/ptwf"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <GithubIcon />
+            GitHub
+          </a>
+        </Button>
+        <Button variant="ghost" size="sm" onClick={toggleTheme}>
+          <SunIcon className="dark:hidden" />
+          <MoonIcon className="hidden dark:block" />
+          <span className="dark:hidden">Light</span>
+          <span className="hidden dark:inline">Dark</span>
+        </Button>
+      </footer>
     </PageShell>
   );
 }
