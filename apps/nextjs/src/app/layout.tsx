@@ -10,7 +10,6 @@ import "~/app/styles.css";
 import { TooltipProvider } from "@acme/ui/tooltip";
 
 import { ConvexProvider } from "~/components/convex-provider";
-import { StickerBackground } from "~/components/sticker-background";
 import { UncaughtErrorToastListener } from "~/components/uncaught-error-toast-listener";
 
 export const metadata: Metadata = {
@@ -40,7 +39,6 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           <TooltipProvider>
             <ThemeProvider>
               <UncaughtErrorToastListener />
-              <StickerBackground showControls={false} />
               <div className="relative z-30">{props.children}</div>
               <Toaster />
             </ThemeProvider>
