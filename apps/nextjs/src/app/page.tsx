@@ -30,17 +30,14 @@ export default function HomePage() {
     <PageShell>
       <PawTrailBackground spacing={320} />
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
-        <div className="flex w-full -translate-y-4 flex-col items-center text-center">
-          <h1 className="text-6xl leading-[0.95] font-medium tracking-[-0.07em] text-balance sm:whitespace-nowrap">
-            Who knows
-            <br className="sm:hidden" /> pets?
+        <div className="flex w-full flex-col items-center text-center">
+          <h1 className="text-5xl leading-[0.95] font-medium tracking-[-0.07em]">
+            Who knows pets?
           </h1>
-
-          <p className="text-muted-foreground mt-8 max-w-md text-lg leading-relaxed sm:text-xl">
-            Put your pet-care know-how to the test with friends. See who really
-            knows pets best.
+          <p className="text-muted-foreground mt-4 max-w-md text-lg leading-relaxed sm:text-xl">
+            Put your pet-care know-how to the test with your friends. See who
+            really knows pets best!
           </p>
-
           <div className="mt-10 flex w-full max-w-md flex-col gap-3 sm:flex-row">
             <Button
               size="xl"
