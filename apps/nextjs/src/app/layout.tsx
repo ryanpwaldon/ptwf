@@ -37,7 +37,12 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       >
         <ConvexProvider>
           <TooltipProvider>
-            <ThemeProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
               <UncaughtErrorToastListener />
               <div className="relative z-30">{props.children}</div>
               <Toaster />

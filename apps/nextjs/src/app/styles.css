@@ -6,8 +6,6 @@
 @source "../../../../apps/convex/src/**/*.ts";
 
 @custom-variant dark (&:where(.dark, .dark *));
-@custom-variant light (&:where(.light, .light *));
-@custom-variant auto (&:where(.auto, .auto *));
 @custom-variant hover {
   @media (hover: hover) {
     &:hover {
