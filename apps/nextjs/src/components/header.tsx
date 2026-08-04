@@ -1,100 +1,47 @@
 "use client";
 
-import type { PropsWithChildren } from "react";
 import Link from "next/link";
-import {
-  ArrowLeftIcon,
-  EllipsisIcon,
-  LogOutIcon,
-  SunMoonIcon,
-} from "lucide-react";
+import { ArrowLeftIcon, MoonIcon, SunIcon } from "lucide-react";
 
-import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@acme/ui/dropdown-menu";
+import { Separator } from "@acme/ui/separator";
 import { useTheme } from "@acme/ui/theme";
 
-export function Header({
-  children,
-  className,
-}: PropsWithChildren<{ className?: string }>) {
-  return (
-    <header
-      className={cn("flex h-16 items-center justify-between px-4", className)}
-    >
-      {children}
-    </header>
-  );
+interface HeaderProps {
+  title: string;
 }
 
-export function HeaderTitle({ children }: PropsWithChildren) {
-  return <p className="text-sm font-medium">{children}</p>;
-}
+export function Header({ title }: HeaderProps) {
+  const { resolvedTheme, setTheme } = useTheme();
 
-export function HeaderHomeLink() {
   return (
-    <Button asChild variant="link" className="-ml-2.5">
-      <Link href="/">
-        <ArrowLeftIcon />
-        Home
-      </Link>
-    </Button>
-  );
-}
-
-export function HeaderMenu({ children }: PropsWithChildren) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="icon" variant="ghost" aria-label="Open menu">
-          <EllipsisIcon />
+    <header className="bg-background/95 sticky top-0 z-10 flex h-16 items-center justify-between border-b px-4 backdrop-blur">
+      <div className="flex items-center">
+        <Button
+          asChild
+          variant="ghost"
+          className="text-muted-foreground hover:text-foreground -ml-2.5 pr-0"
+        >
+          <Link href="/">
+            <ArrowLeftIcon />
+            Home
+          </Link>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
-        {children}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-export function HeaderThemeItem() {
-  const { themeMode, toggleMode } = useTheme();
-  const themeLabel =
-    themeMode === "auto" ? "System" : themeMode === "dark" ? "Dark" : "Light";
-
-  return (
-    <DropdownMenuItem
-      onSelect={(event) => {
-        event.preventDefault();
-        toggleMode();
-      }}
-    >
-      <SunMoonIcon />
-      Theme
-      <span className="text-muted-foreground ml-auto text-xs">
-        {themeLabel}
-      </span>
-    </DropdownMenuItem>
-  );
-}
-
-export function HeaderMenuSeparator() {
-  return <DropdownMenuSeparator />;
-}
-
-export function HeaderExitGameItem() {
-  return (
-    <DropdownMenuItem asChild>
-      <Link href="/">
-        <LogOutIcon />
-        Exit game
-      </Link>
-    </DropdownMenuItem>
+        <Separator
+          orientation="vertical"
+          className="mx-2 data-[orientation=vertical]:h-4"
+        />
+        <p className="text-sm font-medium">{title}</p>
+      </div>
+      <Button
+        size="icon"
+        variant="ghost"
+        aria-label="Toggle color theme"
+        onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      >
+        <MoonIcon className="dark:hidden" />
+        <SunIcon className="hidden dark:block" />
+      </Button>
+    </header>
   );
 }

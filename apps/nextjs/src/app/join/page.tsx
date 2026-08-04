@@ -14,12 +14,7 @@ import { Card, CardContent } from "@acme/ui/card";
 import { Field, FieldError, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 
-import {
-  Header,
-  HeaderHomeLink,
-  HeaderMenu,
-  HeaderThemeItem,
-} from "~/components/header";
+import { Header } from "~/components/header";
 import { PageShell } from "~/components/page-shell";
 
 export default function JoinPage() {
@@ -46,12 +41,7 @@ export default function JoinPage() {
 
   return (
     <PageShell>
-      <Header>
-        <HeaderHomeLink />
-        <HeaderMenu>
-          <HeaderThemeItem />
-        </HeaderMenu>
-      </Header>
+      <Header title="Join game" />
       <main className="flex-1 px-4">
         <div className="mt-8">
           <h1 className="text-2xl font-extrabold tracking-tight">

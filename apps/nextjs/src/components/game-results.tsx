@@ -7,14 +7,7 @@ import { getCharacterByValue } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
 
-import {
-  Header,
-  HeaderExitGameItem,
-  HeaderMenu,
-  HeaderMenuSeparator,
-  HeaderThemeItem,
-  HeaderTitle,
-} from "~/components/header";
+import { Header } from "~/components/header";
 import { Leaderboard } from "~/components/leaderboard";
 import { QuestionResult } from "~/components/question-result";
 import { PageShell } from "./page-shell";
@@ -87,14 +80,7 @@ export function GameResults({
 
   return (
     <PageShell>
-      <Header>
-        <HeaderTitle>Game results</HeaderTitle>
-        <HeaderMenu>
-          <HeaderThemeItem />
-          <HeaderMenuSeparator />
-          <HeaderExitGameItem />
-        </HeaderMenu>
-      </Header>
+      <Header title="Game results" />
       <main className="flex-1 px-4 pb-16">
         <div className="mt-8">
           <h1 className="text-2xl font-extrabold tracking-tight">
