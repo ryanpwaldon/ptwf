@@ -88,7 +88,7 @@ export default function HomePage() {
             GitHub
           </a>
         </Button>
-        <ThemeToggle />
+        <ThemeToggle size="sm" />
       </footer>
     </PageShell>
   );

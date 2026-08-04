@@ -63,6 +63,6 @@ export const stickerAssets = [
 
 export type StickerAsset = (typeof stickerAssets)[number];
 
-export function getStickerSource(asset: StickerAsset, theme: "light" | "dark") {
+export function getStickerSource(asset: StickerAsset, theme?: string) {
   return theme === "dark" ? `/stickers/${asset.id}-dark.svg` : asset.lightSrc;
 }
