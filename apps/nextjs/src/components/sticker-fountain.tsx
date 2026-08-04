@@ -646,7 +646,7 @@ export function StickerFountain({
       <div
         ref={fountainRef}
         className={cn(
-          "pointer-events-none relative z-0 h-full w-full overflow-visible",
+          "pointer-events-none relative z-0 h-full w-full overflow-x-clip overflow-y-visible",
           className,
         )}
         aria-hidden="true"
