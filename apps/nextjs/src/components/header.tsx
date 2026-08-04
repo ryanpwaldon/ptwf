@@ -32,7 +32,7 @@ export function Header({ title }: HeaderProps) {
         />
         <p className="text-sm font-medium">{title}</p>
       </div>
-      <ThemeToggle />
+      <ThemeToggle size="default" />
     </header>
   );
 }

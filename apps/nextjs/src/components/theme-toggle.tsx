@@ -1,17 +1,22 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { MoonIcon, SunIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import { useTheme } from "@acme/ui/theme";
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  size: ComponentProps<typeof Button>["size"];
+}
+
+export function ThemeToggle({ size }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
 
   return (
     <Button
       variant="ghost"
-      size="sm"
+      size={size}
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
       <SunIcon className="dark:hidden" />
