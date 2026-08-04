@@ -16,21 +16,10 @@ import {
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
+import { useTheme } from "@acme/ui/theme";
 
+import { getStickerSource, stickerAssets } from "./sticker-assets";
 import styles from "./sticker-fountain.module.css";
-
-const stickers = [
-  { src: "/stickers/blanket-burrito-dog.svg", width: 872, height: 528 },
-  { src: "/stickers/cat-in-box.svg", width: 749, height: 735 },
-  { src: "/stickers/giant-stick-dog.svg", width: 1295, height: 646 },
-  { src: "/stickers/guilty-dog.svg", width: 972, height: 811 },
-  { src: "/stickers/laptop-cat.svg", width: 896, height: 552 },
-  { src: "/stickers/paper-bag-cat.svg", width: 710, height: 802 },
-  { src: "/stickers/post-bath-dog.svg", width: 788, height: 647 },
-  { src: "/stickers/sock-thief-dog.svg", width: 1016, height: 708 },
-  { src: "/stickers/toilet-paper-cat.svg", width: 1284, height: 620 },
-  { src: "/stickers/upside-down-cat.svg", width: 915, height: 925 },
-] as const;
 
 export interface StickerFountainSettings {
   scale: number;
@@ -66,7 +55,7 @@ interface LayoutSize {
 
 interface StickerPlacement {
   id: string;
-  asset: (typeof stickers)[number];
+  asset: (typeof stickerAssets)[number];
   x: number;
   y: number;
   rotation: number;
@@ -182,15 +171,15 @@ function buildPlacements(
             const deltaY = y - placement.y;
             return deltaX ** 2 + deltaY ** 2 < neighborRadius ** 2;
           })
-          .map((placement) => placement.asset.src),
+          .map((placement) => placement.asset.id),
       );
-      const availableStickers = stickers.filter(
-        (sticker) => !neighboringSources.has(sticker.src),
+      const availableStickers = stickerAssets.filter(
+        (sticker) => !neighboringSources.has(sticker.id),
       );
       const asset =
         availableStickers[Math.floor(assetRandom * availableStickers.length)] ??
-        stickers[Math.floor(assetRandom * stickers.length)] ??
-        stickers[0];
+        stickerAssets[Math.floor(assetRandom * stickerAssets.length)] ??
+        stickerAssets[0];
 
       placements.push({
         id: `${seed}-${row}-${column}`,
@@ -578,6 +567,7 @@ export function StickerFountain({
   const [copied, setCopied] = useState(false);
   const [replay, setReplay] = useState(0);
   const fountainRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setSettings(defaultSettings);
@@ -710,7 +700,7 @@ export function StickerFountain({
             <Image
               key={`${placement.id}-${replay}`}
               className={cn(styles.sticker, "absolute max-w-none select-none")}
-              src={placement.asset.src}
+              src={getStickerSource(placement.asset, resolvedTheme)}
               width={placement.asset.width}
               height={placement.asset.height}
               sizes={`${Math.ceil(renderedWidth)}px`}

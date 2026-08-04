@@ -17,20 +17,8 @@ import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { useTheme } from "@acme/ui/theme";
 
+import { getStickerSource, stickerAssets } from "./sticker-assets";
 import styles from "./sticker-background.module.css";
-
-const stickerSources = [
-  "/stickers/blanket-burrito-dog.png",
-  "/stickers/cat-in-box.png",
-  "/stickers/giant-stick-dog.png",
-  "/stickers/guilty-dog.png",
-  "/stickers/laptop-cat.png",
-  "/stickers/paper-bag-cat.png",
-  "/stickers/post-bath-dog.png",
-  "/stickers/sock-thief-dog.png",
-  "/stickers/toilet-paper-cat.png",
-  "/stickers/upside-down-cat.png",
-] as const;
 
 export interface StickerBackgroundSettings {
   spacing: number;
@@ -62,7 +50,7 @@ interface LayoutSize {
 
 interface StickerPlacement {
   id: string;
-  source: (typeof stickerSources)[number];
+  asset: (typeof stickerAssets)[number];
   x: number;
   y: number;
   size: number;
@@ -183,9 +171,9 @@ function buildPlacements(
     const variance = settings.sizeVariance / 100;
     return {
       id: `${seed}-${index}`,
-      source:
-        stickerSources[Math.floor(random() * stickerSources.length)] ??
-        stickerSources[0],
+      asset:
+        stickerAssets[Math.floor(random() * stickerAssets.length)] ??
+        stickerAssets[0],
       x,
       y,
       size: settings.size * (1 - variance + random() * variance * 2),
@@ -373,9 +361,9 @@ export function StickerBackground({
               styles.sticker,
               "absolute h-auto max-w-none select-none",
             )}
-            src={placement.source}
-            width={placement.size}
-            height={placement.size}
+            src={getStickerSource(placement.asset, resolvedTheme)}
+            width={placement.asset.width}
+            height={placement.asset.height}
             sizes={`${Math.ceil(placement.size)}px`}
             alt=""
             draggable={false}
