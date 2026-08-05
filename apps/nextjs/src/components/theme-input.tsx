@@ -35,7 +35,7 @@ export function ThemeInput({ value, onChange }: ThemeInputProps) {
           <div
             className={`flex aspect-square h-full shrink-0 items-center justify-center overflow-hidden p-1 ${selected.posterClassName}`}
           >
-            <p className="text-center text-[12px] leading-none font-bold text-white">
+            <p className="text-center text-[12px] leading-tight font-bold text-white">
               {selected.posterLabel}
             </p>
           </div>
@@ -67,7 +67,7 @@ export function ThemeInput({ value, onChange }: ThemeInputProps) {
                 <div
                   className={`flex aspect-square h-18 shrink-0 items-center justify-center overflow-hidden rounded p-1 ${option.posterClassName}`}
                 >
-                  <p className="text-center text-[10px] leading-none font-bold text-white">
+                  <p className="text-center text-[10px] leading-tight font-bold text-white">
                     {option.posterLabel}
                   </p>
                 </div>

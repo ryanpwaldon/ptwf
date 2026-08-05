@@ -31,7 +31,7 @@ export const QUIZ_THEME_OPTIONS = [
   {
     value: "behaviour-and-communication",
     label: "Behaviour & Communication",
-    posterLabel: "Behaviour & Communication",
+    posterLabel: "Behaviour & Comms",
     description: "Read the signals pets use to express comfort and concern.",
     instructions:
       "Questions should focus on species-typical body language, vocalisations, social needs, stress signals, play, rest, and humane ways people can respond to animal behaviour.",
