@@ -77,9 +77,7 @@ export function AnimalInput({ value, onChange }: AnimalInputProps) {
         />
         <CommandPickerList>
           <CommandPickerEmpty>No animals found.</CommandPickerEmpty>
-          <CommandPickerGroup
-            heading={search ? undefined : "Available animals"}
-          >
+          <CommandPickerGroup>
             {filteredAnimals.map((animal) => (
               <CommandPickerItem
                 key={animal.value}
