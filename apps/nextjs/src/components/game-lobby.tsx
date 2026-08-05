@@ -3,7 +3,7 @@
 import type { FunctionReturnType } from "convex/server";
 import { useState } from "react";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, LoaderCircleIcon } from "lucide-react";
 
 import { api, getCharacterByValue } from "@acme/convex";
 import { AvatarBadge } from "@acme/ui/avatar";
@@ -45,6 +45,10 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   const takenCharacterValues = players.filter((p) => p.character !== me.character).map((p) => p.character); // prettier-ignore
   const readyByCharacter = new Map(players.map((p) => [p.character, p.isReady])); // prettier-ignore
   const readyPlayerCount = players.filter((player) => player.isReady).length;
+  const readyButtonLabel =
+    players.length === 1
+      ? "Play"
+      : `Ready ${readyPlayerCount}/${players.length}`;
 
   async function handleReadyToggle() {
     setIsUpdatingReady(true);
@@ -151,17 +155,24 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         <Button
           size="xl"
           disabled={isUpdatingReady}
-          className="transition-none"
+          className="transition-none disabled:opacity-100"
           onClick={() => void handleReadyToggle()}
           variant={me.isReady ? "outline" : "default"}
         >
-          {players.length === 1 ? (
-            "Play"
-          ) : (
-            <>
-              Ready {readyPlayerCount}/{players.length}
-            </>
-          )}
+          <span className="grid place-items-center">
+            <span
+              className={
+                isUpdatingReady
+                  ? "invisible col-start-1 row-start-1"
+                  : "col-start-1 row-start-1"
+              }
+            >
+              {readyButtonLabel}
+            </span>
+            {isUpdatingReady && (
+              <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
+            )}
+          </span>
         </Button>
       </div>
     </PageShell>
