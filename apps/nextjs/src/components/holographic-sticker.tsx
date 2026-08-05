@@ -16,7 +16,6 @@ import { cn } from "@acme/ui";
 import { useTheme } from "@acme/ui/theme";
 
 import type { StickerAsset } from "./sticker-assets";
-import styles from "./holographic-sticker.module.css";
 import { getStickerSource } from "./sticker-assets";
 
 export type HolographicEffect = "diffraction" | "mica" | "embossed";
@@ -102,39 +101,225 @@ export function HolographicSticker({
   }
 
   return (
-    <motion.div
-      className={cn(styles.sticker, "relative mx-auto", className)}
-      data-effect={effect}
-      style={{ ...stickerStyle, transform }}
-      onPointerMove={handlePointerMove}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-      aria-hidden="true"
-    >
-      <Image
-        className={styles.image}
-        src={source}
-        width={asset.width}
-        height={asset.height}
-        sizes="(min-width: 640px) 18rem, 16rem"
-        alt=""
-        draggable={false}
-        priority={priority}
-      />
-      <motion.span className={styles.foil} style={{ opacity: foilOpacity }}>
-        <motion.span
-          className={styles.spectrum}
-          style={{ backgroundPosition: foilPosition }}
+    <>
+      <motion.div
+        className={cn("holographic-sticker relative mx-auto", className)}
+        data-effect={effect}
+        style={{ ...stickerStyle, transform }}
+        onPointerMove={handlePointerMove}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        aria-hidden="true"
+      >
+        <Image
+          className="holographic-sticker__image"
+          src={source}
+          width={asset.width}
+          height={asset.height}
+          sizes="(min-width: 640px) 18rem, 16rem"
+          alt=""
+          draggable={false}
+          priority={priority}
         />
         <motion.span
-          className={styles.relief}
-          style={{ backgroundPosition: texturePosition }}
+          className="holographic-sticker__foil"
+          style={{ opacity: foilOpacity }}
+        >
+          <motion.span
+            className="holographic-sticker__spectrum"
+            style={{ backgroundPosition: foilPosition }}
+          />
+          <motion.span
+            className="holographic-sticker__relief"
+            style={{ backgroundPosition: texturePosition }}
+          />
+        </motion.span>
+        <motion.span
+          className="holographic-sticker__glaze"
+          style={{ backgroundImage: glaze, opacity: glazeOpacity }}
         />
-      </motion.span>
-      <motion.span
-        className={styles.glaze}
-        style={{ backgroundImage: glaze, opacity: glazeOpacity }}
-      />
-    </motion.div>
+      </motion.div>
+
+      <style href="holographic-sticker" precedence="medium">{`
+        .holographic-sticker {
+          --sticker-image: none;
+          --holographic-mask: none;
+          filter: drop-shadow(0 18px 24px rgb(0 0 0 / 0.22));
+          transform-style: preserve-3d;
+          will-change: transform;
+        }
+
+        .holographic-sticker__image {
+          position: relative;
+          z-index: 1;
+          display: block;
+          width: 100%;
+          height: auto;
+          user-select: none;
+        }
+
+        .holographic-sticker__foil,
+        .holographic-sticker__glaze {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+          -webkit-mask-position: center;
+          mask-position: center;
+          -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+        }
+
+        .holographic-sticker__foil {
+          z-index: 2;
+          -webkit-mask-image: var(--holographic-mask);
+          mask-image: var(--holographic-mask);
+        }
+
+        .holographic-sticker__spectrum,
+        .holographic-sticker__relief {
+          position: absolute;
+          inset: 0;
+        }
+
+        .holographic-sticker__spectrum {
+          background-image: repeating-linear-gradient(
+            112deg,
+            rgb(255 119 115) 0%,
+            rgb(255 237 95) 14%,
+            rgb(168 255 95) 28%,
+            rgb(131 255 247) 42%,
+            rgb(120 148 255) 56%,
+            rgb(216 117 255) 70%,
+            rgb(255 119 115) 84%
+          );
+          background-size: 180% 220%;
+          mix-blend-mode: normal;
+          -webkit-mask-repeat: repeat;
+          mask-repeat: repeat;
+        }
+
+        .holographic-sticker__relief {
+          mix-blend-mode: screen;
+        }
+
+        .holographic-sticker__glaze {
+          z-index: 3;
+          -webkit-mask-image: var(--sticker-image);
+          mask-image: var(--sticker-image);
+          mix-blend-mode: screen;
+        }
+
+        .holographic-sticker[data-effect="diffraction"]
+          .holographic-sticker__spectrum {
+          -webkit-mask-image: repeating-linear-gradient(
+            -24deg,
+            rgb(0 0 0 / 0.9) 0,
+            rgb(0 0 0 / 0.38) 1px,
+            transparent 2px,
+            transparent 5px
+          );
+          mask-image: repeating-linear-gradient(
+            -24deg,
+            rgb(0 0 0 / 0.9) 0,
+            rgb(0 0 0 / 0.38) 1px,
+            transparent 2px,
+            transparent 5px
+          );
+          filter: contrast(1.15) saturate(1.2);
+        }
+
+        .holographic-sticker[data-effect="diffraction"]
+          .holographic-sticker__relief {
+          background-image:
+            repeating-linear-gradient(
+              -24deg,
+              rgb(255 255 255 / 0.7) 0,
+              rgb(255 255 255 / 0.04) 1px,
+              rgb(0 0 0 / 0.16) 2px,
+              transparent 5px
+            ),
+            radial-gradient(circle, rgb(255 255 255 / 0.48), transparent 56%);
+          background-size:
+            100% 100%,
+            80% 120%;
+          filter: contrast(1.1);
+        }
+
+        .holographic-sticker[data-effect="mica"]
+          .holographic-sticker__spectrum {
+          background-image: conic-gradient(
+            from 210deg,
+            rgb(64 255 231),
+            rgb(92 104 255),
+            rgb(255 72 202),
+            rgb(255 230 100),
+            rgb(64 255 231)
+          );
+          background-size: 170% 210%;
+          -webkit-mask-image: url("/holographic/mica-texture.svg");
+          mask-image: url("/holographic/mica-texture.svg");
+          -webkit-mask-size: 46% 95%;
+          mask-size: 46% 95%;
+          filter: contrast(1.2) saturate(1.3);
+        }
+
+        .holographic-sticker[data-effect="mica"] .holographic-sticker__relief {
+          background-image:
+            url("/holographic/mica-texture.svg"),
+            radial-gradient(circle, rgb(255 255 255 / 0.72), transparent 48%);
+          background-size:
+            46% 95%,
+            70% 110%;
+          background-blend-mode: screen;
+          filter: contrast(1.15);
+        }
+
+        .holographic-sticker[data-effect="embossed"]
+          .holographic-sticker__spectrum {
+          background-image: conic-gradient(
+            from 35deg,
+            rgb(119 238 255),
+            rgb(174 125 255),
+            rgb(255 147 221),
+            rgb(255 226 138),
+            rgb(119 238 255)
+          );
+          background-size: 210% 210%;
+          -webkit-mask-image: url("/holographic/embossed-texture.svg");
+          mask-image: url("/holographic/embossed-texture.svg");
+          -webkit-mask-size: 38% 76%;
+          mask-size: 38% 76%;
+          filter: contrast(1.2) saturate(1.1);
+        }
+
+        .holographic-sticker[data-effect="embossed"]
+          .holographic-sticker__relief {
+          background-image:
+            url("/holographic/embossed-texture.svg"),
+            linear-gradient(
+              105deg,
+              transparent 22%,
+              rgb(255 255 255 / 0.7) 42%,
+              transparent 58%
+            );
+          background-size:
+            38% 76%,
+            190% 100%;
+          background-blend-mode: screen;
+          filter: contrast(1.12);
+        }
+
+        @media (hover: none),
+          (pointer: coarse),
+          (prefers-reduced-motion: reduce) {
+          .holographic-sticker {
+            transform: none !important;
+            will-change: auto;
+          }
+        }
+      `}</style>
+    </>
   );
 }
