@@ -13,9 +13,10 @@ import {
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 
+import { HolographicSticker } from "~/components/holographic-sticker";
 import { PageShell } from "~/components/page-shell";
 import { PawTrailBackground } from "~/components/paw-trail-background";
-import { StickerFountain } from "~/components/sticker-fountain";
+import { stickerAssets } from "~/components/sticker-assets";
 import { ThemeToggle } from "~/components/theme-toggle";
 
 export default function HomePage() {
@@ -38,8 +39,13 @@ export default function HomePage() {
       <PawTrailBackground spacing={320} />
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="relative isolate w-full">
-          <StickerFountain className="absolute bottom-[calc(100%+6rem)] left-1/2 h-[clamp(18rem,calc(50dvh-12rem),44rem)] w-screen -translate-x-1/2" />
           <div className="relative z-10 flex w-full flex-col items-center text-center">
+            <HolographicSticker
+              asset={stickerAssets["toilet-paper-cat"]}
+              effect="diffraction"
+              className="mb-8 w-64 sm:w-72"
+              priority
+            />
             <h1 className="text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
               Who knows pets?
             </h1>
