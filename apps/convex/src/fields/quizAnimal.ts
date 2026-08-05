@@ -6,28 +6,28 @@ export const QUIZ_ANIMAL_OPTIONS = [
     label: "Dogs",
     description:
       "Explore canine nutrition, grooming, training, behaviour, and everyday wellbeing.",
-    imagePath: "/animals/dogs.webp",
+    imagePath: "/animals/dogs.svg",
   },
   {
     value: "cats",
     label: "Cats",
     description:
       "Test what you know about feline health, enrichment, communication, and care.",
-    imagePath: "/animals/cats.webp",
+    imagePath: "/animals/cats.svg",
   },
   {
     value: "birds",
     label: "Birds",
     description:
       "Learn about companion bird diets, habitats, behaviour, safety, and enrichment.",
-    imagePath: "/animals/birds.webp",
+    imagePath: "/animals/birds.svg",
   },
   {
     value: "fish",
     label: "Fish",
     description:
       "Dive into aquarium care, water quality, feeding, habitats, and fish wellbeing.",
-    imagePath: "/animals/fish.webp",
+    imagePath: "/animals/fish.svg",
   },
 ] as const;
 

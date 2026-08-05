@@ -6,15 +6,6 @@ The initial pet catalogue includes dogs, cats, birds, and fish. Care topics cove
 
 The app is built on Next.js with Convex as the serverless backend, providing a real-time database and live synchronisation across all connected clients. Pet-care question generation is handled by Gemini via OpenRouter, with a curated animal catalogue and original illustrations bundled into the app.
 
-<table>
-  <tr>
-    <td><img src="apps/nextjs/public/animals/dogs.webp" alt="Dogs" width="100%"></td>
-    <td><img src="apps/nextjs/public/animals/cats.webp" alt="Cats" width="100%"></td>
-    <td><img src="apps/nextjs/public/animals/birds.webp" alt="Birds" width="100%"></td>
-    <td><img src="apps/nextjs/public/animals/fish.webp" alt="Fish" width="100%"></td>
-  </tr>
-</table>
-
 ## Setup
 
 Create a [Convex](https://convex.dev) account, follow their getting-started guide, then copy `.env.example` to `.env` and set `NEXT_PUBLIC_CONVEX_URL` to your deployment URL. Create an [OpenRouter](https://openrouter.ai) account, generate an API key, and add it as `OPENROUTER_API_KEY` in your Convex dashboard environment variables.

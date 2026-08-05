@@ -56,7 +56,7 @@ export function AnimalInput({ value, onChange }: AnimalInputProps) {
             alt={`${selected.label} illustration`}
             src={selected.imagePath}
             icon={<PawPrint className="text-muted-foreground size-1/3" />}
-            containerClassName="aspect-2/3 h-full shrink-0"
+            containerClassName="aspect-square h-full shrink-0"
           />
           <div className="min-w-0 px-3">
             <div className="truncate text-left font-medium">
@@ -93,7 +93,7 @@ export function AnimalInput({ value, onChange }: AnimalInputProps) {
                   alt={`${animal.label} illustration`}
                   src={animal.imagePath}
                   icon={<PawPrint className="text-muted-foreground size-1/3" />}
-                  containerClassName="aspect-2/3 h-18 shrink-0"
+                  containerClassName="aspect-square h-18 shrink-0 rounded-sm"
                 />
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium">
