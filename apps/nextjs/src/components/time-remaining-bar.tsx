@@ -22,7 +22,7 @@ export function TimeRemainingBar({
   }, [phase, width, durationSeconds]);
 
   return (
-    <div className="bg-primary/10 flex h-2 w-full justify-end rounded-full">
+    <div className="bg-secondary flex h-2 w-full justify-end rounded-full">
       <motion.div
         className="bg-primary h-full rounded-full"
         style={{ width }}

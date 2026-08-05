@@ -8,10 +8,10 @@ interface QuestionStatusTrackProps extends React.ComponentProps<"div"> {
 }
 
 const stepStyles: Record<QuestionStatus, string> = {
-  incomplete: "bg-primary/10",
+  incomplete: "bg-secondary",
   correct: "bg-correct",
   incorrect: "bg-incorrect",
-  skipped: "bg-primary/10",
+  skipped: "bg-secondary",
 };
 
 export function QuestionStatusTrack({
