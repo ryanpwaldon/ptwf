@@ -76,7 +76,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             <CardHeader className="border-b">
               <CardTitle>Invite your friends</CardTitle>
               <CardDescription>
-                Share this code so they can join.
+                Share the code, or copy the link.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center">
