@@ -41,11 +41,11 @@ export default function HomePage() {
           <StickerFountain className="absolute bottom-[calc(100%+6rem)] left-1/2 h-[clamp(18rem,calc(50dvh-12rem),44rem)] w-screen -translate-x-1/2" />
           <div className="relative z-10 flex w-full flex-col items-center text-center">
             <h1 className="text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
-              Who knows pets?
+              All about pets!
             </h1>
             <p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl">
-              Put your pet-care know-how to the test with your friends. See who
-              really knows pets best!
+              Challenge your friends and learn interesting pet-care facts
+              together through trivia.
             </p>
             <div className="mt-8 flex w-full max-w-xs flex-col gap-3 sm:max-w-md sm:flex-row">
               <Button

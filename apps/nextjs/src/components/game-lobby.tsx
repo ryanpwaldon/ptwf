@@ -68,7 +68,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             Get ready to play
           </h1>
           <p className="text-muted-foreground">
-            Choose an animal and topic, then invite your friends.
+            Choose a pet and a care topic, then invite your friends.
           </p>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -86,7 +86,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           <Card className="sm:col-span-1">
             <CardHeader className="border-b">
               <CardTitle>Your player</CardTitle>
-              <CardDescription>Choose your pet.</CardDescription>
+              <CardDescription>Choose your character.</CardDescription>
             </CardHeader>
             <CardContent className="flex h-full items-center justify-center">
               <AvatarInput
@@ -101,9 +101,9 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </div>
         <Card className="mt-4">
           <CardHeader className="border-b">
-            <CardTitle>Choose an animal</CardTitle>
+            <CardTitle>Choose a pet</CardTitle>
             <CardDescription>
-              Which animal should the questions be about?
+              Which pet should the questions be about?
             </CardDescription>
           </CardHeader>
           <CardContent className="flex h-full items-center">
@@ -120,7 +120,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </Card>
         <Card className="mt-4">
           <CardHeader className="border-b">
-            <CardTitle>Choose a topic</CardTitle>
+            <CardTitle>Choose a care topic</CardTitle>
             <CardDescription>What should the questions cover?</CardDescription>
           </CardHeader>
           <CardContent className="flex h-full items-center">

@@ -84,11 +84,9 @@ export function GameResults({
       <main className="flex-1 px-4 pb-16">
         <div className="mt-8">
           <h1 className="text-2xl font-extrabold tracking-tight">
-            The results are in
+            Great game!
           </h1>
-          <p className="text-muted-foreground">
-            Let’s see who knows pets best.
-          </p>
+          <p className="text-muted-foreground">Here are the final results.</p>
         </div>
         <Card className="mt-6 py-0">
           <CardContent className="p-0">

@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Who Knows Pets?";
+export const alt = "All about pets!";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -34,9 +34,9 @@ export default async function Image() {
             color: "white",
           }}
         >
-          <span>Who</span>
-          <span>Knows</span>
-          <span>Pets?</span>
+          <span>All</span>
+          <span>about</span>
+          <span>pets!</span>
         </div>
       </div>
     ),
