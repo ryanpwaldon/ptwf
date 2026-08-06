@@ -37,46 +37,41 @@ export default function HomePage() {
     <PageShell>
       <PawTrailBackground spacing={320} />
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
-        <div className="relative isolate w-full">
-          <div className="relative z-10 flex w-full flex-col items-center text-center">
-            <div className="mb-5">
-              <h1 className="sr-only">Pet Care Trivia</h1>
-              <ArchedBadge label="Pet Care Trivia" />
-            </div>
-            <h2 className="text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
-              All about pets!
-            </h2>
-            <p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl">
-              Challenge your friends and learn interesting pet-care facts
-              together through trivia.
-            </p>
-            <div className="mt-8 flex w-full max-w-xs flex-col gap-3 sm:max-w-md sm:flex-row">
-              <Button
-                size="xl"
-                variant="default"
-                onClick={handleCreate}
-                disabled={isCreating}
-                className="flex-none disabled:opacity-100 sm:flex-1"
-              >
-                {isCreating ? (
-                  <LoaderCircleIcon className="animate-spin" />
-                ) : (
-                  <>
-                    <PawPrintIcon />
-                    Start a game
-                  </>
-                )}
-              </Button>
-              <Button
-                variant="secondary"
-                size="xl"
-                onClick={() => router.push("/join")}
-                className="flex-none sm:flex-1"
-              >
-                <KeyRoundIcon />
-                Join with a code
-              </Button>
-            </div>
+        <div className="flex w-full flex-col items-center text-center">
+          <h1 className="sr-only">Pet Care Trivia</h1>
+          <ArchedBadge className="mb-5" label="Pet Care Trivia" />
+          <h2 className="text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
+            All about pets!
+          </h2>
+          <p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl">
+            Challenge your friends and learn interesting pet-care facts together
+            through trivia.
+          </p>
+          <div className="mt-8 flex w-full max-w-xs flex-col gap-3 sm:max-w-md sm:flex-row">
+            <Button
+              size="xl"
+              onClick={handleCreate}
+              disabled={isCreating}
+              className="disabled:opacity-100 sm:flex-1"
+            >
+              {isCreating ? (
+                <LoaderCircleIcon className="animate-spin" />
+              ) : (
+                <>
+                  <PawPrintIcon />
+                  Start a game
+                </>
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              size="xl"
+              onClick={() => router.push("/join")}
+              className="sm:flex-1"
+            >
+              <KeyRoundIcon />
+              Join with a code
+            </Button>
           </div>
         </div>
       </main>
