@@ -40,12 +40,6 @@ export default function HomePage() {
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="relative isolate w-full">
           <div className="relative z-10 flex w-full flex-col items-center text-center">
-            <HolographicSticker
-              asset={stickerAssets["toilet-paper-cat"]}
-              effect="diffraction"
-              className="mb-8 w-64 sm:w-72"
-              priority
-            />
             <h1 className="text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
               All about pets!
             </h1>
