@@ -1,8 +1,8 @@
 import type { ComponentProps } from "react";
-import Image from "next/image";
 
 import { cn } from "@acme/ui";
 
+import { HolographicSticker } from "./holographic-sticker";
 import { stickerAssets } from "./sticker-assets";
 
 const accessoryStickerIds = ["ball", "bowl", "bone", "fish"] as const;
@@ -89,24 +89,20 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
           aspectRatio,
           width: `${aspectRatio * config.height}cqh`,
         }}
+        role="img"
+        aria-label="Playful pet stickers"
       >
-        <Image
-          src={heroSticker.lightSrc}
-          alt="Playful Pet Sticker"
-          width={heroSticker.width}
-          height={heroSticker.height}
+        <HolographicSticker
+          asset={heroSticker}
           className="size-full drop-shadow-xl"
+          priority
         />
         {accessoryStickerIds.map((accessoryId) => {
           const accessory = stickerAssets[accessoryId];
           const placement = config.accessories[accessoryId];
           return (
-            <Image
+            <div
               key={accessoryId}
-              src={accessory.lightSrc}
-              alt="Pet Accessory Sticker"
-              width={accessory.width}
-              height={accessory.height}
               className="absolute drop-shadow-sm"
               style={{
                 top: `${50 + placement.y}%`,
@@ -115,7 +111,9 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
                 height: `${placement.size}cqh`,
                 transform: `translate(-50%, -50%) rotate(${placement.rotate}deg)`,
               }}
-            />
+            >
+              <HolographicSticker asset={accessory} className="size-full" />
+            </div>
           );
         })}
       </div>
