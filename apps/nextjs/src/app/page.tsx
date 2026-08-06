@@ -16,6 +16,7 @@ import { Button } from "@acme/ui/button";
 import { ArchedBadge } from "~/components/arched-badge";
 import { PageShell } from "~/components/page-shell";
 import { PawTrailBackground } from "~/components/paw-trail-background";
+import { StickerLockup } from "~/components/sticker-lockup";
 import { ThemeToggle } from "~/components/theme-toggle";
 
 export default function HomePage() {
@@ -39,8 +40,9 @@ export default function HomePage() {
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="flex w-full flex-col items-center text-center">
           <h1 className="sr-only">Pet Care Trivia</h1>
-          <ArchedBadge className="mb-5" label="Pet Care Trivia" />
-          <h2 className="text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
+          <ArchedBadge label="Pet Care Trivia" />
+          <StickerLockup className="h-40 max-w-55" />
+          <h2 className="mt-8 text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
             All about pets!
           </h2>
           <p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl">
