@@ -394,7 +394,7 @@ export function ArchedBadge({
     <>
       <svg
         {...props}
-        className={cn("block overflow-visible", className)}
+        className={cn("block overflow-visible select-none", className)}
         viewBox={`${-shadowPaddingX} ${-shadowPaddingTop} ${renderedWidth} ${renderedHeight}`}
         width={renderedWidth}
         height={renderedHeight}
