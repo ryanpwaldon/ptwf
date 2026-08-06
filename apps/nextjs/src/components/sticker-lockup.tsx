@@ -5,24 +5,80 @@ import { cn } from "@acme/ui";
 
 import { stickerAssets } from "./sticker-assets";
 
-const heroSticker = stickerAssets["toilet-paper-cat"];
-// const heroSticker = stickerAssets["blanket-burrito-dog"];
-// const heroSticker = stickerAssets["cat-in-box"];
-// const heroSticker = stickerAssets["giant-stick-dog"];
-// const heroSticker = stickerAssets["guilty-dog"];
-// const heroSticker = stickerAssets["laptop-cat"];
-// const heroSticker = stickerAssets["paper-bag-cat"];
-// const heroSticker = stickerAssets["post-bath-dog"];
-// const heroSticker = stickerAssets["sock-thief-dog"];
-// const heroSticker = stickerAssets["upside-down-cat"];
+const accessoryStickerIds = ["ball", "bowl", "bone", "fish"] as const;
+
+type AccessoryStickerId = (typeof accessoryStickerIds)[number];
+
+interface AccessoryPlacement {
+  x: number;
+  y: number;
+  size: number;
+  rotate: number;
+}
+
+interface StickerLockupConfig {
+  height: number;
+  accessories: Record<AccessoryStickerId, AccessoryPlacement>;
+}
+
+const stickerLockupConfigs = {
+  "toilet-paper-cat": {
+    height: 90,
+    accessories: {
+      ball: { x: -40, y: -30, size: 25, rotate: 0 },
+      bowl: { x: 40, y: -45, size: 25, rotate: 20 },
+      bone: { x: 50, y: 40, size: 25, rotate: 20 },
+      fish: { x: -55, y: 50, size: 30, rotate: 0 },
+    },
+  },
+  "cat-in-box": {
+    height: 100,
+    accessories: {
+      ball: { x: -55, y: -30, size: 25, rotate: 0 },
+      bowl: { x: 55, y: -20, size: 25, rotate: 0 },
+      bone: { x: -60, y: 40, size: 30, rotate: 0 },
+      fish: { x: 70, y: 40, size: 30, rotate: 20 },
+    },
+  },
+  "paper-bag-cat": {
+    height: 100,
+    accessories: {
+      ball: { x: -65, y: -30, size: 25, rotate: 0 },
+      bowl: { x: 75, y: -20, size: 25, rotate: 0 },
+      bone: { x: -70, y: 40, size: 30, rotate: 0 },
+      fish: { x: 70, y: 40, size: 30, rotate: 20 },
+    },
+  },
+  "post-bath-dog": {
+    height: 100,
+    accessories: {
+      ball: { x: -55, y: -40, size: 25, rotate: 0 },
+      bowl: { x: 55, y: -40, size: 25, rotate: 30 },
+      bone: { x: -60, y: 40, size: 30, rotate: 45 },
+      fish: { x: 55, y: 45, size: 30, rotate: -20 },
+    },
+  },
+  "sock-thief-dog": {
+    height: 100,
+    accessories: {
+      ball: { x: -40, y: -25, size: 25, rotate: 0 },
+      bowl: { x: 55, y: -10, size: 30, rotate: 10 },
+      bone: { x: -45, y: 40, size: 35, rotate: 20 },
+      fish: { x: 50, y: 40, size: 30, rotate: -20 },
+    },
+  },
+} satisfies Record<string, StickerLockupConfig>;
+
+const heroStickerId = "toilet-paper-cat";
 
 export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
+  const config = stickerLockupConfigs[heroStickerId];
+  const heroSticker = stickerAssets[heroStickerId];
   const aspectRatio = heroSticker.width / heroSticker.height;
-
   return (
     <div
       className={cn(
-        "[container-type:size] grid w-full place-items-center",
+        "@container-[size] grid w-full place-items-center",
         className,
       )}
       {...props}
@@ -31,7 +87,7 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
         className="relative"
         style={{
           aspectRatio,
-          width: `min(100cqw, ${aspectRatio * 80}cqh)`,
+          width: `${aspectRatio * config.height}cqh`,
         }}
       >
         <Image
@@ -39,36 +95,29 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
           alt="Playful Pet Sticker"
           width={heroSticker.width}
           height={heroSticker.height}
-          className="size-full drop-shadow-2xl"
+          className="size-full drop-shadow-xl"
         />
-        <Image
-          src={stickerAssets.ball.lightSrc}
-          alt="Pet Accessory Sticker"
-          width={50}
-          height={50}
-          className="absolute top-0 left-0 size-[25cqh] -translate-x-1/2 -translate-y-1/2 drop-shadow-sm"
-        />
-        <Image
-          src={stickerAssets.bowl.lightSrc}
-          alt="Pet Accessory Sticker"
-          width={50}
-          height={50}
-          className="absolute top-0 left-full size-[25cqh] -translate-x-1/2 -translate-y-1/2 drop-shadow-sm"
-        />
-        <Image
-          src={stickerAssets.bone.lightSrc}
-          alt="Pet Accessory Sticker"
-          width={50}
-          height={50}
-          className="absolute top-full left-0 size-[30cqh] -translate-x-1/2 -translate-y-1/2 drop-shadow-sm"
-        />
-        <Image
-          src={stickerAssets.fish.lightSrc}
-          alt="Pet Accessory Sticker"
-          width={50}
-          height={50}
-          className="absolute top-full left-full size-[25cqh] -translate-x-1/2 -translate-y-1/2 drop-shadow-sm"
-        />
+        {accessoryStickerIds.map((accessoryId) => {
+          const accessory = stickerAssets[accessoryId];
+          const placement = config.accessories[accessoryId];
+          return (
+            <Image
+              key={accessoryId}
+              src={accessory.lightSrc}
+              alt="Pet Accessory Sticker"
+              width={accessory.width}
+              height={accessory.height}
+              className="absolute drop-shadow-sm"
+              style={{
+                top: `${50 + placement.y}%`,
+                left: `${50 + placement.x}%`,
+                width: `${placement.size}cqh`,
+                height: `${placement.size}cqh`,
+                transform: `translate(-50%, -50%) rotate(${placement.rotate}deg)`,
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );
