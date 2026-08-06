@@ -1,8 +1,8 @@
 "use client";
 
 import type { MotionValue } from "motion/react";
-import type { CSSProperties, PointerEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -23,6 +23,32 @@ export interface HolographicStickerProps {
   asset: StickerAsset;
   className?: string;
   priority?: boolean;
+}
+
+export interface HolographicMotion {
+  interaction: MotionValue<number>;
+  maxRotateX: number;
+  maxRotateY: number;
+  rotateX: MotionValue<number>;
+  rotateY: MotionValue<number>;
+}
+
+interface HolographicMotionProviderProps {
+  children: ReactNode;
+  value: HolographicMotion;
+}
+
+const HolographicMotionContext = createContext<HolographicMotion | null>(null);
+
+export function HolographicMotionProvider({
+  children,
+  value,
+}: HolographicMotionProviderProps) {
+  return (
+    <HolographicMotionContext value={value}>
+      {children}
+    </HolographicMotionContext>
+  );
 }
 
 type StickerStyle = Omit<CSSProperties, "transform"> & {
@@ -53,6 +79,7 @@ export function HolographicSticker({
   const [hasMounted, setHasMounted] = useState(false);
   const isTouching = useRef(false);
   const shouldReduceMotion = useReducedMotion();
+  const sharedMotion = useContext(HolographicMotionContext);
   const pointerX = useMotionValue(50);
   const pointerY = useMotionValue(50);
   const pointerDistance = useMotionValue(0);
@@ -64,15 +91,34 @@ export function HolographicSticker({
   const rotateX = useTransform(smoothY, [0, 100], [-25, 25]);
   const rotateY = useTransform(smoothX, [0, 100], [14, -14]);
   const scale = useTransform(smoothInteraction, [0, 1], [1, 1.015]);
-  const backgroundX = useTransform(smoothX, [0, 100], [37, 63]);
-  const backgroundY = useTransform(smoothY, [0, 100], [33, 67]);
-  const inverseBackgroundX = useTransform(smoothX, [0, 100], [63, 37]);
-  const inverseBackgroundY = useTransform(smoothY, [0, 100], [67, 33]);
-  const glareOpacity = useTransform(
-    () => smoothInteraction.get() * (smoothDistance.get() + 0.2),
+  const effectX = useTransform(
+    sharedMotion?.rotateY ?? smoothX,
+    sharedMotion
+      ? [-sharedMotion.maxRotateY, sharedMotion.maxRotateY]
+      : [0, 100],
+    [0, 100],
   );
-  const pointerXPercent = useMotionTemplate`${smoothX}%`;
-  const pointerYPercent = useMotionTemplate`${smoothY}%`;
+  const effectY = useTransform(
+    sharedMotion?.rotateX ?? smoothY,
+    sharedMotion
+      ? [-sharedMotion.maxRotateX, sharedMotion.maxRotateX]
+      : [0, 100],
+    sharedMotion ? [100, 0] : [0, 100],
+  );
+  const effectInteraction = sharedMotion?.interaction ?? smoothInteraction;
+  const transformDistance = useTransform(() =>
+    Math.min(Math.hypot(effectX.get() - 50, effectY.get() - 50) / 50, 1),
+  );
+  const effectDistance = sharedMotion ? transformDistance : smoothDistance;
+  const backgroundX = useTransform(effectX, [0, 100], [37, 63]);
+  const backgroundY = useTransform(effectY, [0, 100], [33, 67]);
+  const inverseBackgroundX = useTransform(effectX, [0, 100], [63, 37]);
+  const inverseBackgroundY = useTransform(effectY, [0, 100], [67, 33]);
+  const glareOpacity = useTransform(
+    () => effectInteraction.get() * (effectDistance.get() + 0.2),
+  );
+  const pointerXPercent = useMotionTemplate`${effectX}%`;
+  const pointerYPercent = useMotionTemplate`${effectY}%`;
   const backgroundXPercent = useMotionTemplate`${backgroundX}%`;
   const backgroundYPercent = useMotionTemplate`${backgroundY}%`;
   const inverseBackgroundXPercent = useMotionTemplate`${inverseBackgroundX}%`;
@@ -89,10 +135,10 @@ export function HolographicSticker({
     "--background-y-inverse": inverseBackgroundYPercent,
     "--glare-opacity": glareOpacity,
     "--holographic-mask": `url("${asset.maskSrc}")`,
-    "--interaction": smoothInteraction,
+    "--interaction": effectInteraction,
     "--pointer-x": pointerXPercent,
     "--pointer-y": pointerYPercent,
-    transform: shouldReduceMotion ? "none" : transform,
+    transform: shouldReduceMotion || sharedMotion ? "none" : transform,
   } satisfies StickerStyle;
 
   useEffect(() => {
@@ -100,8 +146,10 @@ export function HolographicSticker({
   }, []);
 
   useEffect(() => {
+    if (sharedMotion) return;
+
     interaction.set(shouldReduceMotion ? 0.4 : 0);
-  }, [interaction, shouldReduceMotion]);
+  }, [interaction, sharedMotion, shouldReduceMotion]);
 
   function updatePointer(event: PointerEvent<HTMLDivElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
@@ -129,6 +177,7 @@ export function HolographicSticker({
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
     if (
+      sharedMotion ||
       shouldReduceMotion ||
       (event.pointerType === "touch" && !isTouching.current)
     ) {
@@ -139,18 +188,24 @@ export function HolographicSticker({
   }
 
   function handlePointerEnter(event: PointerEvent<HTMLDivElement>) {
-    if (shouldReduceMotion || event.pointerType === "touch") return;
+    if (sharedMotion || shouldReduceMotion || event.pointerType === "touch") {
+      return;
+    }
     updatePointer(event);
   }
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
-    if (shouldReduceMotion || event.pointerType !== "touch") return;
+    if (sharedMotion || shouldReduceMotion || event.pointerType !== "touch") {
+      return;
+    }
     isTouching.current = true;
     updatePointer(event);
   }
 
   function handlePointerEnd(event: PointerEvent<HTMLDivElement>) {
-    if (shouldReduceMotion || event.pointerType !== "touch") return;
+    if (sharedMotion || shouldReduceMotion || event.pointerType !== "touch") {
+      return;
+    }
 
     isTouching.current = false;
 
@@ -158,7 +213,7 @@ export function HolographicSticker({
   }
 
   function handlePointerLeave() {
-    if (shouldReduceMotion) return;
+    if (sharedMotion || shouldReduceMotion) return;
 
     resetPointer();
   }
