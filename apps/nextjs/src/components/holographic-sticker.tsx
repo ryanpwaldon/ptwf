@@ -66,8 +66,8 @@ export function HolographicSticker({
   const scale = useTransform(smoothInteraction, [0, 1], [1, 1.015]);
   const backgroundX = useTransform(smoothX, [0, 100], [37, 63]);
   const backgroundY = useTransform(smoothY, [0, 100], [33, 67]);
-  const inverseBackgroundX = useTransform(smoothX, [0, 100], [-37, -63]);
-  const inverseBackgroundY = useTransform(smoothY, [0, 100], [-33, -67]);
+  const inverseBackgroundX = useTransform(smoothX, [0, 100], [63, 37]);
+  const inverseBackgroundY = useTransform(smoothY, [0, 100], [67, 33]);
   const glareOpacity = useTransform(
     () => smoothInteraction.get() * (smoothDistance.get() + 0.2),
   );
@@ -167,7 +167,7 @@ export function HolographicSticker({
     <>
       <motion.div
         className={cn(
-          "[container-type:inline-size] relative isolate mx-auto [filter:drop-shadow(0_18px_24px_rgb(0_0_0_/_0.22))] will-change-transform [transform-style:preserve-3d]",
+          "@container relative isolate mx-auto filter-[drop-shadow(0_18px_24px_rgb(0_0_0/0.22))] will-change-transform [transform-style:preserve-3d]",
           className,
         )}
         style={stickerStyle}
@@ -180,23 +180,23 @@ export function HolographicSticker({
         aria-hidden="true"
       >
         <Image
-          className="relative z-[1] block h-auto w-full select-none"
+          className="relative z-1 block h-auto w-full select-none"
           src={source}
           width={asset.width}
           height={asset.height}
           sizes="(min-width: 640px) 18rem, 16rem"
           alt=""
           draggable={false}
-          priority={priority}
+          preload={priority}
         />
 
-        <span className="venusaur-holo__shine pointer-events-none absolute inset-0 z-[2] overflow-hidden">
+        <span className="venusaur-holo__shine pointer-events-none absolute inset-0 z-2 overflow-hidden">
           <span className="venusaur-holo__shine-pass venusaur-holo__shine-pass--primary absolute inset-0" />
           <span className="venusaur-holo__shine-pass venusaur-holo__shine-pass--secondary absolute inset-0" />
         </span>
 
-        <span className="venusaur-holo__glitter pointer-events-none absolute inset-0 z-[3] overflow-hidden" />
-        <span className="venusaur-holo__glare pointer-events-none absolute inset-0 z-[4] overflow-hidden" />
+        <span className="venusaur-holo__glitter pointer-events-none absolute inset-0 z-3 overflow-hidden" />
+        <span className="venusaur-holo__glare pointer-events-none absolute inset-0 z-4 overflow-hidden" />
       </motion.div>
 
       <style href="venusaur-holographic-sticker" precedence="medium">{`
@@ -253,6 +253,7 @@ export function HolographicSticker({
               hsl(0 0% 0% / 0.25) 120%
             );
           background-blend-mode: screen, hue, hard-light;
+          background-repeat: repeat, no-repeat, no-repeat, no-repeat;
           background-position:
             center,
             0% var(--background-y),
@@ -307,12 +308,13 @@ export function HolographicSticker({
             url("/holographic/venusaur/birthday-holo-dank.webp"),
             url("/holographic/venusaur/birthday-holo-dank-2.webp");
           background-blend-mode: darken, hue, lighten;
+          background-repeat: no-repeat;
           background-position:
             center,
             var(--pointer-x) var(--pointer-y),
             center,
             center;
-          background-size: cover, 500% 500%, 140% 140%, 120% 120%;
+          background-size: cover, 500% 500%, 140% auto, 120% auto;
           opacity: var(--interaction);
           filter: brightness(2) contrast(0.5) saturate(0.75);
           mix-blend-mode: hard-light;
@@ -338,8 +340,8 @@ export function HolographicSticker({
           mask-position: center;
           -webkit-mask-repeat: no-repeat;
           mask-repeat: no-repeat;
-          -webkit-mask-size: cover;
-          mask-size: cover;
+          -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
         }
 
         .venusaur-holo__glare {

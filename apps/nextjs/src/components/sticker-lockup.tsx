@@ -108,7 +108,7 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
                 top: `${50 + placement.y}%`,
                 left: `${50 + placement.x}%`,
                 width: `${placement.size}cqh`,
-                height: `${placement.size}cqh`,
+                aspectRatio: accessory.width / accessory.height,
                 transform: `translate(-50%, -50%) rotate(${placement.rotate}deg)`,
               }}
             >
