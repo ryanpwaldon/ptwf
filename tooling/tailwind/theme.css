@@ -61,6 +61,8 @@
   --color-correct-foreground: var(--correct-foreground);
   --color-incorrect: var(--incorrect);
   --color-incorrect-foreground: var(--incorrect-foreground);
+  --color-sticker-surface: var(--sticker-surface);
+  --color-sticker-foreground: var(--sticker-foreground);
 }
 
 :root {
@@ -100,6 +102,8 @@
   --correct-foreground: var(--color-lime-900);
   --incorrect: var(--color-red-400);
   --incorrect-foreground: var(--color-red-900);
+  --sticker-surface: #fff;
+  --sticker-foreground: #000;
 }
 
 .dark {
@@ -138,6 +142,8 @@
   --correct-foreground: var(--color-lime-300);
   --incorrect: var(--color-red-500);
   --incorrect-foreground: var(--color-red-300);
+  --sticker-surface: #dcdce7;
+  --sticker-foreground: #17151d;
 }
 
 @layer base {

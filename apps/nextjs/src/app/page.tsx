@@ -13,6 +13,7 @@ import {
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 
+import { ArchedBadge } from "~/components/arched-badge";
 import { HolographicSticker } from "~/components/holographic-sticker";
 import { PageShell } from "~/components/page-shell";
 import { PawTrailBackground } from "~/components/paw-trail-background";
@@ -40,15 +41,19 @@ export default function HomePage() {
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="relative isolate w-full">
           <div className="relative z-10 flex w-full flex-col items-center text-center">
+            <div className="mb-5">
+              <h1 className="sr-only">Pet Care Trivia</h1>
+              <ArchedBadge label="Pet Care Trivia" />
+            </div>
             <HolographicSticker
               asset={stickerAssets["toilet-paper-cat"]}
               effect="diffraction"
               className="mb-8 w-64 sm:w-72"
               priority
             />
-            <h1 className="text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
+            <h2 className="text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
               All about pets!
-            </h1>
+            </h2>
             <p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl">
               Challenge your friends and learn interesting pet-care facts
               together through trivia.
