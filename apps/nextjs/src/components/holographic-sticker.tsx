@@ -91,6 +91,7 @@ export function HolographicSticker({
   const rotateX = useTransform(smoothY, [0, 100], [-25, 25]);
   const rotateY = useTransform(smoothX, [0, 100], [14, -14]);
   const scale = useTransform(smoothInteraction, [0, 1], [1, 1.015]);
+  const sharedTransform = useMotionTemplate`perspective(900px) rotateX(${sharedMotion?.rotateX ?? rotateX}deg) rotateY(${sharedMotion?.rotateY ?? rotateY}deg)`;
   const effectX = useTransform(
     sharedMotion?.rotateY ?? smoothX,
     sharedMotion
@@ -138,7 +139,11 @@ export function HolographicSticker({
     "--interaction": effectInteraction,
     "--pointer-x": pointerXPercent,
     "--pointer-y": pointerYPercent,
-    transform: shouldReduceMotion || sharedMotion ? "none" : transform,
+    transform: shouldReduceMotion
+      ? "none"
+      : sharedMotion
+        ? sharedTransform
+        : transform,
   } satisfies StickerStyle;
 
   useEffect(() => {

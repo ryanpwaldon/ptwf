@@ -4,7 +4,6 @@ import type { ComponentProps } from "react";
 import { useEffect, useMemo, useRef } from "react";
 import {
   motion,
-  useMotionTemplate,
   useMotionValue,
   useReducedMotion,
   useSpring,
@@ -105,7 +104,6 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
   const rotateX = useSpring(targetRotateX, lockupSpring);
   const rotateY = useSpring(targetRotateY, lockupSpring);
   const interaction = useSpring(targetInteraction, lockupSpring);
-  const transform = useMotionTemplate`perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
   const config = stickerLockupConfigs[heroStickerId];
   const heroSticker = stickerAssets[heroStickerId];
   const aspectRatio = heroSticker.width / heroSticker.height;
@@ -206,10 +204,9 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
       <HolographicMotionProvider value={holographicMotion}>
         <motion.div
           ref={lockupRef}
-          className="relative will-change-transform [transform-style:preserve-3d]"
+          className="relative"
           style={{
             aspectRatio,
-            transform: shouldReduceMotion ? "none" : transform,
             width: `${aspectRatio * config.height}cqh`,
           }}
           role="img"
