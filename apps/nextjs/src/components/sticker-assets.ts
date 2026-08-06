@@ -88,6 +88,38 @@ export const stickerAssets = {
     height: 925,
     maskSrc: "/stickers/upside-down-cat-mask.svg",
   },
+  ball: {
+    id: "ball",
+    lightSrc: "/stickers/ball.svg",
+    darkSrc: "/stickers/ball-dark.svg",
+    width: 915,
+    height: 925,
+    maskSrc: "/stickers/ball-mask.svg",
+  },
+  bowl: {
+    id: "bowl",
+    lightSrc: "/stickers/bowl.svg",
+    darkSrc: "/stickers/bowl-dark.svg",
+    width: 915,
+    height: 925,
+    maskSrc: "/stickers/bowl-mask.svg",
+  },
+  bone: {
+    id: "bone",
+    lightSrc: "/stickers/bone.svg",
+    darkSrc: "/stickers/bone-dark.svg",
+    width: 915,
+    height: 925,
+    maskSrc: "/stickers/bone-mask.svg",
+  },
+  fish: {
+    id: "fish",
+    lightSrc: "/stickers/fish.svg",
+    darkSrc: "/stickers/fish-dark.svg",
+    width: 915,
+    height: 925,
+    maskSrc: "/stickers/fish-mask.svg",
+  },
 } as const satisfies Record<string, StickerAsset>;
 
 export function getStickerSource(asset: StickerAsset, theme?: string) {
