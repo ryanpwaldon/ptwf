@@ -46,8 +46,8 @@ export default function HomePage() {
             All about pets!
           </h2>
           <p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl">
-            Challenge your friends and learn interesting pet-care facts together
-            through trivia.
+            Challenge your friends and learn interesting pet-care facts over a
+            game of trivia.
           </p>
           <div className="mt-8 flex w-full max-w-xs flex-col gap-3 sm:max-w-md sm:flex-row">
             <Button
