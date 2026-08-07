@@ -86,6 +86,8 @@ const heroStickerId = "toilet-paper-cat";
 const maxRotateX = 7;
 const maxRotateY = 9;
 const pointerDeadZone = 12;
+const accessoryTiltIntensity = 1.75;
+const accessoryFoilIntensity = 0.5;
 
 const lockupSpring = {
   stiffness: 110,
@@ -232,7 +234,12 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
                   transform: `translate(-50%, -50%) rotate(${placement.rotate}deg)`,
                 }}
               >
-                <HolographicSticker asset={accessory} className="size-full" />
+                <HolographicSticker
+                  asset={accessory}
+                  className="size-full"
+                  tiltIntensity={accessoryTiltIntensity}
+                  foilIntensity={accessoryFoilIntensity}
+                />
               </div>
             );
           })}

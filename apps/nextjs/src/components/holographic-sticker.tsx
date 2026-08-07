@@ -22,7 +22,9 @@ import { getStickerSource } from "./sticker-assets";
 export interface HolographicStickerProps {
   asset: StickerAsset;
   className?: string;
+  foilIntensity?: number;
   priority?: boolean;
+  tiltIntensity?: number;
 }
 
 export interface HolographicMotion {
@@ -73,7 +75,9 @@ const interactionSpring = {
 export function HolographicSticker({
   asset,
   className,
+  foilIntensity = 1,
   priority = false,
+  tiltIntensity = 1,
 }: HolographicStickerProps) {
   const { resolvedTheme } = useTheme();
   const [hasMounted, setHasMounted] = useState(false);
@@ -91,20 +95,30 @@ export function HolographicSticker({
   const rotateX = useTransform(smoothY, [0, 100], [-25, 25]);
   const rotateY = useTransform(smoothX, [0, 100], [14, -14]);
   const scale = useTransform(smoothInteraction, [0, 1], [1, 1.015]);
-  const sharedTransform = useMotionTemplate`perspective(900px) rotateX(${sharedMotion?.rotateX ?? rotateX}deg) rotateY(${sharedMotion?.rotateY ?? rotateY}deg)`;
+  const displayRotateX = useTransform(
+    sharedMotion?.rotateX ?? rotateX,
+    (value) => value * tiltIntensity,
+  );
+  const displayRotateY = useTransform(
+    sharedMotion?.rotateY ?? rotateY,
+    (value) => value * tiltIntensity,
+  );
+  const foilRange = 50 * Math.max(foilIntensity, 0);
   const effectX = useTransform(
     sharedMotion?.rotateY ?? smoothX,
     sharedMotion
       ? [-sharedMotion.maxRotateY, sharedMotion.maxRotateY]
       : [0, 100],
-    [0, 100],
+    [50 - foilRange, 50 + foilRange],
   );
   const effectY = useTransform(
     sharedMotion?.rotateX ?? smoothY,
     sharedMotion
       ? [-sharedMotion.maxRotateX, sharedMotion.maxRotateX]
       : [0, 100],
-    sharedMotion ? [100, 0] : [0, 100],
+    sharedMotion
+      ? [50 + foilRange, 50 - foilRange]
+      : [50 - foilRange, 50 + foilRange],
   );
   const effectInteraction = sharedMotion?.interaction ?? smoothInteraction;
   const transformDistance = useTransform(() =>
@@ -124,7 +138,8 @@ export function HolographicSticker({
   const backgroundYPercent = useMotionTemplate`${backgroundY}%`;
   const inverseBackgroundXPercent = useMotionTemplate`${inverseBackgroundX}%`;
   const inverseBackgroundYPercent = useMotionTemplate`${inverseBackgroundY}%`;
-  const transform = useMotionTemplate`perspective(900px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`;
+  const sharedTransform = useMotionTemplate`perspective(900px) rotateX(${displayRotateX}deg) rotateY(${displayRotateY}deg)`;
+  const transform = useMotionTemplate`perspective(900px) rotateY(${displayRotateY}deg) rotateX(${displayRotateX}deg) scale(${scale})`;
   const source = getStickerSource(
     asset,
     hasMounted ? resolvedTheme : undefined,
