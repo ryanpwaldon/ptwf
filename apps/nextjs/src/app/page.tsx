@@ -9,11 +9,16 @@ import {
   LoaderCircleIcon,
   PawPrintIcon,
 } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 
 import { ArchedBadge } from "~/components/arched-badge";
+import {
+  getHomepageEntrance,
+  homepageEntranceDelays,
+} from "~/components/homepage-entrance";
 import { PageShell } from "~/components/page-shell";
 import { PawTrailBackground } from "~/components/paw-trail-background";
 import { StickerLockup } from "~/components/sticker-lockup";
@@ -23,6 +28,7 @@ export default function HomePage() {
   const router = useRouter();
   const createGame = useSessionMutation(api.games.create);
   const [isCreating, setIsCreating] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   async function handleCreate() {
     setIsCreating(true);
@@ -40,16 +46,45 @@ export default function HomePage() {
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="flex w-full flex-col items-center text-center">
           <h1 className="sr-only">Pet Care Trivia</h1>
-          <ArchedBadge className="h-[73px]" />
-          <StickerLockup className="h-40" />
-          <h2 className="mt-8 text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
+          <motion.div
+            className="h-[73px]"
+            {...getHomepageEntrance(
+              homepageEntranceDelays.first,
+              shouldReduceMotion,
+            )}
+          >
+            <ArchedBadge className="h-full" />
+          </motion.div>
+          <StickerLockup
+            className="h-40"
+            entranceDelay={homepageEntranceDelays.first}
+          />
+          <motion.h2
+            className="mt-8 text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl"
+            {...getHomepageEntrance(
+              homepageEntranceDelays.title,
+              shouldReduceMotion,
+            )}
+          >
             All about pets!
-          </h2>
-          <p className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl">
+          </motion.h2>
+          <motion.p
+            className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl"
+            {...getHomepageEntrance(
+              homepageEntranceDelays.description,
+              shouldReduceMotion,
+            )}
+          >
             Challenge your friends and learn interesting pet-care facts over a
             game of trivia.
-          </p>
-          <div className="mt-8 flex w-full max-w-xs flex-col gap-3 sm:max-w-md sm:flex-row">
+          </motion.p>
+          <motion.div
+            className="mt-8 flex w-full max-w-xs flex-col gap-3 sm:max-w-md sm:flex-row"
+            {...getHomepageEntrance(
+              homepageEntranceDelays.final,
+              shouldReduceMotion,
+            )}
+          >
             <Button
               size="xl"
               onClick={handleCreate}
@@ -74,10 +109,16 @@ export default function HomePage() {
               <KeyRoundIcon />
               Join with a code
             </Button>
-          </div>
+          </motion.div>
         </div>
       </main>
-      <footer className="relative z-10 flex justify-center gap-1 px-4 pb-4">
+      <motion.footer
+        className="relative z-10 flex justify-center gap-1 px-4 pb-4"
+        {...getHomepageEntrance(
+          homepageEntranceDelays.final,
+          shouldReduceMotion,
+        )}
+      >
         <Button asChild variant="ghost" size="sm">
           <a
             href="https://github.com/ryanpwaldon/ptwf"
@@ -89,7 +130,7 @@ export default function HomePage() {
           </a>
         </Button>
         <ThemeToggle size="sm" />
-      </footer>
+      </motion.footer>
     </PageShell>
   );
 }

@@ -1,8 +1,15 @@
+"use client";
+
 import type { ComponentProps } from "react";
 import Image from "next/image";
+import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@acme/ui";
 
+import {
+  getHomepageEntrance,
+  homepageStickerStagger,
+} from "./homepage-entrance";
 import { stickerAssets } from "./sticker-assets";
 
 const accessoryStickerIds = ["ball", "bowl", "bone", "fish"] as const;
@@ -71,10 +78,15 @@ const stickerLockupConfigs = {
 
 const heroStickerId = "toilet-paper-cat";
 
-export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
+export function StickerLockup({
+  className,
+  entranceDelay = 0,
+  ...props
+}: ComponentProps<"div"> & { entranceDelay?: number }) {
   const config = stickerLockupConfigs[heroStickerId];
   const heroSticker = stickerAssets[heroStickerId];
   const aspectRatio = heroSticker.width / heroSticker.height;
+  const shouldReduceMotion = useReducedMotion();
   return (
     <div
       className={cn(
@@ -90,24 +102,25 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
           width: `${aspectRatio * config.height}cqh`,
         }}
       >
-        <Image
-          src={heroSticker.lightSrc}
-          alt="Playful Pet Sticker"
-          width={heroSticker.width}
-          height={heroSticker.height}
-          className="size-full drop-shadow-xl"
-        />
-        {accessoryStickerIds.map((accessoryId) => {
+        <motion.div
+          className="size-full"
+          {...getHomepageEntrance(entranceDelay, shouldReduceMotion)}
+        >
+          <Image
+            src={heroSticker.lightSrc}
+            alt="Playful Pet Sticker"
+            width={heroSticker.width}
+            height={heroSticker.height}
+            className="size-full drop-shadow-xl"
+          />
+        </motion.div>
+        {accessoryStickerIds.map((accessoryId, index) => {
           const accessory = stickerAssets[accessoryId];
           const placement = config.accessories[accessoryId];
           return (
-            <Image
+            <div
               key={accessoryId}
-              src={accessory.lightSrc}
-              alt="Pet Accessory Sticker"
-              width={accessory.width}
-              height={accessory.height}
-              className="absolute drop-shadow-sm"
+              className="absolute"
               style={{
                 top: `${50 + placement.y}%`,
                 left: `${50 + placement.x}%`,
@@ -115,7 +128,23 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
                 height: `${placement.size}cqh`,
                 transform: `translate(-50%, -50%) rotate(${placement.rotate}deg)`,
               }}
-            />
+            >
+              <motion.div
+                className="size-full"
+                {...getHomepageEntrance(
+                  entranceDelay + (index + 1) * homepageStickerStagger,
+                  shouldReduceMotion,
+                )}
+              >
+                <Image
+                  src={accessory.lightSrc}
+                  alt="Pet Accessory Sticker"
+                  width={accessory.width}
+                  height={accessory.height}
+                  className="size-full drop-shadow-sm"
+                />
+              </motion.div>
+            </div>
           );
         })}
       </div>
