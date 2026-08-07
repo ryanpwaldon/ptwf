@@ -136,8 +136,24 @@ const maxRotateX = 7;
 const maxRotateY = 9;
 const mouseFalloffRadius = 420;
 const mouseTiltDistance = 180;
+const defaultFlutterSpeed = 10;
 
-function getFlutterProfile(id: string) {
+interface FlutterState {
+  amplitudeX: number;
+  amplitudeY: number;
+  currentX: number;
+  currentY: number;
+  duration: number;
+  elapsed: number;
+  random: () => number;
+  resting: boolean;
+  startX: number;
+  startY: number;
+  targetX: number;
+  targetY: number;
+}
+
+function createSeededRandom(id: string) {
   let hash = 2166136261;
 
   for (const character of id) {
@@ -145,16 +161,100 @@ function getFlutterProfile(id: string) {
     hash = Math.imul(hash, 16777619);
   }
 
-  const seed = (hash >>> 0) / 4294967295;
+  let seed = hash >>> 0;
 
-  return {
-    amplitudeX: 0.26 + seed * 0.1,
-    amplitudeY: 0.24 + ((seed * 7.13) % 1) * 0.12,
-    phaseX: seed * Math.PI * 2,
-    phaseY: ((seed * 5.71) % 1) * Math.PI * 2,
-    speedX: 0.88 + ((seed * 3.17) % 1) * 0.24,
-    speedY: 0.86 + ((seed * 9.43) % 1) * 0.28,
+  return () => {
+    seed = (seed + 0x6d2b79f5) >>> 0;
+    let value = seed;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+function setNextFlutterTarget(state: FlutterState) {
+  const angle = state.random() * Math.PI * 2;
+  const isGust = state.random() < 0.18;
+  const intensity = isGust
+    ? 0.8 + state.random() * 0.2
+    : 0.18 + state.random() * 0.6;
+
+  state.startX = state.currentX;
+  state.startY = state.currentY;
+  state.targetX = Math.sin(angle) * maxRotateX * state.amplitudeX * intensity;
+  state.targetY = Math.cos(angle) * maxRotateY * state.amplitudeY * intensity;
+
+  const distance = Math.hypot(
+    (state.targetX - state.startX) / (maxRotateX * state.amplitudeX),
+    (state.targetY - state.startY) / (maxRotateY * state.amplitudeY),
+  );
+
+  state.duration = 1.4 + distance * 1.15 + state.random() * 1.8;
+  state.elapsed = 0;
+  state.resting = false;
+}
+
+function createFlutterState(id: string) {
+  const random = createSeededRandom(id);
+  const state: FlutterState = {
+    amplitudeX: 0.26 + random() * 0.1,
+    amplitudeY: 0.24 + random() * 0.12,
+    currentX: 0,
+    currentY: 0,
+    duration: 0,
+    elapsed: 0,
+    random,
+    resting: false,
+    startX: 0,
+    startY: 0,
+    targetX: 0,
+    targetY: 0,
+  };
+
+  setNextFlutterTarget(state);
+
+  return state;
+}
+
+function advanceFlutter(state: FlutterState, elapsedSeconds: number) {
+  let remaining = elapsedSeconds;
+
+  while (remaining > 0) {
+    const segmentRemaining = state.duration - state.elapsed;
+    const step = Math.min(remaining, segmentRemaining);
+
+    state.elapsed += step;
+    remaining -= step;
+
+    if (!state.resting) {
+      const progress = Math.min(state.elapsed / state.duration, 1);
+      const eased = progress ** 3 * (progress * (progress * 6 - 15) + 10);
+
+      state.currentX = state.startX + (state.targetX - state.startX) * eased;
+      state.currentY = state.startY + (state.targetY - state.startY) * eased;
+    }
+
+    if (state.elapsed < state.duration) continue;
+
+    if (state.resting) {
+      setNextFlutterTarget(state);
+      continue;
+    }
+
+    state.currentX = state.targetX;
+    state.currentY = state.targetY;
+
+    if (state.random() < 0.32) {
+      state.duration = 0.2 + state.random() * 1.1;
+      state.elapsed = 0;
+      state.resting = true;
+    } else {
+      setNextFlutterTarget(state);
+    }
+  }
+
+  return state;
 }
 
 export function HolographicSticker({
@@ -172,7 +272,7 @@ export function HolographicSticker({
   const isTouching = useRef(false);
   const shouldReduceMotion = useReducedMotion();
   const sharedPointer = useContext(HolographicPointerContext);
-  const flutterTime = useRef(0);
+  const flutterState = useMemo(() => createFlutterState(asset.id), [asset.id]);
   const pointerX = useMotionValue(50);
   const pointerY = useMotionValue(50);
   const pointerDistance = useMotionValue(0);
@@ -199,7 +299,6 @@ export function HolographicSticker({
   );
   const flutterRotateX = useMotionValue(0);
   const flutterRotateY = useMotionValue(0);
-  const flutterProfile = getFlutterProfile(asset.id);
   const blendedRotateX = useTransform(() => {
     if (!sharedPointer) return rotateX.get();
 
@@ -368,17 +467,10 @@ export function HolographicSticker({
   useAnimationFrame((_time, delta) => {
     if (!sharedPointer || shouldReduceMotion) return;
 
-    flutterTime.current += (delta / 1000) * Math.max(flutterSpeed, 0);
-    const elapsed = flutterTime.current;
-    const xWave =
-      Math.sin(elapsed * 0.42 * flutterProfile.speedX + flutterProfile.phaseX) +
-      Math.sin(elapsed * 0.17 + flutterProfile.phaseY) * 0.45;
-    const yWave =
-      Math.sin(elapsed * 0.37 * flutterProfile.speedY + flutterProfile.phaseY) +
-      Math.sin(elapsed * 0.13 + flutterProfile.phaseX) * 0.5;
-
-    flutterRotateX.set((maxRotateX * flutterProfile.amplitudeX * xWave) / 1.45);
-    flutterRotateY.set((maxRotateY * flutterProfile.amplitudeY * yWave) / 1.5);
+    const speed = Math.max(flutterSpeed, 0) / defaultFlutterSpeed;
+    advanceFlutter(flutterState, (Math.min(delta, 100) / 1000) * speed);
+    flutterRotateX.set(flutterState.currentX);
+    flutterRotateY.set(flutterState.currentY);
   });
 
   useEffect(() => {
