@@ -270,7 +270,6 @@ export function HolographicSticker({
           <span className="venusaur-holo__shine-pass venusaur-holo__shine-pass--secondary absolute inset-0" />
         </span>
 
-        <span className="venusaur-holo__glitter pointer-events-none absolute inset-0 z-3 overflow-hidden" />
         <span className="venusaur-holo__glare pointer-events-none absolute inset-0 z-4 overflow-hidden" />
       </motion.div>
 
@@ -364,61 +363,6 @@ export function HolographicSticker({
           mix-blend-mode: difference;
         }
 
-        .venusaur-holo__glitter {
-          background-image:
-            radial-gradient(
-              farthest-corner circle at var(--pointer-x) var(--pointer-y),
-              hsl(295 100% 10%) 20%,
-              hsl(183 84% 85% / 0.15) 100%
-            ),
-            linear-gradient(
-              133deg,
-              hsl(2 100% 73%) 25%,
-              hsl(53 100% 69%),
-              hsl(93 100% 69%),
-              hsl(176 100% 76%),
-              hsl(228 100% 74%),
-              hsl(283 100% 73%) 75%
-            ),
-            url("/holographic/venusaur/birthday-holo-dank.webp"),
-            url("/holographic/venusaur/birthday-holo-dank-2.webp");
-          background-blend-mode: darken, hue, lighten;
-          background-repeat: no-repeat;
-          background-position:
-            center,
-            var(--pointer-x) var(--pointer-y),
-            center,
-            center;
-          background-size: cover, 500% 500%, 140% auto, 120% auto;
-          opacity: var(--interaction);
-          filter: brightness(2) contrast(0.5) saturate(0.75);
-          mix-blend-mode: hard-light;
-          -webkit-mask-image:
-            radial-gradient(
-              farthest-corner circle at var(--pointer-x) var(--pointer-y),
-              transparent 30%,
-              black 100%
-            ),
-            var(--holographic-mask);
-          mask-image:
-            radial-gradient(
-              farthest-corner circle at var(--pointer-x) var(--pointer-y),
-              transparent 30%,
-              black 100%
-            ),
-            var(--holographic-mask);
-          -webkit-mask-composite: destination-in;
-          mask-composite: intersect;
-          -webkit-mask-mode: alpha, luminance;
-          mask-mode: alpha, luminance;
-          -webkit-mask-position: center;
-          mask-position: center;
-          -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
-          -webkit-mask-size: 100% 100%;
-          mask-size: 100% 100%;
-        }
-
         .venusaur-holo__glare {
           background-image: radial-gradient(
             farthest-corner circle at var(--pointer-x) var(--pointer-y),
@@ -433,7 +377,6 @@ export function HolographicSticker({
 
         @media (hover: none), (pointer: coarse) {
           .venusaur-holo__shine,
-          .venusaur-holo__glitter,
           .venusaur-holo__glare {
             will-change: opacity, background-position;
           }
