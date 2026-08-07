@@ -7,9 +7,15 @@ export const homepageEntranceDelays = {
 
 export const homepageStickerStagger = 0.06;
 
+interface HomepageEntranceOffset {
+  x?: number;
+  y?: number;
+}
+
 export function getHomepageEntrance(
   delay: number,
   shouldReduceMotion: boolean | null,
+  offset: HomepageEntranceOffset = {},
 ) {
   if (shouldReduceMotion) {
     return {
@@ -19,9 +25,14 @@ export function getHomepageEntrance(
     };
   }
 
+  const { x = 0, y = 16 } = offset;
+
   return {
-    initial: { opacity: 0, transform: "translateY(16px)" },
-    animate: { opacity: 1, transform: "translateY(0px)" },
+    initial: {
+      opacity: 0,
+      transform: `translate3d(${x}px, ${y}px, 0)`,
+    },
+    animate: { opacity: 1, transform: "translate3d(0px, 0px, 0)" },
     transition: {
       type: "spring" as const,
       visualDuration: 0.55,

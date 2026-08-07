@@ -134,6 +134,10 @@ export function StickerLockup({
                 {...getHomepageEntrance(
                   entranceDelay + (index + 1) * homepageStickerStagger,
                   shouldReduceMotion,
+                  {
+                    x: placement.x < 0 ? 32 : -32,
+                    y: 48,
+                  },
                 )}
               >
                 <Image
