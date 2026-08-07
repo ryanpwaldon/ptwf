@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@acme/ui";
 
+import { ArchedBadge } from "./arched-badge";
 import {
   HolographicPointerProvider,
   HolographicSticker,
@@ -108,6 +109,19 @@ export function StickerLockup({
           role="img"
           aria-label="Playful pet stickers"
         >
+          <div className="absolute bottom-[calc(100%+1rem)] left-1/2 h-14 -translate-x-1/2">
+            <motion.div
+              className="h-full"
+              {...getHomepageEntrance(
+                entranceDelay +
+                  (accessoryStickerIds.length + 1) * homepageStickerStagger,
+                shouldReduceMotion,
+                { y: 48 },
+              )}
+            >
+              <ArchedBadge className="h-full" />
+            </motion.div>
+          </div>
           <motion.div
             className="size-full"
             {...getHomepageEntrance(entranceDelay, shouldReduceMotion)}

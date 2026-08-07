@@ -14,7 +14,6 @@ import { motion, useReducedMotion } from "motion/react";
 import { api } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 
-import { ArchedBadge } from "~/components/arched-badge";
 import {
   getHomepageEntrance,
   homepageEntranceDelays,
@@ -46,17 +45,8 @@ export default function HomePage() {
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="flex w-full flex-col items-center text-center">
           <h1 className="sr-only">Pet Care Trivia</h1>
-          <motion.div
-            className="h-14"
-            {...getHomepageEntrance(
-              homepageEntranceDelays.first,
-              shouldReduceMotion,
-            )}
-          >
-            <ArchedBadge className="h-full" />
-          </motion.div>
           <StickerLockup
-            className="mt-4 h-40"
+            className="mt-[4.5rem] h-40"
             entranceDelay={homepageEntranceDelays.first}
           />
           <motion.h2
