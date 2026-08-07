@@ -209,12 +209,14 @@ export function HolographicSticker({
   const effectRotateX = useTransform(() => {
     if (!sharedPointer) return mouseRotateX.get();
 
-    return circularRotateX.get() + mouseRotateX.get();
+    const totalInfluence = 1 + smoothMouseInfluence.get();
+    return (circularRotateX.get() + mouseRotateX.get()) / totalInfluence;
   });
   const effectRotateY = useTransform(() => {
     if (!sharedPointer) return mouseRotateY.get();
 
-    return circularRotateY.get() + mouseRotateY.get();
+    const totalInfluence = 1 + smoothMouseInfluence.get();
+    return (circularRotateY.get() + mouseRotateY.get()) / totalInfluence;
   });
   const scale = useTransform(smoothInteraction, [0, 1], [1, 1.015]);
   const displayRotateX = useTransform(() => {
