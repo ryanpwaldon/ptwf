@@ -1,10 +1,19 @@
 "use client";
 
-import type { CSSProperties, PointerEvent } from "react";
-import { useEffect, useState } from "react";
+import type { MotionValue } from "motion/react";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import {
   motion,
+  useAnimationFrame,
   useMotionTemplate,
   useMotionValue,
   useReducedMotion,
@@ -18,305 +27,576 @@ import { useTheme } from "@acme/ui/theme";
 import type { StickerAsset } from "./sticker-assets";
 import { getStickerSource } from "./sticker-assets";
 
-export type HolographicEffect = "diffraction" | "mica" | "embossed";
-
 export interface HolographicStickerProps {
   asset: StickerAsset;
-  effect: HolographicEffect;
+  circularTiltIntensity?: number;
+  circularTiltSpeed?: number;
   className?: string;
+  foilIntensity?: number;
+  mouseTiltIntensity?: number;
   priority?: boolean;
 }
 
-type StickerStyle = CSSProperties & {
-  "--sticker-image": string;
+interface PointerPosition {
+  x: number;
+  y: number;
+}
+
+interface HolographicPointer {
+  active: MotionValue<number>;
+  mouseInfluence: number;
+  position: MotionValue<PointerPosition>;
+}
+
+interface HolographicPointerProviderProps {
+  children: ReactNode;
+  mouseInfluence?: number;
+}
+
+const HolographicPointerContext = createContext<HolographicPointer | null>(
+  null,
+);
+
+export function HolographicPointerProvider({
+  children,
+  mouseInfluence = 1,
+}: HolographicPointerProviderProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const active = useMotionValue(0);
+  const position = useMotionValue<PointerPosition>({ x: 0, y: 0 });
+  const value = useMemo(
+    () => ({ active, mouseInfluence, position }),
+    [active, mouseInfluence, position],
+  );
+
+  useEffect(() => {
+    function resetPointer() {
+      active.set(0);
+    }
+
+    if (shouldReduceMotion) {
+      resetPointer();
+      return;
+    }
+
+    function handlePointerMove(event: globalThis.PointerEvent) {
+      if (event.pointerType !== "mouse") return;
+
+      active.set(1);
+      position.set({ x: event.clientX, y: event.clientY });
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState !== "visible") resetPointer();
+    }
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("blur", resetPointer);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("blur", resetPointer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [active, position, shouldReduceMotion]);
+
+  return (
+    <HolographicPointerContext value={value}>
+      {children}
+    </HolographicPointerContext>
+  );
+}
+
+type StickerStyle = Omit<CSSProperties, "transform"> & {
+  "--background-x": MotionValue<string>;
+  "--background-x-inverse": MotionValue<string>;
+  "--background-y": MotionValue<string>;
+  "--background-y-inverse": MotionValue<string>;
+  "--glare-opacity": MotionValue<number>;
   "--holographic-mask": string;
+  "--interaction": MotionValue<number>;
+  "--pointer-x": MotionValue<string>;
+  "--pointer-y": MotionValue<string>;
+  transform: MotionValue<string> | "none";
 };
 
-const spring = {
+const interactionSpring = {
   stiffness: 150,
   damping: 18,
   mass: 0.55,
 };
 
+const sharedMotionSpring = {
+  stiffness: 110,
+  damping: 20,
+  mass: 0.75,
+};
+
+const maxRotateX = 7;
+const maxRotateY = 9;
+const mouseFalloffRadius = 420;
+const mouseTiltDistance = 180;
+const degreesToRadians = Math.PI / 180;
+
+function getCircularTiltPhase(id: string) {
+  let hash = 2166136261;
+
+  for (const character of id) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return ((hash >>> 0) / 4294967296) * Math.PI * 2;
+}
+
 export function HolographicSticker({
   asset,
-  effect,
+  circularTiltIntensity = 1,
+  circularTiltSpeed = 20,
   className,
+  foilIntensity = 1,
+  mouseTiltIntensity = 1,
   priority = false,
 }: HolographicStickerProps) {
   const { resolvedTheme } = useTheme();
   const [hasMounted, setHasMounted] = useState(false);
+  const stickerRef = useRef<HTMLDivElement>(null);
+  const centerRef = useRef({ x: 0, y: 0 });
+  const isTouching = useRef(false);
   const shouldReduceMotion = useReducedMotion();
+  const sharedPointer = useContext(HolographicPointerContext);
+  const circularTiltPhase = useMemo(
+    () => getCircularTiltPhase(asset.id),
+    [asset.id],
+  );
   const pointerX = useMotionValue(50);
   const pointerY = useMotionValue(50);
+  const pointerDistance = useMotionValue(0);
   const interaction = useMotionValue(0);
-  const smoothX = useSpring(pointerX, spring);
-  const smoothY = useSpring(pointerY, spring);
-  const smoothInteraction = useSpring(interaction, spring);
-  const rotateX = useTransform(smoothY, [0, 100], [8, -8]);
-  const rotateY = useTransform(smoothX, [0, 100], [-8, 8]);
-  const scale = useTransform(smoothInteraction, [0, 1], [1, 1.025]);
-  const foilX = useTransform(smoothX, [0, 100], [12, 88]);
-  const foilY = useTransform(smoothY, [0, 100], [18, 82]);
-  const textureX = useTransform(smoothX, [0, 100], [24, -24]);
-  const textureY = useTransform(smoothY, [0, 100], [18, -18]);
-  const foilOpacity = useTransform(smoothInteraction, [0, 1], [0, 0.78]);
-  const glazeOpacity = useTransform(smoothInteraction, [0, 1], [0, 0.22]);
-  const transform = useMotionTemplate`perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`;
-  const foilPosition = useMotionTemplate`${foilX}% ${foilY}%`;
-  const texturePosition = useMotionTemplate`${textureX}px ${textureY}px, ${foilX}% ${foilY}%`;
-  const glaze = useMotionTemplate`radial-gradient(circle at ${smoothX}% ${smoothY}%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.16) 22%, transparent 52%)`;
+  const smoothX = useSpring(pointerX, interactionSpring);
+  const smoothY = useSpring(pointerY, interactionSpring);
+  const smoothDistance = useSpring(pointerDistance, interactionSpring);
+  const smoothInteraction = useSpring(interaction, interactionSpring);
+  const rotateX = useTransform(smoothY, [0, 100], [-25, 25]);
+  const rotateY = useTransform(smoothX, [0, 100], [14, -14]);
+  const targetSharedRotateX = useMotionValue(0);
+  const targetSharedRotateY = useMotionValue(0);
+  const targetMouseInfluence = useMotionValue(0);
+  const sharedRotateX = useSpring(targetSharedRotateX, sharedMotionSpring);
+  const sharedRotateY = useSpring(targetSharedRotateY, sharedMotionSpring);
+  const smoothMouseInfluence = useSpring(
+    targetMouseInfluence,
+    sharedMotionSpring,
+  );
+  const sharedInteraction = useTransform(
+    smoothMouseInfluence,
+    [0, 1],
+    [0.4, 1],
+  );
+  const circularRotateX = useMotionValue(0);
+  const circularRotateY = useMotionValue(0);
+  const mouseRotateX = useTransform(() => {
+    if (!sharedPointer) return rotateX.get();
+
+    return sharedRotateX.get() * smoothMouseInfluence.get();
+  });
+  const mouseRotateY = useTransform(() => {
+    if (!sharedPointer) return rotateY.get();
+
+    return sharedRotateY.get() * smoothMouseInfluence.get();
+  });
+  const effectRotateX = useTransform(() => {
+    if (!sharedPointer) return mouseRotateX.get();
+
+    const totalInfluence = 1 + smoothMouseInfluence.get();
+    return (circularRotateX.get() + mouseRotateX.get()) / totalInfluence;
+  });
+  const effectRotateY = useTransform(() => {
+    if (!sharedPointer) return mouseRotateY.get();
+
+    const totalInfluence = 1 + smoothMouseInfluence.get();
+    return (circularRotateY.get() + mouseRotateY.get()) / totalInfluence;
+  });
+  const scale = useTransform(smoothInteraction, [0, 1], [1, 1.015]);
+  const displayRotateX = useTransform(() => {
+    const circularTilt = sharedPointer
+      ? circularRotateX.get() * circularTiltIntensity
+      : 0;
+
+    return circularTilt + mouseRotateX.get() * mouseTiltIntensity;
+  });
+  const displayRotateY = useTransform(() => {
+    const circularTilt = sharedPointer
+      ? circularRotateY.get() * circularTiltIntensity
+      : 0;
+
+    return circularTilt + mouseRotateY.get() * mouseTiltIntensity;
+  });
+  const foilRange = 50 * Math.max(foilIntensity, 0);
+  const effectX = useTransform(
+    sharedPointer ? effectRotateY : smoothX,
+    sharedPointer ? [-maxRotateY, maxRotateY] : [0, 100],
+    [50 - foilRange, 50 + foilRange],
+  );
+  const effectY = useTransform(
+    sharedPointer ? effectRotateX : smoothY,
+    sharedPointer ? [-maxRotateX, maxRotateX] : [0, 100],
+    sharedPointer
+      ? [50 + foilRange, 50 - foilRange]
+      : [50 - foilRange, 50 + foilRange],
+  );
+  const effectInteraction = sharedPointer
+    ? sharedInteraction
+    : smoothInteraction;
+  const transformDistance = useTransform(() =>
+    Math.min(Math.hypot(effectX.get() - 50, effectY.get() - 50) / 50, 1),
+  );
+  const effectDistance = sharedPointer ? transformDistance : smoothDistance;
+  const backgroundX = useTransform(effectX, [0, 100], [37, 63]);
+  const backgroundY = useTransform(effectY, [0, 100], [33, 67]);
+  const inverseBackgroundX = useTransform(effectX, [0, 100], [63, 37]);
+  const inverseBackgroundY = useTransform(effectY, [0, 100], [67, 33]);
+  const glareOpacity = useTransform(
+    () => effectInteraction.get() * (effectDistance.get() + 0.2),
+  );
+  const pointerXPercent = useMotionTemplate`${effectX}%`;
+  const pointerYPercent = useMotionTemplate`${effectY}%`;
+  const backgroundXPercent = useMotionTemplate`${backgroundX}%`;
+  const backgroundYPercent = useMotionTemplate`${backgroundY}%`;
+  const inverseBackgroundXPercent = useMotionTemplate`${inverseBackgroundX}%`;
+  const inverseBackgroundYPercent = useMotionTemplate`${inverseBackgroundY}%`;
+  const sharedTransform = useMotionTemplate`perspective(600px) rotateX(${displayRotateX}deg) rotateY(${displayRotateY}deg)`;
+  const transform = useMotionTemplate`perspective(600px) rotateY(${displayRotateY}deg) rotateX(${displayRotateX}deg) scale(${scale})`;
   const source = getStickerSource(
     asset,
     hasMounted ? resolvedTheme : undefined,
   );
   const stickerStyle = {
-    "--sticker-image": `url("${source}")`,
+    "--background-x": backgroundXPercent,
+    "--background-x-inverse": inverseBackgroundXPercent,
+    "--background-y": backgroundYPercent,
+    "--background-y-inverse": inverseBackgroundYPercent,
+    "--glare-opacity": glareOpacity,
     "--holographic-mask": `url("${asset.maskSrc}")`,
+    "--interaction": effectInteraction,
+    "--pointer-x": pointerXPercent,
+    "--pointer-y": pointerYPercent,
+    transform: shouldReduceMotion
+      ? "none"
+      : sharedPointer
+        ? sharedTransform
+        : transform,
   } satisfies StickerStyle;
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (event.pointerType !== "mouse" || shouldReduceMotion) return;
+  useEffect(() => {
+    if (!sharedPointer || !stickerRef.current) return;
 
+    const pointer: HolographicPointer = sharedPointer;
+    const sticker: HTMLDivElement = stickerRef.current;
+
+    function resetMouseMotion() {
+      targetSharedRotateX.set(0);
+      targetSharedRotateY.set(0);
+      targetMouseInfluence.set(0);
+    }
+
+    function updateMouseMotion(position: PointerPosition) {
+      if (shouldReduceMotion || pointer.active.get() === 0) {
+        resetMouseMotion();
+        return;
+      }
+
+      const center = centerRef.current;
+      const deltaX = position.x - center.x;
+      const deltaY = position.y - center.y;
+      const distance = Math.hypot(deltaX, deltaY);
+      const normalizedDistance = distance / mouseFalloffRadius;
+      const proximity = 1 / (1 + normalizedDistance ** 3);
+      const influence = Math.min(
+        proximity * Math.max(pointer.mouseInfluence, 0),
+        1,
+      );
+      const normalizedX = Math.max(-1, Math.min(deltaX / mouseTiltDistance, 1));
+      const normalizedY = Math.max(-1, Math.min(deltaY / mouseTiltDistance, 1));
+
+      targetSharedRotateX.set(-normalizedY * maxRotateX);
+      targetSharedRotateY.set(normalizedX * maxRotateY);
+      targetMouseInfluence.set(influence);
+    }
+
+    function measureCenter() {
+      const bounds = sticker.getBoundingClientRect();
+      centerRef.current = {
+        x: bounds.left + bounds.width / 2,
+        y: bounds.top + bounds.height / 2,
+      };
+      updateMouseMotion(pointer.position.get());
+    }
+
+    measureCenter();
+
+    const resizeObserver = new ResizeObserver(measureCenter);
+    const unsubscribePosition = pointer.position.on(
+      "change",
+      updateMouseMotion,
+    );
+    const unsubscribeActive = pointer.active.on("change", (active) => {
+      if (active === 0) resetMouseMotion();
+    });
+
+    resizeObserver.observe(sticker);
+    window.addEventListener("resize", measureCenter);
+    window.addEventListener("scroll", measureCenter, {
+      capture: true,
+      passive: true,
+    });
+
+    return () => {
+      resizeObserver.disconnect();
+      unsubscribePosition();
+      unsubscribeActive();
+      window.removeEventListener("resize", measureCenter);
+      window.removeEventListener("scroll", measureCenter, true);
+    };
+  }, [
+    sharedPointer,
+    shouldReduceMotion,
+    targetMouseInfluence,
+    targetSharedRotateX,
+    targetSharedRotateY,
+  ]);
+
+  useAnimationFrame((time) => {
+    if (!sharedPointer || shouldReduceMotion) return;
+
+    const angle =
+      circularTiltPhase +
+      (time / 1000) * Math.max(circularTiltSpeed, 0) * degreesToRadians;
+
+    circularRotateX.set(Math.sin(angle) * maxRotateX);
+    circularRotateY.set(Math.cos(angle) * maxRotateY);
+  });
+
+  useEffect(() => {
+    if (sharedPointer) return;
+
+    interaction.set(shouldReduceMotion ? 0.4 : 0);
+  }, [interaction, sharedPointer, shouldReduceMotion]);
+
+  function updatePointer(event: PointerEvent<HTMLDivElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
-    pointerX.set(((event.clientX - bounds.left) / bounds.width) * 100);
-    pointerY.set(((event.clientY - bounds.top) / bounds.height) * 100);
+    const x = Math.min(
+      Math.max(((event.clientX - bounds.left) / bounds.width) * 100, 0),
+      100,
+    );
+    const y = Math.min(
+      Math.max(((event.clientY - bounds.top) / bounds.height) * 100, 0),
+      100,
+    );
+
+    pointerX.set(x);
+    pointerY.set(y);
+    pointerDistance.set(Math.min(Math.hypot(x - 50, y - 50) / 50, 1));
     interaction.set(1);
+  }
+
+  function resetPointer() {
+    pointerX.set(50);
+    pointerY.set(50);
+    pointerDistance.set(0);
+    interaction.set(0);
+  }
+
+  function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+    if (
+      sharedPointer ||
+      shouldReduceMotion ||
+      (event.pointerType === "touch" && !isTouching.current)
+    ) {
+      return;
+    }
+
+    updatePointer(event);
   }
 
   function handlePointerEnter(event: PointerEvent<HTMLDivElement>) {
-    if (event.pointerType !== "mouse" || shouldReduceMotion) return;
-    interaction.set(1);
+    if (sharedPointer || shouldReduceMotion || event.pointerType === "touch") {
+      return;
+    }
+    updatePointer(event);
   }
 
-  function handlePointerLeave(event: PointerEvent<HTMLDivElement>) {
-    if (event.pointerType !== "mouse" || shouldReduceMotion) return;
-    pointerX.set(50);
-    pointerY.set(50);
-    interaction.set(0);
+  function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (sharedPointer || shouldReduceMotion || event.pointerType !== "touch") {
+      return;
+    }
+    isTouching.current = true;
+    updatePointer(event);
+  }
+
+  function handlePointerEnd(event: PointerEvent<HTMLDivElement>) {
+    if (sharedPointer || shouldReduceMotion || event.pointerType !== "touch") {
+      return;
+    }
+
+    isTouching.current = false;
+
+    resetPointer();
+  }
+
+  function handlePointerLeave() {
+    if (sharedPointer || shouldReduceMotion) return;
+
+    resetPointer();
   }
 
   return (
     <>
       <motion.div
-        className={cn("holographic-sticker relative mx-auto", className)}
-        data-effect={effect}
-        style={{ ...stickerStyle, transform }}
+        ref={stickerRef}
+        className={cn(
+          "@container relative isolate mx-auto filter-[drop-shadow(0_18px_24px_rgb(0_0_0/0.22))] will-change-transform transform-3d",
+          className,
+        )}
+        style={stickerStyle}
         onPointerMove={handlePointerMove}
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
         aria-hidden="true"
       >
         <Image
-          className="holographic-sticker__image"
+          className="relative z-1 block h-auto w-full select-none"
           src={source}
           width={asset.width}
           height={asset.height}
           sizes="(min-width: 640px) 18rem, 16rem"
           alt=""
           draggable={false}
-          priority={priority}
+          preload={priority}
         />
-        <motion.span
-          className="holographic-sticker__foil"
-          style={{ opacity: foilOpacity }}
-        >
-          <motion.span
-            className="holographic-sticker__spectrum"
-            style={{ backgroundPosition: foilPosition }}
-          />
-          <motion.span
-            className="holographic-sticker__relief"
-            style={{ backgroundPosition: texturePosition }}
-          />
-        </motion.span>
-        <motion.span
-          className="holographic-sticker__glaze"
-          style={{ backgroundImage: glaze, opacity: glazeOpacity }}
-        />
+
+        <span className="holographic-sticker__shine pointer-events-none absolute inset-0 z-2 overflow-hidden">
+          <span className="holographic-sticker__shine-pass holographic-sticker__shine-pass--primary absolute inset-0" />
+          <span className="holographic-sticker__shine-pass holographic-sticker__shine-pass--secondary absolute inset-0" />
+        </span>
+
+        <span className="holographic-sticker__glare pointer-events-none absolute inset-0 z-4 overflow-hidden" />
       </motion.div>
 
       <style href="holographic-sticker" precedence="medium">{`
-        .holographic-sticker {
-          --sticker-image: none;
-          --holographic-mask: none;
-          filter: drop-shadow(0 18px 24px rgb(0 0 0 / 0.22));
-          transform-style: preserve-3d;
-          will-change: transform;
-        }
-
-        .holographic-sticker__image {
-          position: relative;
-          z-index: 1;
-          display: block;
-          width: 100%;
-          height: auto;
-          user-select: none;
-        }
-
-        .holographic-sticker__foil,
-        .holographic-sticker__glaze {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
+        .holographic-sticker__shine,
+        .holographic-sticker__glare {
+          -webkit-mask-image: var(--holographic-mask);
+          mask-image: var(--holographic-mask);
           -webkit-mask-position: center;
           mask-position: center;
+          -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
           -webkit-mask-size: 100% 100%;
           mask-size: 100% 100%;
         }
 
-        .holographic-sticker__foil {
-          z-index: 2;
-          -webkit-mask-image: var(--holographic-mask);
-          mask-image: var(--holographic-mask);
+        .holographic-sticker__shine {
+          opacity: var(--interaction);
+          filter: brightness(0.45) contrast(1.5) saturate(1.2);
+          mix-blend-mode: color-dodge;
         }
 
-        .holographic-sticker__spectrum,
-        .holographic-sticker__relief {
-          position: absolute;
-          inset: 0;
-        }
-
-        .holographic-sticker__spectrum {
-          background-image: repeating-linear-gradient(
-            112deg,
-            rgb(255 119 115) 0%,
-            rgb(255 237 95) 14%,
-            rgb(168 255 95) 28%,
-            rgb(131 255 247) 42%,
-            rgb(120 148 255) 56%,
-            rgb(216 117 255) 70%,
-            rgb(255 119 115) 84%
-          );
-          background-size: 180% 220%;
-          mix-blend-mode: normal;
-          -webkit-mask-repeat: repeat;
-          mask-repeat: repeat;
-        }
-
-        .holographic-sticker__relief {
-          mix-blend-mode: screen;
-        }
-
-        .holographic-sticker__glaze {
-          z-index: 3;
-          -webkit-mask-image: var(--sticker-image);
-          mask-image: var(--sticker-image);
-          mix-blend-mode: screen;
-        }
-
-        .holographic-sticker[data-effect="diffraction"]
-          .holographic-sticker__spectrum {
-          -webkit-mask-image: repeating-linear-gradient(
-            -24deg,
-            rgb(0 0 0 / 0.9) 0,
-            rgb(0 0 0 / 0.38) 1px,
-            transparent 2px,
-            transparent 5px
-          );
-          mask-image: repeating-linear-gradient(
-            -24deg,
-            rgb(0 0 0 / 0.9) 0,
-            rgb(0 0 0 / 0.38) 1px,
-            transparent 2px,
-            transparent 5px
-          );
-          filter: contrast(1.15) saturate(1.2);
-        }
-
-        .holographic-sticker[data-effect="diffraction"]
-          .holographic-sticker__relief {
+        .holographic-sticker__shine-pass {
+          --holo-color-1: hsl(228 100% 74%);
+          --holo-color-2: hsl(283 100% 73%);
+          --holo-color-3: hsl(2 100% 73%);
+          --holo-color-4: hsl(53 100% 69%);
+          --holo-color-5: hsl(93 100% 69%);
+          --holo-color-6: hsl(176 100% 76%);
           background-image:
+            url("/holographic/grain.webp"),
             repeating-linear-gradient(
-              -24deg,
-              rgb(255 255 255 / 0.7) 0,
-              rgb(255 255 255 / 0.04) 1px,
-              rgb(0 0 0 / 0.16) 2px,
-              transparent 5px
+              0deg,
+              var(--holo-color-1) 5%,
+              var(--holo-color-2) 10%,
+              var(--holo-color-3) 15%,
+              var(--holo-color-4) 20%,
+              var(--holo-color-5) 25%,
+              var(--holo-color-6) 30%,
+              var(--holo-color-1) 35%
             ),
-            radial-gradient(circle, rgb(255 255 255 / 0.48), transparent 56%);
-          background-size:
-            100% 100%,
-            80% 120%;
-          filter: contrast(1.1);
-        }
-
-        .holographic-sticker[data-effect="mica"]
-          .holographic-sticker__spectrum {
-          background-image: conic-gradient(
-            from 210deg,
-            rgb(64 255 231),
-            rgb(92 104 255),
-            rgb(255 72 202),
-            rgb(255 230 100),
-            rgb(64 255 231)
-          );
-          background-size: 170% 210%;
-          -webkit-mask-image: url("/holographic/mica-texture.svg");
-          mask-image: url("/holographic/mica-texture.svg");
-          -webkit-mask-size: 46% 95%;
-          mask-size: 46% 95%;
-          filter: contrast(1.2) saturate(1.3);
-        }
-
-        .holographic-sticker[data-effect="mica"] .holographic-sticker__relief {
-          background-image:
-            url("/holographic/mica-texture.svg"),
-            radial-gradient(circle, rgb(255 255 255 / 0.72), transparent 48%);
-          background-size:
-            46% 95%,
-            70% 110%;
-          background-blend-mode: screen;
-          filter: contrast(1.15);
-        }
-
-        .holographic-sticker[data-effect="embossed"]
-          .holographic-sticker__spectrum {
-          background-image: conic-gradient(
-            from 35deg,
-            rgb(119 238 255),
-            rgb(174 125 255),
-            rgb(255 147 221),
-            rgb(255 226 138),
-            rgb(119 238 255)
-          );
-          background-size: 210% 210%;
-          -webkit-mask-image: url("/holographic/embossed-texture.svg");
-          mask-image: url("/holographic/embossed-texture.svg");
-          -webkit-mask-size: 38% 76%;
-          mask-size: 38% 76%;
-          filter: contrast(1.2) saturate(1.1);
-        }
-
-        .holographic-sticker[data-effect="embossed"]
-          .holographic-sticker__relief {
-          background-image:
-            url("/holographic/embossed-texture.svg"),
-            linear-gradient(
-              105deg,
-              transparent 22%,
-              rgb(255 255 255 / 0.7) 42%,
-              transparent 58%
+            repeating-linear-gradient(
+              133deg,
+              #0e1221 0%,
+              hsl(180 10% 60%) 2.8%,
+              hsl(180 20.9% 82.2%) 3.5%,
+              hsl(180 10% 60%) 4.2%,
+              #0e1221 7%,
+              #0e1221 12%
+            ),
+            radial-gradient(
+              farthest-corner circle at var(--pointer-x) var(--pointer-y),
+              hsl(0 0% 0% / 0.1) 12%,
+              hsl(0 0% 0% / 0.15) 20%,
+              hsl(0 0% 0% / 0.25) 120%
             );
+          background-blend-mode: screen, hue, hard-light;
+          background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+          background-position:
+            center,
+            0% var(--background-y),
+            var(--background-x) var(--background-y),
+            var(--background-x) var(--background-y);
           background-size:
-            38% 76%,
-            190% 100%;
-          background-blend-mode: screen;
-          filter: contrast(1.12);
+            64cqi 64cqi,
+            200% 700%,
+            300% 100%,
+            200% 100%;
+          filter: brightness(1) contrast(1.5) saturate(2);
+          mix-blend-mode: lighten;
         }
 
-        @media (hover: none),
-          (pointer: coarse),
-          (prefers-reduced-motion: reduce) {
-          .holographic-sticker {
-            transform: none !important;
-            will-change: auto;
+        .holographic-sticker__shine-pass--secondary {
+          --holo-color-1: hsl(283 100% 73%);
+          --holo-color-2: hsl(2 100% 73%);
+          --holo-color-3: hsl(53 100% 69%);
+          --holo-color-4: hsl(93 100% 69%);
+          --holo-color-5: hsl(176 100% 76%);
+          --holo-color-6: hsl(228 100% 74%);
+          background-position:
+            center,
+            0% var(--background-y),
+            var(--background-x-inverse) var(--background-y-inverse),
+            var(--background-x) var(--background-y);
+          background-size:
+            64cqi 100%,
+            200% 400%,
+            195% 100%,
+            200% 100%;
+          filter: brightness(1.2) contrast(1) saturate(2);
+          mix-blend-mode: difference;
+        }
+
+        .holographic-sticker__glare {
+          background-image: radial-gradient(
+            farthest-corner circle at var(--pointer-x) var(--pointer-y),
+            hsl(0 0% 40%) 0%,
+            hsl(210 3% 54% / 0.5) 63%,
+            hsl(0 0% 30%) 150%
+          );
+          opacity: var(--glare-opacity);
+          filter: brightness(1.5) contrast(2);
+          mix-blend-mode: color-burn;
+        }
+
+        @media (hover: none), (pointer: coarse) {
+          .holographic-sticker__shine,
+          .holographic-sticker__glare {
+            will-change: opacity, background-position;
           }
         }
       `}</style>

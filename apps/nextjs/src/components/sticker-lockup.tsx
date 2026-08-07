@@ -1,11 +1,14 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@acme/ui";
 
+import {
+  HolographicPointerProvider,
+  HolographicSticker,
+} from "./holographic-sticker";
 import {
   getHomepageEntrance,
   homepageStickerStagger,
@@ -76,7 +79,7 @@ const stickerLockupConfigs = {
   },
 } satisfies Record<string, StickerLockupConfig>;
 
-const heroStickerId = "toilet-paper-cat";
+const heroStickerId = "toilet-paper-cat" as keyof typeof stickerLockupConfigs;
 
 export function StickerLockup({
   className,
@@ -95,63 +98,70 @@ export function StickerLockup({
       )}
       {...props}
     >
-      <div
-        className="relative"
-        style={{
-          aspectRatio,
-          width: `${aspectRatio * config.height}cqh`,
-        }}
-      >
-        <motion.div
-          className="size-full"
-          {...getHomepageEntrance(entranceDelay, shouldReduceMotion)}
+      <HolographicPointerProvider mouseInfluence={1}>
+        <div
+          className="relative"
+          style={{
+            aspectRatio,
+            width: `${aspectRatio * config.height}cqh`,
+          }}
+          role="img"
+          aria-label="Playful pet stickers"
         >
-          <Image
-            src={heroSticker.lightSrc}
-            alt="Playful Pet Sticker"
-            width={heroSticker.width}
-            height={heroSticker.height}
-            className="size-full drop-shadow-xl"
-          />
-        </motion.div>
-        {accessoryStickerIds.map((accessoryId, index) => {
-          const accessory = stickerAssets[accessoryId];
-          const placement = config.accessories[accessoryId];
-          return (
-            <div
-              key={accessoryId}
-              className="absolute"
-              style={{
-                top: `${50 + placement.y}%`,
-                left: `${50 + placement.x}%`,
-                width: `${placement.size}cqh`,
-                height: `${placement.size}cqh`,
-                transform: `translate(-50%, -50%) rotate(${placement.rotate}deg)`,
-              }}
-            >
-              <motion.div
-                className="size-full"
-                {...getHomepageEntrance(
-                  entranceDelay + (index + 1) * homepageStickerStagger,
-                  shouldReduceMotion,
-                  {
-                    x: placement.x < 0 ? 32 : -32,
-                    y: 48,
-                  },
-                )}
+          <motion.div
+            className="size-full"
+            {...getHomepageEntrance(entranceDelay, shouldReduceMotion)}
+          >
+            <HolographicSticker
+              asset={heroSticker}
+              className="size-full drop-shadow-xl"
+              mouseTiltIntensity={1}
+              circularTiltIntensity={0.1}
+              foilIntensity={1}
+              circularTiltSpeed={100}
+              priority
+            />
+          </motion.div>
+          {accessoryStickerIds.map((accessoryId, index) => {
+            const accessory = stickerAssets[accessoryId];
+            const placement = config.accessories[accessoryId];
+            return (
+              <div
+                key={accessoryId}
+                className="absolute drop-shadow-sm"
+                style={{
+                  top: `${50 + placement.y}%`,
+                  left: `${50 + placement.x}%`,
+                  width: `${placement.size}cqh`,
+                  aspectRatio: accessory.width / accessory.height,
+                  transform: `translate(-50%, -50%) rotate(${placement.rotate}deg)`,
+                }}
               >
-                <Image
-                  src={accessory.lightSrc}
-                  alt="Pet Accessory Sticker"
-                  width={accessory.width}
-                  height={accessory.height}
-                  className="size-full drop-shadow-sm"
-                />
-              </motion.div>
-            </div>
-          );
-        })}
-      </div>
+                <motion.div
+                  className="size-full"
+                  {...getHomepageEntrance(
+                    entranceDelay + (index + 1) * homepageStickerStagger,
+                    shouldReduceMotion,
+                    {
+                      x: placement.x < 0 ? 32 : -32,
+                      y: 48,
+                    },
+                  )}
+                >
+                  <HolographicSticker
+                    asset={accessory}
+                    className="size-full"
+                    mouseTiltIntensity={3}
+                    circularTiltIntensity={1}
+                    foilIntensity={0.5}
+                    circularTiltSpeed={300}
+                  />
+                </motion.div>
+              </div>
+            );
+          })}
+        </div>
+      </HolographicPointerProvider>
     </div>
   );
 }
