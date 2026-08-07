@@ -11,37 +11,28 @@ export function ArchedBadge({ className, ...props }: ArchedBadgeProps) {
   return (
     <svg
       {...props}
-      viewBox="0 0 149 73"
+      viewBox="7 7 135 57"
       aria-hidden="true"
       className={cn(
-        "block aspect-[149/73] overflow-visible select-none",
+        "block aspect-[135/57] overflow-visible drop-shadow-[0_2px_4px_rgb(0_0_0/0.1)] select-none",
         className,
       )}
     >
-      <defs>
-        <filter
-          id="arched-badge-shadow"
-          x="0"
-          y="0"
-          width="149"
-          height="73"
-          filterUnits="userSpaceOnUse"
-        >
-          <feDropShadow
-            dx="0"
-            dy="2"
-            stdDeviation="4"
-            floodColor="#000"
-            floodOpacity="0.1"
-          />
-        </filter>
-      </defs>
+      <path
+        d="M 26.5 44.5 A 73 73 0 0 1 122.5 44.5"
+        className="stroke-sticker-surface fill-none [stroke-linecap:round]"
+        strokeWidth="49"
+      />
+      <path
+        d="M 26.5 44.5 A 73 73 0 0 1 122.5 44.5"
+        className="stroke-sticker-foreground fill-none [stroke-linecap:round]"
+        strokeWidth="33"
+      />
       <path
         id="arched-badge-curve"
         d="M 26.5 44.5 A 73 73 0 0 1 122.5 44.5"
         className="stroke-sticker-surface fill-none [stroke-linecap:round]"
         strokeWidth="29"
-        filter="url(#arched-badge-shadow)"
       />
       <text
         className="fill-sticker-foreground font-sans"
