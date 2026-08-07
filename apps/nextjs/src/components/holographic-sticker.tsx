@@ -242,7 +242,7 @@ export function HolographicSticker({
     <>
       <motion.div
         className={cn(
-          "@container relative isolate mx-auto filter-[drop-shadow(0_18px_24px_rgb(0_0_0/0.22))] will-change-transform [transform-style:preserve-3d]",
+          "@container relative isolate mx-auto filter-[drop-shadow(0_18px_24px_rgb(0_0_0/0.22))] will-change-transform transform-3d",
           className,
         )}
         style={stickerStyle}
@@ -265,17 +265,17 @@ export function HolographicSticker({
           preload={priority}
         />
 
-        <span className="venusaur-holo__shine pointer-events-none absolute inset-0 z-2 overflow-hidden">
-          <span className="venusaur-holo__shine-pass venusaur-holo__shine-pass--primary absolute inset-0" />
-          <span className="venusaur-holo__shine-pass venusaur-holo__shine-pass--secondary absolute inset-0" />
+        <span className="holographic-sticker__shine pointer-events-none absolute inset-0 z-2 overflow-hidden">
+          <span className="holographic-sticker__shine-pass holographic-sticker__shine-pass--primary absolute inset-0" />
+          <span className="holographic-sticker__shine-pass holographic-sticker__shine-pass--secondary absolute inset-0" />
         </span>
 
-        <span className="venusaur-holo__glare pointer-events-none absolute inset-0 z-4 overflow-hidden" />
+        <span className="holographic-sticker__glare pointer-events-none absolute inset-0 z-4 overflow-hidden" />
       </motion.div>
 
-      <style href="venusaur-holographic-sticker" precedence="medium">{`
-        .venusaur-holo__shine,
-        .venusaur-holo__glare {
+      <style href="holographic-sticker" precedence="medium">{`
+        .holographic-sticker__shine,
+        .holographic-sticker__glare {
           -webkit-mask-image: var(--holographic-mask);
           mask-image: var(--holographic-mask);
           -webkit-mask-position: center;
@@ -286,13 +286,13 @@ export function HolographicSticker({
           mask-size: 100% 100%;
         }
 
-        .venusaur-holo__shine {
+        .holographic-sticker__shine {
           opacity: var(--interaction);
           filter: brightness(0.45) contrast(1.5) saturate(1.2);
           mix-blend-mode: color-dodge;
         }
 
-        .venusaur-holo__shine-pass {
+        .holographic-sticker__shine-pass {
           --holo-color-1: hsl(228 100% 74%);
           --holo-color-2: hsl(283 100% 73%);
           --holo-color-3: hsl(2 100% 73%);
@@ -300,7 +300,7 @@ export function HolographicSticker({
           --holo-color-5: hsl(93 100% 69%);
           --holo-color-6: hsl(176 100% 76%);
           background-image:
-            url("/holographic/venusaur/grain.webp"),
+            url("/holographic/grain.webp"),
             repeating-linear-gradient(
               0deg,
               var(--holo-color-1) 5%,
@@ -342,7 +342,7 @@ export function HolographicSticker({
           mix-blend-mode: lighten;
         }
 
-        .venusaur-holo__shine-pass--secondary {
+        .holographic-sticker__shine-pass--secondary {
           --holo-color-1: hsl(283 100% 73%);
           --holo-color-2: hsl(2 100% 73%);
           --holo-color-3: hsl(53 100% 69%);
@@ -363,7 +363,7 @@ export function HolographicSticker({
           mix-blend-mode: difference;
         }
 
-        .venusaur-holo__glare {
+        .holographic-sticker__glare {
           background-image: radial-gradient(
             farthest-corner circle at var(--pointer-x) var(--pointer-y),
             hsl(0 0% 40%) 0%,
@@ -376,8 +376,8 @@ export function HolographicSticker({
         }
 
         @media (hover: none), (pointer: coarse) {
-          .venusaur-holo__shine,
-          .venusaur-holo__glare {
+          .holographic-sticker__shine,
+          .holographic-sticker__glare {
             will-change: opacity, background-position;
           }
         }
