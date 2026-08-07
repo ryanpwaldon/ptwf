@@ -47,7 +47,7 @@ export default function HomePage() {
         <div className="flex w-full flex-col items-center text-center">
           <h1 className="sr-only">Pet Care Trivia</h1>
           <motion.div
-            className="h-[73px]"
+            className="h-14"
             {...getHomepageEntrance(
               homepageEntranceDelays.first,
               shouldReduceMotion,
@@ -56,7 +56,7 @@ export default function HomePage() {
             <ArchedBadge className="h-full" />
           </motion.div>
           <StickerLockup
-            className="h-40"
+            className="mt-4 h-40"
             entranceDelay={homepageEntranceDelays.first}
           />
           <motion.h2
