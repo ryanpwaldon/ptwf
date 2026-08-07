@@ -143,12 +143,18 @@ interface FlutterState {
   currentY: number;
   duration: number;
   elapsed: number;
+  endControl: FlutterPoint;
+  nextStartControl: FlutterPoint;
+  nextTarget: FlutterPoint;
   random: () => number;
-  resting: boolean;
-  startX: number;
-  startY: number;
-  targetX: number;
-  targetY: number;
+  start: FlutterPoint;
+  startControl: FlutterPoint;
+  target: FlutterPoint;
+}
+
+interface FlutterPoint {
+  x: number;
+  y: number;
 }
 
 function createSeededRandom(id: string) {
@@ -171,44 +177,140 @@ function createSeededRandom(id: string) {
   };
 }
 
-function setNextFlutterTarget(state: FlutterState) {
-  const angle = state.random() * Math.PI * 2;
-  const isGust = state.random() < 0.18;
-  const intensity = isGust
-    ? 0.8 + state.random() * 0.2
-    : 0.18 + state.random() * 0.6;
+function createFlutterTarget(
+  random: () => number,
+  avoid?: FlutterPoint,
+): FlutterPoint {
+  let target: FlutterPoint = { x: 0, y: 0 };
 
-  state.startX = state.currentX;
-  state.startY = state.currentY;
-  state.targetX = Math.sin(angle) * maxRotateX * intensity;
-  state.targetY = Math.cos(angle) * maxRotateY * intensity;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const angle = random() * Math.PI * 2;
+    const isGust = random() < 0.18;
+    const intensity = isGust ? 0.8 + random() * 0.2 : 0.18 + random() * 0.6;
 
-  const distance = Math.hypot(
-    (state.targetX - state.startX) / maxRotateX,
-    (state.targetY - state.startY) / maxRotateY,
+    target = {
+      x: Math.sin(angle) * intensity,
+      y: Math.cos(angle) * intensity,
+    };
+
+    if (!avoid || Math.hypot(target.x - avoid.x, target.y - avoid.y) > 0.45) {
+      break;
+    }
+  }
+
+  return target;
+}
+
+function getJunctionControls(
+  previous: FlutterPoint,
+  junction: FlutterPoint,
+  next: FlutterPoint,
+) {
+  const deltaX = next.x - previous.x;
+  const deltaY = next.y - previous.y;
+  const directionLength = Math.hypot(deltaX, deltaY);
+  const directionX = directionLength === 0 ? 0 : deltaX / directionLength;
+  const directionY = directionLength === 0 ? 0 : deltaY / directionLength;
+  const previousDistance = Math.hypot(
+    junction.x - previous.x,
+    junction.y - previous.y,
   );
+  const nextDistance = Math.hypot(next.x - junction.x, next.y - junction.y);
+  const desiredHandle = Math.min(previousDistance, nextDistance) * 0.28;
+  const xBoundary =
+    Math.abs(directionX) < 0.0001
+      ? Infinity
+      : (1 - Math.abs(junction.x)) / Math.abs(directionX);
+  const yBoundary =
+    Math.abs(directionY) < 0.0001
+      ? Infinity
+      : (1 - Math.abs(junction.y)) / Math.abs(directionY);
+  const handleLength = Math.max(
+    0,
+    Math.min(desiredHandle, xBoundary * 0.85, yBoundary * 0.85),
+  );
+  const offset = {
+    x: directionX * handleLength,
+    y: directionY * handleLength,
+  };
 
-  state.duration = 1.4 + distance * 1.15 + state.random() * 1.8;
+  return {
+    incoming: {
+      x: junction.x - offset.x,
+      y: junction.y - offset.y,
+    },
+    outgoing: {
+      x: junction.x + offset.x,
+      y: junction.y + offset.y,
+    },
+  };
+}
+
+function interpolateBezier(
+  start: FlutterPoint,
+  startControl: FlutterPoint,
+  endControl: FlutterPoint,
+  target: FlutterPoint,
+  progress: number,
+) {
+  const inverse = 1 - progress;
+  const startWeight = inverse ** 3;
+  const startControlWeight = 3 * inverse ** 2 * progress;
+  const endControlWeight = 3 * inverse * progress ** 2;
+  const targetWeight = progress ** 3;
+
+  return {
+    x:
+      start.x * startWeight +
+      startControl.x * startControlWeight +
+      endControl.x * endControlWeight +
+      target.x * targetWeight,
+    y:
+      start.y * startWeight +
+      startControl.y * startControlWeight +
+      endControl.y * endControlWeight +
+      target.y * targetWeight,
+  };
+}
+
+function setNextFlutterSegment(state: FlutterState) {
+  state.start = state.target;
+  state.startControl = state.nextStartControl;
+  state.target = state.nextTarget;
+  state.nextTarget = createFlutterTarget(state.random, state.start);
+
+  const controls = getJunctionControls(
+    state.start,
+    state.target,
+    state.nextTarget,
+  );
+  state.endControl = controls.incoming;
+  state.nextStartControl = controls.outgoing;
   state.elapsed = 0;
-  state.resting = false;
 }
 
 function createFlutterState(id: string) {
   const random = createSeededRandom(id);
+  const start = { x: 0, y: 0 };
+  const target = createFlutterTarget(random);
+  const nextTarget = createFlutterTarget(random, start);
+  const controls = getJunctionControls(start, target, nextTarget);
   const state: FlutterState = {
     currentX: 0,
     currentY: 0,
-    duration: 0,
+    duration: 2.4 + random() * 0.8,
     elapsed: 0,
+    endControl: controls.incoming,
+    nextStartControl: controls.outgoing,
+    nextTarget,
     random,
-    resting: false,
-    startX: 0,
-    startY: 0,
-    targetX: 0,
-    targetY: 0,
+    start,
+    startControl: {
+      x: start.x + (target.x - start.x) * 0.3,
+      y: start.y + (target.y - start.y) * 0.3,
+    },
+    target,
   };
-
-  setNextFlutterTarget(state);
 
   return state;
 }
@@ -223,31 +325,21 @@ function advanceFlutter(state: FlutterState, elapsedSeconds: number) {
     state.elapsed += step;
     remaining -= step;
 
-    if (!state.resting) {
-      const progress = Math.min(state.elapsed / state.duration, 1);
-      const eased = progress ** 3 * (progress * (progress * 6 - 15) + 10);
+    const progress = Math.min(state.elapsed / state.duration, 1);
+    const point = interpolateBezier(
+      state.start,
+      state.startControl,
+      state.endControl,
+      state.target,
+      progress,
+    );
 
-      state.currentX = state.startX + (state.targetX - state.startX) * eased;
-      state.currentY = state.startY + (state.targetY - state.startY) * eased;
-    }
+    state.currentX = point.x * maxRotateX;
+    state.currentY = point.y * maxRotateY;
 
     if (state.elapsed < state.duration) continue;
 
-    if (state.resting) {
-      setNextFlutterTarget(state);
-      continue;
-    }
-
-    state.currentX = state.targetX;
-    state.currentY = state.targetY;
-
-    if (state.random() < 0.32) {
-      state.duration = 0.2 + state.random() * 1.1;
-      state.elapsed = 0;
-      state.resting = true;
-    } else {
-      setNextFlutterTarget(state);
-    }
+    setNextFlutterSegment(state);
   }
 
   return state;
