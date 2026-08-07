@@ -266,8 +266,8 @@ export function HolographicSticker({
   const backgroundYPercent = useMotionTemplate`${backgroundY}%`;
   const inverseBackgroundXPercent = useMotionTemplate`${inverseBackgroundX}%`;
   const inverseBackgroundYPercent = useMotionTemplate`${inverseBackgroundY}%`;
-  const sharedTransform = useMotionTemplate`perspective(700px) rotateX(${displayRotateX}deg) rotateY(${displayRotateY}deg)`;
-  const transform = useMotionTemplate`perspective(700px) rotateY(${displayRotateY}deg) rotateX(${displayRotateX}deg) scale(${scale})`;
+  const sharedTransform = useMotionTemplate`perspective(600px) rotateX(${displayRotateX}deg) rotateY(${displayRotateY}deg)`;
+  const transform = useMotionTemplate`perspective(600px) rotateY(${displayRotateY}deg) rotateX(${displayRotateX}deg) scale(${scale})`;
   const source = getStickerSource(
     asset,
     hasMounted ? resolvedTheme : undefined,
