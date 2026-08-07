@@ -76,20 +76,7 @@ const stickerLockupConfigs = {
 
 const heroStickerId = "toilet-paper-cat" as keyof typeof stickerLockupConfigs;
 
-const accessoryTiltIntensity = 1.75;
-const accessoryFoilIntensity = 0.5;
-
-interface StickerLockupProps extends ComponentProps<"div"> {
-  flutterSpeed?: number;
-  mouseInfluence?: number;
-}
-
-export function StickerLockup({
-  className,
-  flutterSpeed = 10,
-  mouseInfluence = 1,
-  ...props
-}: StickerLockupProps) {
+export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
   const config = stickerLockupConfigs[heroStickerId];
   const heroSticker = stickerAssets[heroStickerId];
   const aspectRatio = heroSticker.width / heroSticker.height;
@@ -102,7 +89,7 @@ export function StickerLockup({
       )}
       {...props}
     >
-      <HolographicPointerProvider mouseInfluence={mouseInfluence}>
+      <HolographicPointerProvider mouseInfluence={1}>
         <div
           className="relative"
           style={{
@@ -115,7 +102,7 @@ export function StickerLockup({
           <HolographicSticker
             asset={heroSticker}
             className="size-full drop-shadow-xl"
-            flutterSpeed={flutterSpeed}
+            flutterSpeed={50}
             priority
           />
           {accessoryStickerIds.map((accessoryId) => {
@@ -136,9 +123,9 @@ export function StickerLockup({
                 <HolographicSticker
                   asset={accessory}
                   className="size-full"
-                  tiltIntensity={accessoryTiltIntensity}
-                  foilIntensity={accessoryFoilIntensity}
-                  flutterSpeed={flutterSpeed}
+                  tiltIntensity={1.75}
+                  foilIntensity={0.5}
+                  flutterSpeed={50}
                 />
               </div>
             );

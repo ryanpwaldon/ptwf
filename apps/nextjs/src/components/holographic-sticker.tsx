@@ -139,8 +139,6 @@ const mouseTiltDistance = 180;
 const defaultFlutterSpeed = 10;
 
 interface FlutterState {
-  amplitudeX: number;
-  amplitudeY: number;
   currentX: number;
   currentY: number;
   duration: number;
@@ -182,12 +180,12 @@ function setNextFlutterTarget(state: FlutterState) {
 
   state.startX = state.currentX;
   state.startY = state.currentY;
-  state.targetX = Math.sin(angle) * maxRotateX * state.amplitudeX * intensity;
-  state.targetY = Math.cos(angle) * maxRotateY * state.amplitudeY * intensity;
+  state.targetX = Math.sin(angle) * maxRotateX * intensity;
+  state.targetY = Math.cos(angle) * maxRotateY * intensity;
 
   const distance = Math.hypot(
-    (state.targetX - state.startX) / (maxRotateX * state.amplitudeX),
-    (state.targetY - state.startY) / (maxRotateY * state.amplitudeY),
+    (state.targetX - state.startX) / maxRotateX,
+    (state.targetY - state.startY) / maxRotateY,
   );
 
   state.duration = 1.4 + distance * 1.15 + state.random() * 1.8;
@@ -198,8 +196,6 @@ function setNextFlutterTarget(state: FlutterState) {
 function createFlutterState(id: string) {
   const random = createSeededRandom(id);
   const state: FlutterState = {
-    amplitudeX: 0.26 + random() * 0.1,
-    amplitudeY: 0.24 + random() * 0.12,
     currentX: 0,
     currentY: 0,
     duration: 0,
