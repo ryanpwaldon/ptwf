@@ -104,7 +104,7 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
             className="size-full drop-shadow-xl"
             tiltIntensity={2}
             foilIntensity={1}
-            flutterSpeed={20}
+            rotationSpeed={20}
             priority
           />
           {accessoryStickerIds.map((accessoryId) => {
@@ -127,7 +127,7 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
                   className="size-full"
                   tiltIntensity={4}
                   foilIntensity={0.5}
-                  flutterSpeed={20}
+                  rotationSpeed={20}
                 />
               </div>
             );

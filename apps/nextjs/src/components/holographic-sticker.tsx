@@ -31,8 +31,8 @@ export interface HolographicStickerProps {
   asset: StickerAsset;
   className?: string;
   foilIntensity?: number;
-  flutterSpeed?: number;
   priority?: boolean;
+  rotationSpeed?: number;
   tiltIntensity?: number;
 }
 
@@ -136,28 +136,9 @@ const maxRotateX = 7;
 const maxRotateY = 9;
 const mouseFalloffRadius = 420;
 const mouseTiltDistance = 180;
-const defaultFlutterSpeed = 10;
+const degreesToRadians = Math.PI / 180;
 
-interface FlutterState {
-  currentX: number;
-  currentY: number;
-  duration: number;
-  elapsed: number;
-  endControl: FlutterPoint;
-  nextStartControl: FlutterPoint;
-  nextTarget: FlutterPoint;
-  random: () => number;
-  start: FlutterPoint;
-  startControl: FlutterPoint;
-  target: FlutterPoint;
-}
-
-interface FlutterPoint {
-  x: number;
-  y: number;
-}
-
-function createSeededRandom(id: string) {
+function getRotationPhase(id: string) {
   let hash = 2166136261;
 
   for (const character of id) {
@@ -165,192 +146,15 @@ function createSeededRandom(id: string) {
     hash = Math.imul(hash, 16777619);
   }
 
-  let seed = hash >>> 0;
-
-  return () => {
-    seed = (seed + 0x6d2b79f5) >>> 0;
-    let value = seed;
-    value = Math.imul(value ^ (value >>> 15), value | 1);
-    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-
-    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function createFlutterTarget(
-  random: () => number,
-  avoid?: FlutterPoint,
-): FlutterPoint {
-  let target: FlutterPoint = { x: 0, y: 0 };
-
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const angle = random() * Math.PI * 2;
-    const isGust = random() < 0.18;
-    const intensity = isGust ? 0.8 + random() * 0.2 : 0.18 + random() * 0.6;
-
-    target = {
-      x: Math.sin(angle) * intensity,
-      y: Math.cos(angle) * intensity,
-    };
-
-    if (!avoid || Math.hypot(target.x - avoid.x, target.y - avoid.y) > 0.45) {
-      break;
-    }
-  }
-
-  return target;
-}
-
-function getJunctionControls(
-  previous: FlutterPoint,
-  junction: FlutterPoint,
-  next: FlutterPoint,
-) {
-  const deltaX = next.x - previous.x;
-  const deltaY = next.y - previous.y;
-  const directionLength = Math.hypot(deltaX, deltaY);
-  const directionX = directionLength === 0 ? 0 : deltaX / directionLength;
-  const directionY = directionLength === 0 ? 0 : deltaY / directionLength;
-  const previousDistance = Math.hypot(
-    junction.x - previous.x,
-    junction.y - previous.y,
-  );
-  const nextDistance = Math.hypot(next.x - junction.x, next.y - junction.y);
-  const desiredHandle = Math.min(previousDistance, nextDistance) * 0.28;
-  const xBoundary =
-    Math.abs(directionX) < 0.0001
-      ? Infinity
-      : (1 - Math.abs(junction.x)) / Math.abs(directionX);
-  const yBoundary =
-    Math.abs(directionY) < 0.0001
-      ? Infinity
-      : (1 - Math.abs(junction.y)) / Math.abs(directionY);
-  const handleLength = Math.max(
-    0,
-    Math.min(desiredHandle, xBoundary * 0.85, yBoundary * 0.85),
-  );
-  const offset = {
-    x: directionX * handleLength,
-    y: directionY * handleLength,
-  };
-
-  return {
-    incoming: {
-      x: junction.x - offset.x,
-      y: junction.y - offset.y,
-    },
-    outgoing: {
-      x: junction.x + offset.x,
-      y: junction.y + offset.y,
-    },
-  };
-}
-
-function interpolateBezier(
-  start: FlutterPoint,
-  startControl: FlutterPoint,
-  endControl: FlutterPoint,
-  target: FlutterPoint,
-  progress: number,
-) {
-  const inverse = 1 - progress;
-  const startWeight = inverse ** 3;
-  const startControlWeight = 3 * inverse ** 2 * progress;
-  const endControlWeight = 3 * inverse * progress ** 2;
-  const targetWeight = progress ** 3;
-
-  return {
-    x:
-      start.x * startWeight +
-      startControl.x * startControlWeight +
-      endControl.x * endControlWeight +
-      target.x * targetWeight,
-    y:
-      start.y * startWeight +
-      startControl.y * startControlWeight +
-      endControl.y * endControlWeight +
-      target.y * targetWeight,
-  };
-}
-
-function setNextFlutterSegment(state: FlutterState) {
-  state.start = state.target;
-  state.startControl = state.nextStartControl;
-  state.target = state.nextTarget;
-  state.nextTarget = createFlutterTarget(state.random, state.start);
-
-  const controls = getJunctionControls(
-    state.start,
-    state.target,
-    state.nextTarget,
-  );
-  state.endControl = controls.incoming;
-  state.nextStartControl = controls.outgoing;
-  state.elapsed = 0;
-}
-
-function createFlutterState(id: string) {
-  const random = createSeededRandom(id);
-  const start = { x: 0, y: 0 };
-  const target = createFlutterTarget(random);
-  const nextTarget = createFlutterTarget(random, start);
-  const controls = getJunctionControls(start, target, nextTarget);
-  const state: FlutterState = {
-    currentX: 0,
-    currentY: 0,
-    duration: 2.4 + random() * 0.8,
-    elapsed: 0,
-    endControl: controls.incoming,
-    nextStartControl: controls.outgoing,
-    nextTarget,
-    random,
-    start,
-    startControl: {
-      x: start.x + (target.x - start.x) * 0.3,
-      y: start.y + (target.y - start.y) * 0.3,
-    },
-    target,
-  };
-
-  return state;
-}
-
-function advanceFlutter(state: FlutterState, elapsedSeconds: number) {
-  let remaining = elapsedSeconds;
-
-  while (remaining > 0) {
-    const segmentRemaining = state.duration - state.elapsed;
-    const step = Math.min(remaining, segmentRemaining);
-
-    state.elapsed += step;
-    remaining -= step;
-
-    const progress = Math.min(state.elapsed / state.duration, 1);
-    const point = interpolateBezier(
-      state.start,
-      state.startControl,
-      state.endControl,
-      state.target,
-      progress,
-    );
-
-    state.currentX = point.x * maxRotateX;
-    state.currentY = point.y * maxRotateY;
-
-    if (state.elapsed < state.duration) continue;
-
-    setNextFlutterSegment(state);
-  }
-
-  return state;
+  return ((hash >>> 0) / 4294967296) * Math.PI * 2;
 }
 
 export function HolographicSticker({
   asset,
   className,
   foilIntensity = 1,
-  flutterSpeed = 1,
   priority = false,
+  rotationSpeed = 20,
   tiltIntensity = 1,
 }: HolographicStickerProps) {
   const { resolvedTheme } = useTheme();
@@ -360,7 +164,7 @@ export function HolographicSticker({
   const isTouching = useRef(false);
   const shouldReduceMotion = useReducedMotion();
   const sharedPointer = useContext(HolographicPointerContext);
-  const flutterState = useMemo(() => createFlutterState(asset.id), [asset.id]);
+  const rotationPhase = useMemo(() => getRotationPhase(asset.id), [asset.id]);
   const pointerX = useMotionValue(50);
   const pointerY = useMotionValue(50);
   const pointerDistance = useMotionValue(0);
@@ -385,14 +189,14 @@ export function HolographicSticker({
     [0, 1],
     [0.4, 1],
   );
-  const flutterRotateX = useMotionValue(0);
-  const flutterRotateY = useMotionValue(0);
+  const circularRotateX = useMotionValue(0);
+  const circularRotateY = useMotionValue(0);
   const blendedRotateX = useTransform(() => {
     if (!sharedPointer) return rotateX.get();
 
     const mouseInfluence = smoothMouseInfluence.get();
     return (
-      flutterRotateX.get() * (1 - mouseInfluence) +
+      circularRotateX.get() * (1 - mouseInfluence) +
       sharedRotateX.get() * mouseInfluence
     );
   });
@@ -401,7 +205,7 @@ export function HolographicSticker({
 
     const mouseInfluence = smoothMouseInfluence.get();
     return (
-      flutterRotateY.get() * (1 - mouseInfluence) +
+      circularRotateY.get() * (1 - mouseInfluence) +
       sharedRotateY.get() * mouseInfluence
     );
   });
@@ -552,13 +356,15 @@ export function HolographicSticker({
     targetSharedRotateY,
   ]);
 
-  useAnimationFrame((_time, delta) => {
+  useAnimationFrame((time) => {
     if (!sharedPointer || shouldReduceMotion) return;
 
-    const speed = Math.max(flutterSpeed, 0) / defaultFlutterSpeed;
-    advanceFlutter(flutterState, (Math.min(delta, 100) / 1000) * speed);
-    flutterRotateX.set(flutterState.currentX);
-    flutterRotateY.set(flutterState.currentY);
+    const angle =
+      rotationPhase +
+      (time / 1000) * Math.max(rotationSpeed, 0) * degreesToRadians;
+
+    circularRotateX.set(Math.sin(angle) * maxRotateX);
+    circularRotateY.set(Math.cos(angle) * maxRotateY);
   });
 
   useEffect(() => {
