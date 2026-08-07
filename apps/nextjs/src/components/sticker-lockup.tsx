@@ -102,9 +102,10 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
           <HolographicSticker
             asset={heroSticker}
             className="size-full drop-shadow-xl"
-            tiltIntensity={2}
-            foilIntensity={1}
-            rotationSpeed={20}
+            mouseTiltIntensity={0.2}
+            circularTiltIntensity={0.05}
+            foilIntensity={0.5}
+            circularTiltSpeed={20}
             priority
           />
           {accessoryStickerIds.map((accessoryId) => {
@@ -125,9 +126,10 @@ export function StickerLockup({ className, ...props }: ComponentProps<"div">) {
                 <HolographicSticker
                   asset={accessory}
                   className="size-full"
-                  tiltIntensity={4}
+                  mouseTiltIntensity={0.2}
+                  circularTiltIntensity={0.05}
                   foilIntensity={0.5}
-                  rotationSpeed={20}
+                  circularTiltSpeed={20}
                 />
               </div>
             );

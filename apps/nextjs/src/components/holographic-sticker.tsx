@@ -29,11 +29,12 @@ import { getStickerSource } from "./sticker-assets";
 
 export interface HolographicStickerProps {
   asset: StickerAsset;
+  circularTiltIntensity?: number;
+  circularTiltSpeed?: number;
   className?: string;
   foilIntensity?: number;
+  mouseTiltIntensity?: number;
   priority?: boolean;
-  rotationSpeed?: number;
-  tiltIntensity?: number;
 }
 
 interface PointerPosition {
@@ -138,7 +139,7 @@ const mouseFalloffRadius = 420;
 const mouseTiltDistance = 180;
 const degreesToRadians = Math.PI / 180;
 
-function getRotationPhase(id: string) {
+function getCircularTiltPhase(id: string) {
   let hash = 2166136261;
 
   for (const character of id) {
@@ -151,11 +152,12 @@ function getRotationPhase(id: string) {
 
 export function HolographicSticker({
   asset,
+  circularTiltIntensity = 1,
+  circularTiltSpeed = 20,
   className,
   foilIntensity = 1,
+  mouseTiltIntensity = 1,
   priority = false,
-  rotationSpeed = 20,
-  tiltIntensity = 1,
 }: HolographicStickerProps) {
   const { resolvedTheme } = useTheme();
   const [hasMounted, setHasMounted] = useState(false);
@@ -164,7 +166,10 @@ export function HolographicSticker({
   const isTouching = useRef(false);
   const shouldReduceMotion = useReducedMotion();
   const sharedPointer = useContext(HolographicPointerContext);
-  const rotationPhase = useMemo(() => getRotationPhase(asset.id), [asset.id]);
+  const circularTiltPhase = useMemo(
+    () => getCircularTiltPhase(asset.id),
+    [asset.id],
+  );
   const pointerX = useMotionValue(50);
   const pointerY = useMotionValue(50);
   const pointerDistance = useMotionValue(0);
@@ -191,41 +196,49 @@ export function HolographicSticker({
   );
   const circularRotateX = useMotionValue(0);
   const circularRotateY = useMotionValue(0);
-  const blendedRotateX = useTransform(() => {
+  const mouseRotateX = useTransform(() => {
     if (!sharedPointer) return rotateX.get();
 
-    const mouseInfluence = smoothMouseInfluence.get();
-    return (
-      circularRotateX.get() * (1 - mouseInfluence) +
-      sharedRotateX.get() * mouseInfluence
-    );
+    return sharedRotateX.get() * smoothMouseInfluence.get();
   });
-  const blendedRotateY = useTransform(() => {
+  const mouseRotateY = useTransform(() => {
     if (!sharedPointer) return rotateY.get();
 
-    const mouseInfluence = smoothMouseInfluence.get();
-    return (
-      circularRotateY.get() * (1 - mouseInfluence) +
-      sharedRotateY.get() * mouseInfluence
-    );
+    return sharedRotateY.get() * smoothMouseInfluence.get();
+  });
+  const effectRotateX = useTransform(() => {
+    if (!sharedPointer) return mouseRotateX.get();
+
+    return circularRotateX.get() + mouseRotateX.get();
+  });
+  const effectRotateY = useTransform(() => {
+    if (!sharedPointer) return mouseRotateY.get();
+
+    return circularRotateY.get() + mouseRotateY.get();
   });
   const scale = useTransform(smoothInteraction, [0, 1], [1, 1.015]);
-  const displayRotateX = useTransform(
-    blendedRotateX,
-    (value) => value * tiltIntensity,
-  );
-  const displayRotateY = useTransform(
-    blendedRotateY,
-    (value) => value * tiltIntensity,
-  );
+  const displayRotateX = useTransform(() => {
+    const circularTilt = sharedPointer
+      ? circularRotateX.get() * circularTiltIntensity
+      : 0;
+
+    return circularTilt + mouseRotateX.get() * mouseTiltIntensity;
+  });
+  const displayRotateY = useTransform(() => {
+    const circularTilt = sharedPointer
+      ? circularRotateY.get() * circularTiltIntensity
+      : 0;
+
+    return circularTilt + mouseRotateY.get() * mouseTiltIntensity;
+  });
   const foilRange = 50 * Math.max(foilIntensity, 0);
   const effectX = useTransform(
-    sharedPointer ? blendedRotateY : smoothX,
+    sharedPointer ? effectRotateY : smoothX,
     sharedPointer ? [-maxRotateY, maxRotateY] : [0, 100],
     [50 - foilRange, 50 + foilRange],
   );
   const effectY = useTransform(
-    sharedPointer ? blendedRotateX : smoothY,
+    sharedPointer ? effectRotateX : smoothY,
     sharedPointer ? [-maxRotateX, maxRotateX] : [0, 100],
     sharedPointer
       ? [50 + foilRange, 50 - foilRange]
@@ -251,8 +264,8 @@ export function HolographicSticker({
   const backgroundYPercent = useMotionTemplate`${backgroundY}%`;
   const inverseBackgroundXPercent = useMotionTemplate`${inverseBackgroundX}%`;
   const inverseBackgroundYPercent = useMotionTemplate`${inverseBackgroundY}%`;
-  const sharedTransform = useMotionTemplate`perspective(900px) rotateX(${displayRotateX}deg) rotateY(${displayRotateY}deg)`;
-  const transform = useMotionTemplate`perspective(900px) rotateY(${displayRotateY}deg) rotateX(${displayRotateX}deg) scale(${scale})`;
+  const sharedTransform = useMotionTemplate`perspective(700px) rotateX(${displayRotateX}deg) rotateY(${displayRotateY}deg)`;
+  const transform = useMotionTemplate`perspective(700px) rotateY(${displayRotateY}deg) rotateX(${displayRotateX}deg) scale(${scale})`;
   const source = getStickerSource(
     asset,
     hasMounted ? resolvedTheme : undefined,
@@ -360,8 +373,8 @@ export function HolographicSticker({
     if (!sharedPointer || shouldReduceMotion) return;
 
     const angle =
-      rotationPhase +
-      (time / 1000) * Math.max(rotationSpeed, 0) * degreesToRadians;
+      circularTiltPhase +
+      (time / 1000) * Math.max(circularTiltSpeed, 0) * degreesToRadians;
 
     circularRotateX.set(Math.sin(angle) * maxRotateX);
     circularRotateY.set(Math.cos(angle) * maxRotateY);
