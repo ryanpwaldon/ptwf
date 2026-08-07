@@ -40,7 +40,7 @@ export default function HomePage() {
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="flex w-full flex-col items-center text-center">
           <h1 className="sr-only">Pet Care Trivia</h1>
-          <ArchedBadge label="Pet Care Trivia" />
+          <ArchedBadge className="h-[73px]" />
           <StickerLockup className="h-40" />
           <h2 className="mt-8 text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl">
             All about pets!
