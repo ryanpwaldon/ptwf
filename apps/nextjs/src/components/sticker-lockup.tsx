@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@acme/ui";
+import { useTheme } from "@acme/ui/theme";
 
 import { ArchedBadge } from "./arched-badge";
 import {
@@ -82,6 +83,12 @@ const stickerLockupConfigs = {
 
 const heroStickerId = "toilet-paper-cat" as keyof typeof stickerLockupConfigs;
 
+const stickerShadows = {
+  dark: "drop-shadow(0 8px 18px color-mix(in oklab, var(--primary) 72%, transparent))",
+  light:
+    "drop-shadow(0 6px 14px color-mix(in oklab, var(--primary) 48%, transparent))",
+} as const;
+
 export function StickerLockup({
   className,
   entranceDelay = 0,
@@ -91,6 +98,9 @@ export function StickerLockup({
   const heroSticker = stickerAssets[heroStickerId];
   const aspectRatio = heroSticker.width / heroSticker.height;
   const shouldReduceMotion = useReducedMotion();
+  const { resolvedTheme } = useTheme();
+  const stickerShadow =
+    stickerShadows[resolvedTheme === "dark" ? "dark" : "light"];
   return (
     <div
       className={cn(
@@ -119,7 +129,10 @@ export function StickerLockup({
                 { y: 48 },
               )}
             >
-              <ArchedBadge className="h-full" />
+              <ArchedBadge
+                className="h-full"
+                style={{ filter: stickerShadow }}
+              />
             </motion.div>
           </div>
           <motion.div
@@ -128,11 +141,12 @@ export function StickerLockup({
           >
             <HolographicSticker
               asset={heroSticker}
-              className="size-full drop-shadow-xl"
+              className="size-full"
               mouseTiltIntensity={1}
               circularTiltIntensity={0.1}
               foilIntensity={1}
               circularTiltSpeed={100}
+              shadow={stickerShadow}
               priority
             />
           </motion.div>
@@ -142,7 +156,7 @@ export function StickerLockup({
             return (
               <div
                 key={accessoryId}
-                className="absolute drop-shadow-sm"
+                className="absolute"
                 style={{
                   top: `${50 + placement.y}%`,
                   left: `${50 + placement.x}%`,
@@ -169,6 +183,7 @@ export function StickerLockup({
                     circularTiltIntensity={1}
                     foilIntensity={0.5}
                     circularTiltSpeed={300}
+                    shadow={stickerShadow}
                   />
                 </motion.div>
               </div>
