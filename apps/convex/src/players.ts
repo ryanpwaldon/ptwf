@@ -4,8 +4,9 @@ import { ConvexError, v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
-import { CHARACTER_OPTIONS, characterValidator } from "./fields/character";
+import { characterValidator } from "./fields/character";
 import { gameCodeValidator, parseGameCode } from "./fields/gameCode";
+import { addPlayerToLobby } from "./gameHelpers";
 import schema from "./schema";
 
 // ========================================================================================
@@ -26,36 +27,7 @@ export const join = mutation({
       .withIndex("by_code", (q) => q.eq("code", validatedGameCode))
       .unique();
     if (!game) throw new ConvexError("Game not found.");
-    if (game.status !== "lobby") throw new ConvexError("Game is not in lobby.");
-
-    // Check if the player has already joined the game.
-    const existing = await ctx.db
-      .query("players")
-      .withIndex("by_gameId_and_sessionId", (q) =>
-        q.eq("gameId", game._id).eq("sessionId", args.sessionId),
-      )
-      .unique();
-    if (existing) return null;
-
-    // Check if the game is full.
-    const players = await ctx.db
-      .query("players")
-      .withIndex("by_gameId", (q) => q.eq("gameId", game._id))
-      .collect();
-    const takenCharacters = new Set(players.map((p) => p.character));
-    const available = CHARACTER_OPTIONS.filter((c) => !takenCharacters.has(c.value)); // prettier-ignore
-    if (available.length === 0) throw new ConvexError("Game is full.");
-
-    // Random character for the player.
-    const character = available[Math.floor(Math.random() * available.length)];
-    if (!character) throw new ConvexError("Failed to generate a random character."); // prettier-ignore
-
-    await ctx.db.insert("players", {
-      gameId: game._id,
-      sessionId: args.sessionId,
-      character: character.value,
-      isReady: false,
-    });
+    await addPlayerToLobby(ctx, game._id, args.sessionId);
   },
 });
 

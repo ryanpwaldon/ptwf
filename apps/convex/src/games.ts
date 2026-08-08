@@ -5,11 +5,11 @@ import { ConvexError, v } from "convex/values";
 
 import type { DataModel, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-import { CHARACTER_OPTIONS } from "./fields/character";
-import { gameCodeValidator, generateGameCode } from "./fields/gameCode";
+import { gameCodeValidator } from "./fields/gameCode";
 import { quizAnimalValidator } from "./fields/quizAnimal";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
+import { addPlayerToLobby, createGameWithPlayer } from "./gameHelpers";
 import schema from "./schema";
 
 // ========================================================================================
@@ -20,42 +20,52 @@ export const create = mutation({
   args: { ...SessionIdArg },
   returns: v.string(),
   handler: async (ctx, args) => {
-    // Generate a unique game code.
-    let code: string;
-    let existing;
-    do {
-      code = generateGameCode();
-      existing = await ctx.db
-        .query("games")
-        .withIndex("by_code", (q) => q.eq("code", code))
-        .unique();
-    } while (existing !== null);
-
-    // Create the game.
-    const gameId = await ctx.db.insert("games", {
-      code,
-      status: "lobby",
-      quizAnimal: "dogs",
-      quizTone: "standard",
-      quizTheme: "diet-and-nutrition",
-      questionCount: 10,
-      timeLimitSeconds: 60,
-      roundEndsAt: undefined,
-      currentQuestionIndex: 0,
-    });
-
-    // Random character for the player.
-    const character = CHARACTER_OPTIONS[Math.floor(Math.random() * CHARACTER_OPTIONS.length)]; // prettier-ignore
-    if (!character) throw new Error("Failed to generate a random character.");
-
-    // Add the player to the game.
-    await ctx.db.insert("players", {
-      gameId,
-      sessionId: args.sessionId,
-      character: character.value,
-      isReady: false,
-    });
+    const { code } = await createGameWithPlayer(ctx, args.sessionId);
     return code;
+  },
+});
+
+export const playAgain = mutation({
+  args: { gameId: v.id("games"), ...SessionIdArg },
+  returns: v.string(),
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) throw new ConvexError("Game not found.");
+    if (game.status !== "finished") {
+      throw new ConvexError("Game is not finished.");
+    }
+
+    const player = await ctx.db
+      .query("players")
+      .withIndex("by_gameId_and_sessionId", (q) =>
+        q.eq("gameId", args.gameId).eq("sessionId", args.sessionId),
+      )
+      .unique();
+    if (!player) throw new ConvexError("Not a participant.");
+
+    if (player.replayRequested) {
+      if (!game.replayGameId) throw new Error("Replay game not found.");
+      const replayGame = await ctx.db.get(game.replayGameId);
+      if (!replayGame) throw new Error("Replay game not found.");
+      return replayGame.code;
+    }
+
+    let replayGameId = game.replayGameId;
+    let replayCode: string;
+    if (replayGameId) {
+      const replayGame = await ctx.db.get(replayGameId);
+      if (!replayGame) throw new Error("Replay game not found.");
+      await addPlayerToLobby(ctx, replayGameId, args.sessionId);
+      replayCode = replayGame.code;
+    } else {
+      const replayGame = await createGameWithPlayer(ctx, args.sessionId);
+      replayGameId = replayGame.gameId;
+      replayCode = replayGame.code;
+      await ctx.db.patch(game._id, { replayGameId });
+    }
+
+    await ctx.db.patch(player._id, { replayRequested: true });
+    return replayCode;
   },
 });
 

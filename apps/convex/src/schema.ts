@@ -24,6 +24,7 @@ const schema = defineSchema({
     currentQuestionIndex: v.number(),
     roundEndsAt: v.optional(v.number()),
     phase: v.optional(v.union(v.literal("answering"), v.literal("results"))),
+    replayGameId: v.optional(v.id("games")),
   })
     .index("by_code", ["code"])
     .index("by_status", ["status"]),
@@ -33,6 +34,7 @@ const schema = defineSchema({
     sessionId: v.string(),
     character: characterValidator,
     isReady: v.boolean(),
+    replayRequested: v.optional(v.boolean()),
   })
     .index("by_gameId", ["gameId"])
     .index("by_gameId_and_sessionId", ["gameId", "sessionId"]),
