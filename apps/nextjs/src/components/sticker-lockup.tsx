@@ -88,6 +88,11 @@ const stickerShadows = {
   light: "drop-shadow(0 6px 14px rgb(0 0 0 / 0.18))",
 } as const;
 
+const archShadows = {
+  dark: "drop-shadow(0 5px 12px rgb(0 0 0 / 0.12))",
+  light: "drop-shadow(0 4px 10px rgb(0 0 0 / 0.12))",
+} as const;
+
 export function StickerLockup({
   className,
   entranceDelay = 0,
@@ -98,8 +103,9 @@ export function StickerLockup({
   const aspectRatio = heroSticker.width / heroSticker.height;
   const shouldReduceMotion = useReducedMotion();
   const { resolvedTheme } = useTheme();
-  const stickerShadow =
-    stickerShadows[resolvedTheme === "dark" ? "dark" : "light"];
+  const shadowTheme = resolvedTheme === "dark" ? "dark" : "light";
+  const stickerShadow = stickerShadows[shadowTheme];
+  const archShadow = archShadows[shadowTheme];
   return (
     <div
       className={cn(
@@ -128,10 +134,7 @@ export function StickerLockup({
                 { y: 48 },
               )}
             >
-              <ArchedBadge
-                className="h-full"
-                style={{ filter: stickerShadow }}
-              />
+              <ArchedBadge className="h-full" style={{ filter: archShadow }} />
             </motion.div>
           </div>
           <motion.div
