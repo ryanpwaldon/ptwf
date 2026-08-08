@@ -15,6 +15,7 @@ import type * as fields_quizAnimal from "../fields/quizAnimal.js";
 import type * as fields_quizTheme from "../fields/quizTheme.js";
 import type * as fields_quizTone from "../fields/quizTone.js";
 import type * as gameEngine from "../gameEngine.js";
+import type * as gameHelpers from "../gameHelpers.js";
 import type * as games from "../games.js";
 import type * as migrations from "../migrations.js";
 import type * as players from "../players.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   "fields/quizTheme": typeof fields_quizTheme;
   "fields/quizTone": typeof fields_quizTone;
   gameEngine: typeof gameEngine;
+  gameHelpers: typeof gameHelpers;
   games: typeof games;
   migrations: typeof migrations;
   players: typeof players;

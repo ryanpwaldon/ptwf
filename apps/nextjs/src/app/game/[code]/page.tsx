@@ -75,7 +75,7 @@ export default function GamePage() {
       {game.status === "lobby" && <GameLobby game={game} players={players} me={me} />}
       {game.status === "generating" && <GameGenerating />}
       {game.status === "active" && <GamePlay game={game} me={me} players={players} questions={questions} answers={answers} />}
-      {game.status === "finished" && <GameResults me={me} players={players} questions={questions} answers={answers} />}
+      {game.status === "finished" && <GameResults game={game} me={me} players={players} questions={questions} answers={answers} />}
     </>
   );
 }

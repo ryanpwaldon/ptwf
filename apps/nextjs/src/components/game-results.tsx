@@ -1,9 +1,11 @@
 import type { FunctionReturnType } from "convex/server";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSessionMutation } from "convex-helpers/react/sessions";
+import { LoaderCircleIcon, RotateCcwIcon } from "lucide-react";
 
-import type { api } from "@acme/convex";
-import { getCharacterByValue } from "@acme/convex";
+import { api, getCharacterByValue } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
 
@@ -13,11 +15,13 @@ import { QuestionResult } from "~/components/question-result";
 import { PageShell } from "./page-shell";
 
 type Me = NonNullable<FunctionReturnType<typeof api.players.me>>;
+type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
 type Player = FunctionReturnType<typeof api.players.allByGameId>[number];
 type Question = FunctionReturnType<typeof api.questions.allByGameId>[number];
 type Answer = FunctionReturnType<typeof api.answers.allByGameId>[number];
 
 interface GameResultsProps {
+  game: Game;
   me: Me;
   players: Player[];
   questions: Question[];
@@ -25,12 +29,31 @@ interface GameResultsProps {
 }
 
 export function GameResults({
+  game,
   me,
   players,
   questions,
   answers,
 }: GameResultsProps) {
+  const router = useRouter();
+  const playAgain = useSessionMutation(api.games.playAgain);
+  const [isStartingReplay, setIsStartingReplay] = useState(false);
   const sortedQuestions = useMemo(() => [...questions].sort((a, b) => a.index - b.index), [questions]); // prettier-ignore
+  const replayCount = players.filter((player) => player.replayRequested).length;
+  const playAgainLabel =
+    players.length === 1
+      ? "Play again"
+      : `Play again ${replayCount}/${players.length}`;
+
+  async function handlePlayAgain() {
+    setIsStartingReplay(true);
+    try {
+      const code = await playAgain({ gameId: game._id });
+      router.push(`/game/${code}`);
+    } finally {
+      setIsStartingReplay(false);
+    }
+  }
 
   const leaderboardEntries = useMemo(
     () =>
@@ -111,8 +134,21 @@ export function GameResults({
         ))}
       </main>
       <div className="bg-background/95 sticky bottom-0 mt-4 flex justify-end gap-4 border-t p-4 backdrop-blur">
-        <Button size="xl" variant="default" asChild>
+        <Button size="xl" variant="secondary" asChild>
           <Link href="/">Return home</Link>
+        </Button>
+        <Button
+          size="xl"
+          disabled={isStartingReplay}
+          className="disabled:opacity-100"
+          onClick={() => void handlePlayAgain()}
+        >
+          {isStartingReplay ? (
+            <LoaderCircleIcon className="animate-spin" />
+          ) : (
+            <RotateCcwIcon />
+          )}
+          {playAgainLabel}
         </Button>
       </div>
     </PageShell>
