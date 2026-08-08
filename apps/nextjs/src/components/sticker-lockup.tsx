@@ -82,6 +82,9 @@ const stickerLockupConfigs = {
 
 const heroStickerId = "toilet-paper-cat" as keyof typeof stickerLockupConfigs;
 
+const stickerShadowClassName = "drop-shadow-[0_6px_14px_rgb(0_0_0/0.18)]";
+const archShadowClassName = "drop-shadow-[0_4px_10px_rgb(0_0_0/0.12)]";
+
 export function StickerLockup({
   className,
   entranceDelay = 0,
@@ -119,7 +122,7 @@ export function StickerLockup({
                 { y: 48 },
               )}
             >
-              <ArchedBadge className="h-full" />
+              <ArchedBadge className={cn("h-full", archShadowClassName)} />
             </motion.div>
           </div>
           <motion.div
@@ -128,7 +131,7 @@ export function StickerLockup({
           >
             <HolographicSticker
               asset={heroSticker}
-              className="size-full drop-shadow-xl"
+              className={cn("size-full", stickerShadowClassName)}
               mouseTiltIntensity={1}
               circularTiltIntensity={0.1}
               foilIntensity={1}
@@ -142,7 +145,7 @@ export function StickerLockup({
             return (
               <div
                 key={accessoryId}
-                className="absolute drop-shadow-sm"
+                className="absolute"
                 style={{
                   top: `${50 + placement.y}%`,
                   left: `${50 + placement.x}%`,
@@ -164,7 +167,7 @@ export function StickerLockup({
                 >
                   <HolographicSticker
                     asset={accessory}
-                    className="size-full"
+                    className={cn("size-full", stickerShadowClassName)}
                     mouseTiltIntensity={3}
                     circularTiltIntensity={1}
                     foilIntensity={0.5}

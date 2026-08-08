@@ -460,7 +460,7 @@ export function HolographicSticker({
       <motion.div
         ref={stickerRef}
         className={cn(
-          "@container relative isolate mx-auto filter-[drop-shadow(0_18px_24px_rgb(0_0_0/0.22))] will-change-transform transform-3d",
+          "@container relative isolate mx-auto will-change-transform transform-3d",
           className,
         )}
         style={stickerStyle}
