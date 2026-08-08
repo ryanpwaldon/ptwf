@@ -35,6 +35,7 @@ export interface HolographicStickerProps {
   foilIntensity?: number;
   mouseTiltIntensity?: number;
   priority?: boolean;
+  style?: Omit<CSSProperties, "transform">;
 }
 
 interface PointerPosition {
@@ -158,6 +159,7 @@ export function HolographicSticker({
   foilIntensity = 1,
   mouseTiltIntensity = 1,
   priority = false,
+  style,
 }: HolographicStickerProps) {
   const { resolvedTheme } = useTheme();
   const [hasMounted, setHasMounted] = useState(false);
@@ -273,6 +275,7 @@ export function HolographicSticker({
     hasMounted ? resolvedTheme : undefined,
   );
   const stickerStyle = {
+    ...style,
     "--background-x": backgroundXPercent,
     "--background-x-inverse": inverseBackgroundXPercent,
     "--background-y": backgroundYPercent,
@@ -282,7 +285,6 @@ export function HolographicSticker({
     "--interaction": effectInteraction,
     "--pointer-x": pointerXPercent,
     "--pointer-y": pointerYPercent,
-    filter: "drop-shadow(0 6px 14px rgb(0 0 0 / 0.18))",
     transform: shouldReduceMotion
       ? "none"
       : sharedPointer

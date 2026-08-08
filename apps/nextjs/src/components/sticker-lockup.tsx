@@ -82,6 +82,7 @@ const stickerLockupConfigs = {
 
 const heroStickerId = "toilet-paper-cat" as keyof typeof stickerLockupConfigs;
 
+const stickerShadow = "drop-shadow(0 6px 14px rgb(0 0 0 / 0.18))";
 const archShadow = "drop-shadow(0 4px 10px rgb(0 0 0 / 0.12))";
 
 export function StickerLockup({
@@ -135,6 +136,7 @@ export function StickerLockup({
               circularTiltIntensity={0.1}
               foilIntensity={1}
               circularTiltSpeed={100}
+              style={{ filter: stickerShadow }}
               priority
             />
           </motion.div>
@@ -171,6 +173,7 @@ export function StickerLockup({
                     circularTiltIntensity={1}
                     foilIntensity={0.5}
                     circularTiltSpeed={300}
+                    style={{ filter: stickerShadow }}
                   />
                 </motion.div>
               </div>
