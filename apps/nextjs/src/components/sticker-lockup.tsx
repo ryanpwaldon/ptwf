@@ -84,8 +84,8 @@ const stickerLockupConfigs = {
 const heroStickerId = "toilet-paper-cat" as keyof typeof stickerLockupConfigs;
 
 const stickerShadows = {
-  dark: "drop-shadow(0 8px 18px rgb(0 0 0 / 0.22))",
-  light: "drop-shadow(0 6px 14px rgb(0 0 0 / 0.22))",
+  dark: "drop-shadow(0 8px 18px rgb(0 0 0 / 0.18))",
+  light: "drop-shadow(0 6px 14px rgb(0 0 0 / 0.18))",
 } as const;
 
 export function StickerLockup({
