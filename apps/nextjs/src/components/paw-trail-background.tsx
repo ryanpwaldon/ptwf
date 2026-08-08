@@ -3,6 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   ChevronDownIcon,
+  CircleHelpIcon,
   RotateCcwIcon,
   SlidersHorizontalIcon,
 } from "lucide-react";
@@ -10,6 +11,12 @@ import {
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@acme/ui/tooltip";
 
 interface Point {
   x: number;
@@ -18,6 +25,7 @@ interface Point {
 
 interface Paw {
   element: SVGUseElement;
+  fadeOutElement: SVGGElement;
   progress: number;
 }
 
@@ -51,12 +59,16 @@ export interface PawTrailBackgroundProps {
   trailLength?: number;
   curvature?: number;
   walkInDuration?: number;
-  holdDuration?: number;
-  walkOutDuration?: number;
+  footprintDuration?: number;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
+  fadeInEasing?: string;
+  fadeOutEasing?: string;
   overscan?: number;
   pawSpacing?: number;
   pawSize?: number;
   pawOffset?: number;
+  opacity?: number;
   color?: string;
   showPaws?: boolean;
   showSpacingDebug?: boolean;
@@ -68,12 +80,16 @@ interface PawTrailSettings {
   trailLength: number;
   curvature: number;
   walkInDuration: number;
-  holdDuration: number;
-  walkOutDuration: number;
+  footprintDuration: number;
+  fadeInDuration: number;
+  fadeOutDuration: number;
+  fadeInEasing: string;
+  fadeOutEasing: string;
   overscan: number;
   pawSpacing: number;
   pawSize: number;
   pawOffset: number;
+  opacity: number;
   color: string;
   showPaws: boolean;
   showSpacingDebug: boolean;
@@ -81,6 +97,7 @@ interface PawTrailSettings {
 
 interface RangeControlProps {
   label: string;
+  description: string;
   value: number;
   min: number;
   max: number;
@@ -89,8 +106,129 @@ interface RangeControlProps {
   onChange: (value: number) => void;
 }
 
+const easingOptions = [
+  {
+    label: "Strong ease out",
+    value: "cubic-bezier(0.23, 1, 0.32, 1)",
+  },
+  {
+    label: "Gentle ease out",
+    value: "cubic-bezier(0.16, 1, 0.3, 1)",
+  },
+  {
+    label: "Ease in out",
+    value: "cubic-bezier(0.77, 0, 0.175, 1)",
+  },
+  { label: "Ease in", value: "cubic-bezier(0.42, 0, 1, 1)" },
+  { label: "Linear", value: "linear" },
+] as const;
+
+const controlDescriptions = {
+  density:
+    "How aggressively new trails spawn. Higher values fill available space faster and allow more trails at once.",
+  spacing:
+    "The minimum clearance between separate trails. Larger values leave more empty space.",
+  trailLength:
+    "The approximate distance covered by each trail before its random variation is applied.",
+  curvature:
+    "How strongly trails bend. Zero is almost straight; one produces the most pronounced curves.",
+  walkInDuration:
+    "How long the footprints take to progress from the tail to the head of a trail.",
+  footprintDuration:
+    "The complete lifetime of one footprint, from the start of its fade-in through the end of its fade-out.",
+  fadeInDuration:
+    "How long each individual footprint takes to become fully visible.",
+  fadeOutDuration:
+    "How long each individual footprint takes to disappear at the end of its lifetime.",
+  fadeInEasing:
+    "How opacity and scale accelerate during entry. Strong ease out appears quickly, then settles gently.",
+  fadeOutEasing:
+    "How opacity and scale accelerate during exit. Strong ease out disappears promptly, then settles gently.",
+  overscan:
+    "The hidden drawing area beyond the viewport, allowing trails to enter and leave naturally at the edges.",
+  pawSpacing:
+    "The distance between consecutive footprints along the same trail.",
+  pawSize: "The visual scale of every footprint.",
+  pawOffset:
+    "How far alternating left and right footprints sit from the trail's centre line.",
+  opacity:
+    "The maximum visibility of the footprint layer. Fade animations remain relative to this value.",
+  color: "The colour used to draw every footprint.",
+  showPaws: "Shows or hides the rendered footprints.",
+  showSpacingDebug:
+    "Shows the collision-clearance samples used to keep separate trails apart.",
+  collapse: "Shows or hides the paw trail controls.",
+  pause:
+    "Stops new trails from spawning. Footprints already on screen continue their lifecycle.",
+  reseed: "Removes every current trail and starts a new random layout.",
+  reset: "Restores every paw trail control to its default value.",
+} as const;
+
+interface EasingControlProps {
+  label: string;
+  description: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+interface ControlHelpProps {
+  label: string;
+  description: string;
+}
+
+function ControlHelp({ label, description }: ControlHelpProps) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          aria-label={`About ${label}`}
+          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 -m-1 shrink-0 cursor-help rounded-sm p-1 transition-colors outline-none focus-visible:ring-2"
+        >
+          <CircleHelpIcon className="size-3.5" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="right" sideOffset={6} className="max-w-64">
+        {description}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function EasingControl({
+  label,
+  description,
+  value,
+  onChange,
+}: EasingControlProps) {
+  const id = useId();
+
+  return (
+    <div className="grid min-w-0 gap-1.5 text-xs font-medium">
+      <span className="flex items-center gap-1.5">
+        <label htmlFor={id}>{label}</label>
+        <ControlHelp label={label} description={description} />
+      </span>
+      <select
+        id={id}
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.currentTarget.value)}
+        className="border-input bg-background h-7 min-w-0 rounded-md border px-2 text-xs"
+      >
+        {easingOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 function RangeControl({
   label,
+  description,
   value,
   min,
   max,
@@ -98,15 +236,21 @@ function RangeControl({
   format = String,
   onChange,
 }: RangeControlProps) {
+  const id = useId();
+
   return (
-    <label className="grid min-w-0 gap-1.5 text-xs font-medium">
+    <div className="grid min-w-0 gap-1.5 text-xs font-medium">
       <span className="flex items-center justify-between gap-2">
-        <span>{label}</span>
+        <span className="flex min-w-0 items-center gap-1.5">
+          <label htmlFor={id}>{label}</label>
+          <ControlHelp label={label} description={description} />
+        </span>
         <output className="text-muted-foreground font-mono text-[0.6875rem] tabular-nums">
           {format(value)}
         </output>
       </span>
       <input
+        id={id}
         type="range"
         aria-label={label}
         min={min}
@@ -116,7 +260,7 @@ function RangeControl({
         onChange={(event) => onChange(Number(event.currentTarget.value))}
         className="accent-foreground h-4 w-full cursor-pointer"
       />
-    </label>
+    </div>
   );
 }
 
@@ -144,6 +288,8 @@ function PawTrailControls({
   onReset,
   onReseed,
 }: PawTrailControlsProps) {
+  const colorControlId = useId();
+
   return (
     <aside className="fixed bottom-4 left-4 z-50 max-h-[calc(100dvh-2rem)] w-[min(20rem,calc(100vw-2rem))] overflow-y-auto">
       <Card
@@ -155,26 +301,33 @@ function PawTrailControls({
             <SlidersHorizontalIcon className="size-4" />
             Paw trail controls
           </CardTitle>
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="ghost"
-            aria-label={
-              collapsed
-                ? "Expand paw trail controls"
-                : "Collapse paw trail controls"
-            }
-            aria-expanded={!collapsed}
-            onClick={() => onCollapsedChange(!collapsed)}
-            className="transition-transform duration-150 active:scale-[0.97]"
-          >
-            <ChevronDownIcon
-              className={cn(
-                "transition-transform duration-200 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)]",
-                collapsed && "rotate-180",
-              )}
-            />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon-sm"
+                variant="ghost"
+                aria-label={
+                  collapsed
+                    ? "Expand paw trail controls"
+                    : "Collapse paw trail controls"
+                }
+                aria-expanded={!collapsed}
+                onClick={() => onCollapsedChange(!collapsed)}
+                className="transition-transform duration-150 active:scale-[0.97]"
+              >
+                <ChevronDownIcon
+                  className={cn(
+                    "transition-transform duration-200 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)]",
+                    collapsed && "rotate-180",
+                  )}
+                />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={6}>
+              {controlDescriptions.collapse}
+            </TooltipContent>
+          </Tooltip>
         </CardHeader>
 
         {!collapsed && (
@@ -182,6 +335,7 @@ function PawTrailControls({
             <div className="grid grid-cols-2 gap-x-3 gap-y-4">
               <RangeControl
                 label="Density"
+                description={controlDescriptions.density}
                 value={settings.density}
                 min={0.4}
                 max={2}
@@ -191,6 +345,7 @@ function PawTrailControls({
               />
               <RangeControl
                 label="Trail spacing"
+                description={controlDescriptions.spacing}
                 value={settings.spacing}
                 min={28}
                 max={320}
@@ -200,6 +355,7 @@ function PawTrailControls({
               />
               <RangeControl
                 label="Trail length"
+                description={controlDescriptions.trailLength}
                 value={settings.trailLength}
                 min={260}
                 max={900}
@@ -209,6 +365,7 @@ function PawTrailControls({
               />
               <RangeControl
                 label="Curvature"
+                description={controlDescriptions.curvature}
                 value={settings.curvature}
                 min={0}
                 max={1}
@@ -218,6 +375,7 @@ function PawTrailControls({
               />
               <RangeControl
                 label="Walk in"
+                description={controlDescriptions.walkInDuration}
                 value={settings.walkInDuration}
                 min={500}
                 max={5000}
@@ -226,25 +384,52 @@ function PawTrailControls({
                 onChange={(value) => onSettingsChange("walkInDuration", value)}
               />
               <RangeControl
-                label="Hold"
-                value={settings.holdDuration}
-                min={0}
+                label="Footprint duration"
+                description={controlDescriptions.footprintDuration}
+                value={settings.footprintDuration}
+                min={1000}
                 max={6000}
                 step={100}
                 format={(value) => `${(value / 1000).toFixed(1)}s`}
-                onChange={(value) => onSettingsChange("holdDuration", value)}
+                onChange={(value) =>
+                  onSettingsChange("footprintDuration", value)
+                }
               />
               <RangeControl
-                label="Walk out"
-                value={settings.walkOutDuration}
-                min={500}
-                max={5000}
-                step={100}
-                format={(value) => `${(value / 1000).toFixed(1)}s`}
-                onChange={(value) => onSettingsChange("walkOutDuration", value)}
+                label="Fade in"
+                description={controlDescriptions.fadeInDuration}
+                value={settings.fadeInDuration}
+                min={100}
+                max={500}
+                step={10}
+                format={(value) => `${value}ms`}
+                onChange={(value) => onSettingsChange("fadeInDuration", value)}
+              />
+              <RangeControl
+                label="Fade out"
+                description={controlDescriptions.fadeOutDuration}
+                value={settings.fadeOutDuration}
+                min={100}
+                max={500}
+                step={10}
+                format={(value) => `${value}ms`}
+                onChange={(value) => onSettingsChange("fadeOutDuration", value)}
+              />
+              <EasingControl
+                label="Fade in easing"
+                description={controlDescriptions.fadeInEasing}
+                value={settings.fadeInEasing}
+                onChange={(value) => onSettingsChange("fadeInEasing", value)}
+              />
+              <EasingControl
+                label="Fade out easing"
+                description={controlDescriptions.fadeOutEasing}
+                value={settings.fadeOutEasing}
+                onChange={(value) => onSettingsChange("fadeOutEasing", value)}
               />
               <RangeControl
                 label="Overscan"
+                description={controlDescriptions.overscan}
                 value={settings.overscan}
                 min={80}
                 max={420}
@@ -254,6 +439,7 @@ function PawTrailControls({
               />
               <RangeControl
                 label="Paw spacing"
+                description={controlDescriptions.pawSpacing}
                 value={settings.pawSpacing}
                 min={32}
                 max={140}
@@ -263,6 +449,7 @@ function PawTrailControls({
               />
               <RangeControl
                 label="Paw size"
+                description={controlDescriptions.pawSize}
                 value={settings.pawSize}
                 min={0.4}
                 max={1.5}
@@ -272,6 +459,7 @@ function PawTrailControls({
               />
               <RangeControl
                 label="Paw offset"
+                description={controlDescriptions.pawOffset}
                 value={settings.pawOffset}
                 min={0}
                 max={32}
@@ -279,9 +467,26 @@ function PawTrailControls({
                 format={(value) => `${value}px`}
                 onChange={(value) => onSettingsChange("pawOffset", value)}
               />
-              <label className="grid gap-1.5 text-xs font-medium">
-                <span>Paw color</span>
+              <RangeControl
+                label="Footprint opacity"
+                description={controlDescriptions.opacity}
+                value={settings.opacity}
+                min={0}
+                max={1}
+                step={0.01}
+                format={(value) => `${Math.round(value * 100)}%`}
+                onChange={(value) => onSettingsChange("opacity", value)}
+              />
+              <div className="grid gap-1.5 text-xs font-medium">
+                <span className="flex items-center gap-1.5">
+                  <label htmlFor={colorControlId}>Paw color</label>
+                  <ControlHelp
+                    label="Paw color"
+                    description={controlDescriptions.color}
+                  />
+                </span>
                 <input
+                  id={colorControlId}
                   type="color"
                   value={
                     /^#[\da-f]{6}$/i.test(settings.color)
@@ -293,66 +498,99 @@ function PawTrailControls({
                   }
                   className="border-input bg-background h-7 w-full cursor-pointer rounded-md border p-0.5"
                 />
-              </label>
+              </div>
             </div>
 
             <div className="border-border/70 mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t pt-3">
-              <label className="flex cursor-pointer items-center gap-2 text-xs font-medium">
-                <input
-                  type="checkbox"
-                  checked={settings.showPaws}
-                  onChange={(event) =>
-                    onSettingsChange("showPaws", event.currentTarget.checked)
-                  }
-                  className="accent-foreground size-3.5"
+              <span className="flex items-center gap-1.5">
+                <label className="flex cursor-pointer items-center gap-2 text-xs font-medium">
+                  <input
+                    type="checkbox"
+                    checked={settings.showPaws}
+                    onChange={(event) =>
+                      onSettingsChange("showPaws", event.currentTarget.checked)
+                    }
+                    className="accent-foreground size-3.5"
+                  />
+                  Show footprints
+                </label>
+                <ControlHelp
+                  label="Show footprints"
+                  description={controlDescriptions.showPaws}
                 />
-                Show footprints
-              </label>
-              <label className="flex cursor-pointer items-center gap-2 text-xs font-medium">
-                <input
-                  type="checkbox"
-                  checked={settings.showSpacingDebug}
-                  onChange={(event) =>
-                    onSettingsChange(
-                      "showSpacingDebug",
-                      event.currentTarget.checked,
-                    )
-                  }
-                  className="accent-foreground size-3.5"
+              </span>
+              <span className="flex items-center gap-1.5">
+                <label className="flex cursor-pointer items-center gap-2 text-xs font-medium">
+                  <input
+                    type="checkbox"
+                    checked={settings.showSpacingDebug}
+                    onChange={(event) =>
+                      onSettingsChange(
+                        "showSpacingDebug",
+                        event.currentTarget.checked,
+                      )
+                    }
+                    className="accent-foreground size-3.5"
+                  />
+                  Show spacing
+                </label>
+                <ControlHelp
+                  label="Show spacing"
+                  description={controlDescriptions.showSpacingDebug}
                 />
-                Show spacing
-              </label>
+              </span>
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                onClick={() => onPausedChange(!paused)}
-                className="transition-transform duration-150 active:scale-[0.97]"
-              >
-                {paused ? "Resume spawning" : "Pause spawning"}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={onReseed}
-                className="transition-transform duration-150 active:scale-[0.97]"
-              >
-                <RotateCcwIcon />
-                Clear &amp; reseed
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => onPausedChange(!paused)}
+                    className="transition-transform duration-150 active:scale-[0.97]"
+                  >
+                    {paused ? "Resume spawning" : "Pause spawning"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={6}>
+                  {controlDescriptions.pause}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={onReseed}
+                    className="transition-transform duration-150 active:scale-[0.97]"
+                  >
+                    <RotateCcwIcon />
+                    Clear &amp; reseed
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={6}>
+                  {controlDescriptions.reseed}
+                </TooltipContent>
+              </Tooltip>
             </div>
-            <Button
-              type="button"
-              size="xs"
-              variant="ghost"
-              onClick={onReset}
-              className="text-muted-foreground mt-2 w-full transition-transform duration-150 active:scale-[0.97]"
-            >
-              Reset controls
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="xs"
+                  variant="ghost"
+                  onClick={onReset}
+                  className="text-muted-foreground mt-2 w-full transition-transform duration-150 active:scale-[0.97]"
+                >
+                  Reset controls
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={6}>
+                {controlDescriptions.reset}
+              </TooltipContent>
+            </Tooltip>
           </CardContent>
         )}
       </Card>
@@ -462,17 +700,21 @@ export function PawTrailBackground({
   className,
   showControls = false,
   controlsDefaultCollapsed = false,
-  density = 0.8,
-  spacing = 82,
+  density = 2,
+  spacing = 250,
   trailLength = 500,
   curvature = 0.55,
   walkInDuration = 1600,
-  holdDuration = 2600,
-  walkOutDuration = 1400,
+  footprintDuration = 3000,
+  fadeInDuration = 220,
+  fadeOutDuration = 180,
+  fadeInEasing = "cubic-bezier(0.16, 1, 0.3, 1)",
+  fadeOutEasing = "cubic-bezier(0.42, 0, 1, 1)",
   overscan = 220,
   pawSpacing = 62,
   pawSize = 0.68,
   pawOffset = 11,
+  opacity = 0.1,
   color = "currentColor",
   showPaws = true,
   showSpacingDebug = false,
@@ -489,12 +731,16 @@ export function PawTrailBackground({
       trailLength,
       curvature,
       walkInDuration,
-      holdDuration,
-      walkOutDuration,
+      footprintDuration,
+      fadeInDuration,
+      fadeOutDuration,
+      fadeInEasing,
+      fadeOutEasing,
       overscan,
       pawSpacing,
       pawSize,
       pawOffset,
+      opacity,
       color,
       showPaws,
       showSpacingDebug,
@@ -503,7 +749,12 @@ export function PawTrailBackground({
       color,
       curvature,
       density,
-      holdDuration,
+      fadeInDuration,
+      fadeInEasing,
+      fadeOutDuration,
+      fadeOutEasing,
+      footprintDuration,
+      opacity,
       overscan,
       pawOffset,
       pawSize,
@@ -513,7 +764,6 @@ export function PawTrailBackground({
       spacing,
       trailLength,
       walkInDuration,
-      walkOutDuration,
     ],
   );
   const [settings, setSettings] = useState(defaultSettings);
@@ -545,8 +795,11 @@ export function PawTrailBackground({
     trailLength: activeTrailLength,
     curvature: activeCurvature,
     walkInDuration: activeWalkInDuration,
-    holdDuration: activeHoldDuration,
-    walkOutDuration: activeWalkOutDuration,
+    footprintDuration: activeFootprintDuration,
+    fadeInDuration: activeFadeInDuration,
+    fadeOutDuration: activeFadeOutDuration,
+    fadeInEasing: activeFadeInEasing,
+    fadeOutEasing: activeFadeOutEasing,
     overscan: activeOverscan,
     pawSpacing: activePawSpacing,
     pawSize: activePawSize,
@@ -688,9 +941,17 @@ export function PawTrailBackground({
           footprint.style.opacity = reducedMotion.matches ? "1" : "0";
           footprint.style.transformBox = "fill-box";
           footprint.style.transformOrigin = "center";
-          placement.appendChild(footprint);
+          const fadeOutGroup = document.createElementNS(svgNamespace, "g");
+          fadeOutGroup.style.transformBox = "fill-box";
+          fadeOutGroup.style.transformOrigin = "center";
+          fadeOutGroup.appendChild(footprint);
+          placement.appendChild(fadeOutGroup);
           group.appendChild(placement);
-          paws.push({ element: footprint, progress: distance / length });
+          paws.push({
+            element: footprint,
+            fadeOutElement: fadeOutGroup,
+            progress: distance / length,
+          });
           index += 1;
         }
       }
@@ -724,44 +985,52 @@ export function PawTrailBackground({
       return group;
     }
 
-    function animatePawsIn(trail: Trail) {
-      for (const paw of trail.paws) {
-        const duration = 220;
-        const delay = Math.max(
-          0,
-          activeWalkInDuration * paw.progress - duration * 0.55,
-        );
-        const animation = paw.element.animate(
-          [
-            { opacity: 0, transform: "translateY(-10%) scale(0.82)" },
-            { opacity: 1, transform: "translateY(0) scale(1)" },
-          ],
-          {
-            duration,
-            delay,
-            fill: "forwards",
-            easing: "cubic-bezier(0.23, 1, 0.32, 1)",
-          },
-        );
-        trail.animations.push(animation);
-      }
+    function getPawDelay(paw: Paw) {
+      return Math.max(
+        0,
+        activeWalkInDuration * paw.progress - activeFadeInDuration * 0.55,
+      );
     }
 
-    function animatePawsOut(trail: Trail) {
+    function animatePaws(trail: Trail) {
+      const duration = Math.max(
+        activeFootprintDuration,
+        activeFadeInDuration + activeFadeOutDuration,
+      );
+
       for (const paw of trail.paws) {
-        const animation = paw.element.animate(
+        const delay = getPawDelay(paw);
+        const fadeInAnimation = paw.element.animate(
+          [
+            {
+              opacity: 0,
+              transform: "translateY(-10%) scale(0.82)",
+            },
+            {
+              opacity: 1,
+              transform: "translateY(0) scale(1)",
+            },
+          ],
+          {
+            duration: activeFadeInDuration,
+            delay,
+            fill: "forwards",
+            easing: activeFadeInEasing,
+          },
+        );
+        const fadeOutAnimation = paw.fadeOutElement.animate(
           [
             { opacity: 1, transform: "translateY(0) scale(1)" },
             { opacity: 0, transform: "translateY(4%) scale(0.92)" },
           ],
           {
-            duration: 180,
-            delay: activeWalkOutDuration * paw.progress,
+            duration: activeFadeOutDuration,
+            delay: delay + duration - activeFadeOutDuration,
             fill: "forwards",
-            easing: "cubic-bezier(0.23, 1, 0.32, 1)",
+            easing: activeFadeOutEasing,
           },
         );
-        trail.animations.push(animation);
+        trail.animations.push(fadeInAnimation, fadeOutAnimation);
       }
     }
 
@@ -782,19 +1051,17 @@ export function PawTrailBackground({
     function startTrail(trail: Trail) {
       if (reducedMotion.matches) return;
 
-      animatePawsIn(trail);
+      animatePaws(trail);
+      const duration = Math.max(
+        activeFootprintDuration,
+        activeFadeInDuration + activeFadeOutDuration,
+      );
+      const lastPawDelay = trail.paws.reduce(
+        (latest, paw) => Math.max(latest, getPawDelay(paw)),
+        0,
+      );
       trail.timeouts.push(
-        window.setTimeout(
-          () => animatePawsOut(trail),
-          activeWalkInDuration + activeHoldDuration,
-        ),
-        window.setTimeout(
-          () => removeTrail(trail.id),
-          activeWalkInDuration +
-            activeHoldDuration +
-            activeWalkOutDuration +
-            180,
-        ),
+        window.setTimeout(() => removeTrail(trail.id), lastPawDelay + duration),
       );
     }
 
@@ -880,7 +1147,11 @@ export function PawTrailBackground({
   }, [
     activeCurvature,
     activeDensity,
-    activeHoldDuration,
+    activeFadeInDuration,
+    activeFadeInEasing,
+    activeFadeOutDuration,
+    activeFadeOutEasing,
+    activeFootprintDuration,
     activeOverscan,
     activePawOffset,
     activePawSize,
@@ -890,7 +1161,6 @@ export function PawTrailBackground({
     activeSpacing,
     activeTrailLength,
     activeWalkInDuration,
-    activeWalkOutDuration,
     footprintId,
     seed,
   ]);
@@ -900,14 +1170,13 @@ export function PawTrailBackground({
       <div
         aria-hidden="true"
         className={cn(
-          "text-foreground pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-10",
+          "text-foreground pointer-events-none fixed inset-0 z-0 overflow-hidden",
           className,
         )}
-        style={
-          settings.color === "currentColor"
-            ? undefined
-            : { color: settings.color }
-        }
+        style={{
+          color: settings.color === "currentColor" ? undefined : settings.color,
+          opacity: settings.opacity,
+        }}
       >
         <svg
           ref={svgRef}
@@ -929,19 +1198,21 @@ export function PawTrailBackground({
       </div>
 
       {showControls && (
-        <PawTrailControls
-          settings={settings}
-          collapsed={controlsCollapsed}
-          paused={paused}
-          onCollapsedChange={setControlsCollapsed}
-          onPausedChange={setPaused}
-          onSettingsChange={updateSetting}
-          onReset={() => {
-            setSettings(defaultSettings);
-            setPaused(false);
-          }}
-          onReseed={() => setSeed((current) => current + 1)}
-        />
+        <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+          <PawTrailControls
+            settings={settings}
+            collapsed={controlsCollapsed}
+            paused={paused}
+            onCollapsedChange={setControlsCollapsed}
+            onPausedChange={setPaused}
+            onSettingsChange={updateSetting}
+            onReset={() => {
+              setSettings(defaultSettings);
+              setPaused(false);
+            }}
+            onReseed={() => setSeed((current) => current + 1)}
+          />
+        </TooltipProvider>
       )}
     </>
   );

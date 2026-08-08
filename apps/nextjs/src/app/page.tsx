@@ -41,7 +41,7 @@ export default function HomePage() {
 
   return (
     <PageShell>
-      <PawTrailBackground spacing={320} />
+      <PawTrailBackground />
       <main className="relative z-10 flex flex-1 items-center px-4 py-16">
         <div className="flex w-full flex-col items-center text-center">
           <h1 className="sr-only">Pet Care Trivia</h1>
