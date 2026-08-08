@@ -107,6 +107,7 @@ export default function HomePage() {
         {...getHomepageEntrance(
           homepageEntranceDelays.final,
           shouldReduceMotion,
+          { y: 0 },
         )}
       >
         <Button asChild variant="ghost" size="sm">
