@@ -6,7 +6,7 @@ import { api } from "./_generated/api";
 import schema from "./schema";
 import { modules } from "./test.setup";
 
-const SESSION_ID = "session-1" as unknown as SessionId;
+const SESSION_1 = "session-1" as unknown as SessionId;
 const SESSION_2 = "session-2" as unknown as SessionId;
 const STRANGER = "stranger" as unknown as SessionId;
 
@@ -24,7 +24,7 @@ async function setupFinishedGame(t: ReturnType<typeof convexTest>) {
     });
     const player1Id = await ctx.db.insert("players", {
       gameId,
-      sessionId: SESSION_ID,
+      sessionId: SESSION_1,
       character: "apricot",
       isReady: true,
     });
@@ -42,7 +42,7 @@ describe("games", () => {
   it("creates a game with dogs selected by default", async () => {
     const t = convexTest(schema, modules);
 
-    const code = await t.mutation(api.games.create, { sessionId: SESSION_ID });
+    const code = await t.mutation(api.games.create, { sessionId: SESSION_1 });
     const game = await t.query(api.games.byCode, { code });
 
     expect(game?.quizAnimal).toBe("dogs");
@@ -51,12 +51,12 @@ describe("games", () => {
   it("stores only the selected animal value", async () => {
     const t = convexTest(schema, modules);
 
-    const code = await t.mutation(api.games.create, { sessionId: SESSION_ID });
+    const code = await t.mutation(api.games.create, { sessionId: SESSION_1 });
     const game = await t.query(api.games.byCode, { code });
     if (!game) throw new Error("Game not found.");
 
     await t.mutation(api.games.updateQuizAnimal, {
-      sessionId: SESSION_ID,
+      sessionId: SESSION_1,
       gameId: game._id,
       quizAnimal: "cats",
     });
@@ -72,7 +72,7 @@ describe("games.playAgain", () => {
     const { gameId, player1Id } = await setupFinishedGame(t);
 
     const code = await t.mutation(api.games.playAgain, {
-      sessionId: SESSION_ID,
+      sessionId: SESSION_1,
       gameId,
     });
 
@@ -100,7 +100,7 @@ describe("games.playAgain", () => {
     expect(state.originalPlayer?.replayRequested).toBe(true);
     expect(state.replayPlayers).toHaveLength(1);
     expect(state.replayPlayers[0]).toMatchObject({
-      sessionId: SESSION_ID,
+      sessionId: SESSION_1,
       isReady: false,
     });
   });
@@ -110,7 +110,7 @@ describe("games.playAgain", () => {
     const { gameId } = await setupFinishedGame(t);
 
     const firstCode = await t.mutation(api.games.playAgain, {
-      sessionId: SESSION_ID,
+      sessionId: SESSION_1,
       gameId,
     });
     const secondCode = await t.mutation(api.games.playAgain, {
@@ -145,11 +145,11 @@ describe("games.playAgain", () => {
     const { gameId } = await setupFinishedGame(t);
 
     const firstCode = await t.mutation(api.games.playAgain, {
-      sessionId: SESSION_ID,
+      sessionId: SESSION_1,
       gameId,
     });
     const secondCode = await t.mutation(api.games.playAgain, {
-      sessionId: SESSION_ID,
+      sessionId: SESSION_1,
       gameId,
     });
 
@@ -171,7 +171,7 @@ describe("games.playAgain", () => {
     const { gameId } = await setupFinishedGame(t);
 
     const [firstCode, secondCode] = await Promise.all([
-      t.mutation(api.games.playAgain, { sessionId: SESSION_ID, gameId }),
+      t.mutation(api.games.playAgain, { sessionId: SESSION_1, gameId }),
       t.mutation(api.games.playAgain, { sessionId: SESSION_2, gameId }),
     ]);
 
@@ -204,7 +204,7 @@ describe("games.playAgain", () => {
 
     await expect(
       t.mutation(api.games.playAgain, {
-        sessionId: SESSION_ID,
+        sessionId: SESSION_1,
         gameId,
       }),
     ).rejects.toThrowError("Game is not finished.");
@@ -214,7 +214,7 @@ describe("games.playAgain", () => {
     const t = convexTest(schema, modules);
     const { gameId, player2Id } = await setupFinishedGame(t);
     await t.mutation(api.games.playAgain, {
-      sessionId: SESSION_ID,
+      sessionId: SESSION_1,
       gameId,
     });
     const replayGameId = await t.run(async (ctx) => {
