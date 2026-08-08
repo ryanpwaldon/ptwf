@@ -4,7 +4,6 @@ import type { ComponentProps } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@acme/ui";
-import { useTheme } from "@acme/ui/theme";
 
 import { ArchedBadge } from "./arched-badge";
 import {
@@ -83,15 +82,7 @@ const stickerLockupConfigs = {
 
 const heroStickerId = "toilet-paper-cat" as keyof typeof stickerLockupConfigs;
 
-const stickerShadows = {
-  dark: "drop-shadow(0 8px 18px rgb(0 0 0 / 0.18))",
-  light: "drop-shadow(0 6px 14px rgb(0 0 0 / 0.18))",
-} as const;
-
-const archShadows = {
-  dark: "drop-shadow(0 5px 12px rgb(0 0 0 / 0.12))",
-  light: "drop-shadow(0 4px 10px rgb(0 0 0 / 0.12))",
-} as const;
+const archShadow = "drop-shadow(0 4px 10px rgb(0 0 0 / 0.12))";
 
 export function StickerLockup({
   className,
@@ -102,10 +93,6 @@ export function StickerLockup({
   const heroSticker = stickerAssets[heroStickerId];
   const aspectRatio = heroSticker.width / heroSticker.height;
   const shouldReduceMotion = useReducedMotion();
-  const { resolvedTheme } = useTheme();
-  const shadowTheme = resolvedTheme === "dark" ? "dark" : "light";
-  const stickerShadow = stickerShadows[shadowTheme];
-  const archShadow = archShadows[shadowTheme];
   return (
     <div
       className={cn(
@@ -148,7 +135,6 @@ export function StickerLockup({
               circularTiltIntensity={0.1}
               foilIntensity={1}
               circularTiltSpeed={100}
-              shadow={stickerShadow}
               priority
             />
           </motion.div>
@@ -185,7 +171,6 @@ export function StickerLockup({
                     circularTiltIntensity={1}
                     foilIntensity={0.5}
                     circularTiltSpeed={300}
-                    shadow={stickerShadow}
                   />
                 </motion.div>
               </div>

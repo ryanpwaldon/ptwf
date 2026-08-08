@@ -35,7 +35,6 @@ export interface HolographicStickerProps {
   foilIntensity?: number;
   mouseTiltIntensity?: number;
   priority?: boolean;
-  shadow?: CSSProperties["filter"];
 }
 
 interface PointerPosition {
@@ -159,7 +158,6 @@ export function HolographicSticker({
   foilIntensity = 1,
   mouseTiltIntensity = 1,
   priority = false,
-  shadow = "drop-shadow(0 18px 24px rgb(0 0 0 / 0.22))",
 }: HolographicStickerProps) {
   const { resolvedTheme } = useTheme();
   const [hasMounted, setHasMounted] = useState(false);
@@ -284,7 +282,7 @@ export function HolographicSticker({
     "--interaction": effectInteraction,
     "--pointer-x": pointerXPercent,
     "--pointer-y": pointerYPercent,
-    filter: shadow,
+    filter: "drop-shadow(0 6px 14px rgb(0 0 0 / 0.18))",
     transform: shouldReduceMotion
       ? "none"
       : sharedPointer
