@@ -135,7 +135,7 @@ export function StickerLockup({
               mouseTiltIntensity={1}
               circularTiltIntensity={0.1}
               foilIntensity={1}
-              circularTiltSpeed={100}
+              circularTiltSpeed={20}
               priority
             />
           </motion.div>
@@ -170,8 +170,8 @@ export function StickerLockup({
                     className={cn("size-full", stickerShadowClassName)}
                     mouseTiltIntensity={3}
                     circularTiltIntensity={1}
-                    foilIntensity={0.5}
-                    circularTiltSpeed={300}
+                    foilIntensity={0.4}
+                    circularTiltSpeed={200}
                   />
                 </motion.div>
               </div>
