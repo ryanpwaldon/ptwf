@@ -5,7 +5,7 @@ import { ConvexError, v } from "convex/values";
 
 import type { DataModel, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-import { gameCodeValidator } from "./fields/gameCode";
+import { gameCodeValidator, gameCodeZodSchema } from "./fields/gameCode";
 import { quizAnimalValidator } from "./fields/quizAnimal";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
@@ -77,9 +77,12 @@ export const byCode = query({
   args: { code: gameCodeValidator },
   returns: v.nullable(doc(schema, "games")),
   handler: (ctx, args) => {
+    const result = gameCodeZodSchema.safeParse(args.code);
+    if (!result.success) return null;
+
     return ctx.db
       .query("games")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
+      .withIndex("by_code", (q) => q.eq("code", result.data))
       .unique();
   },
 });

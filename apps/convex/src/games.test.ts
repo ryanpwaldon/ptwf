@@ -39,6 +39,27 @@ async function setupFinishedGame(t: ReturnType<typeof convexTest>) {
 }
 
 describe("games", () => {
+  it("finds a game when the code uses lowercase letters", async () => {
+    const t = convexTest(schema, modules);
+    const gameId = await t.run((ctx) =>
+      ctx.db.insert("games", {
+        code: "3PS28N",
+        status: "lobby",
+        quizAnimal: "dogs",
+        quizTone: "standard",
+        quizTheme: "diet-and-nutrition",
+        questionCount: 5,
+        timeLimitSeconds: 30,
+        currentQuestionIndex: 0,
+      }),
+    );
+
+    const game = await t.query(api.games.byCode, { code: "3PS28n" });
+
+    expect(game?._id).toBe(gameId);
+    expect(game?.code).toBe("3PS28N");
+  });
+
   it("creates a game with dogs selected by default", async () => {
     const t = convexTest(schema, modules);
 
