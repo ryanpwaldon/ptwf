@@ -2,24 +2,51 @@
 
 ## Overview
 
-Deployments are fully automated via GitHub Actions. Vercel auto-deploy from git is disabled — Vercel is only ever triggered by the deploy hook called from CI.
+Deployments are automated by `.github/workflows/ci.yml` on pushes to `main`.
+Vercel's Git-triggered deployments are disabled, so GitHub Actions is the only
+production deployment path.
 
-One workflow handles everything:
+The workflow:
 
-- **`ci.yml`** — runs lint, format, and typecheck on every push. If all pass and the branch is `main`, deploys Convex then triggers Vercel.
+1. Runs linting, formatting, type checking, and tests.
+2. Builds the frontend with Vercel's production settings into `.vercel/output`.
+3. Deploys the Convex backend.
+4. Uploads the already-built frontend as a staged production deployment.
+5. Smoke-tests the staged deployment URL.
+6. Promotes the staged frontend to the production domain.
 
-Convex always deploys before Vercel. If Convex fails, Vercel is never triggered. Convex deploys are idempotent, so deploying on any change is safe.
+The old frontend remains live if the frontend build, Convex deployment, staged
+deployment, or smoke test fails. Production workflows are serialized so two
+deployments cannot overlap.
 
-## Required secrets
+## Required GitHub configuration
 
-| Secret                   | How to get it                                                                 |
-| ------------------------ | ----------------------------------------------------------------------------- |
-| `CONVEX_DEPLOY_KEY`      | Convex dashboard → Settings → URL & Deploy Key → Create Production Deploy Key |
-| `VERCEL_DEPLOY_HOOK_URL` | Vercel → Project Settings → Git → Deploy Hooks → create a hook for `main`     |
+Create a GitHub environment named `Production`, then configure these values for
+it or for the repository.
 
-## Disabling Vercel auto-deploy
+### Secrets
 
-Git-triggered deployments are disabled via `vercel.json` at the repo root:
+| Secret                            | How to get it                                                                             |
+| --------------------------------- | ----------------------------------------------------------------------------------------- |
+| `CONVEX_DEPLOY_KEY`               | Convex dashboard → Settings → Deploy Keys. Grant only the `deployment:deploy` permission. |
+| `VERCEL_TOKEN`                    | Vercel account settings → Tokens. Create a token that can deploy the project.             |
+| `VERCEL_AUTOMATION_BYPASS_SECRET` | Vercel project → Settings → Deployment Protection → Protection Bypass for Automation.     |
+
+### Variables
+
+| Variable            | How to get it                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `VERCEL_ORG_ID`     | Run `vercel link`, then read `orgId` from the generated `.vercel/project.json`.     |
+| `VERCEL_PROJECT_ID` | Run `vercel link`, then read `projectId` from the generated `.vercel/project.json`. |
+
+The `.vercel` directory is ignored by Git and must not be committed.
+
+After the CLI deployment succeeds once, remove the old
+`VERCEL_DEPLOY_HOOK_URL` secret and delete the unused deploy hook in Vercel.
+
+## Vercel configuration
+
+Git-triggered deployments are disabled by `vercel.json` at the repository root:
 
 ```json
 {
@@ -29,58 +56,76 @@ Git-triggered deployments are disabled via `vercel.json` at the repo root:
 }
 ```
 
-This prevents Vercel from deploying on every git push. Deploy hooks (called from GitHub Actions) are unaffected and continue to work normally.
+The Vercel production environment must define `NEXT_PUBLIC_CONVEX_URL` with the
+production Convex deployment URL. The workflow pulls the production project
+settings before building, then deploys the exact output from that build rather
+than rebuilding after the backend changes.
 
----
+The smoke test sends the project's automation bypass secret so it can reach a
+staged deployment protected by Vercel Authentication.
 
-## Backward-compatibility rule
+## Backward compatibility
 
-The pipeline only works safely if every Convex change is backward-compatible with the currently-deployed frontend. A Vercel build failure is only safe if the old frontend can still function on the new backend.
+Every Convex deployment must remain compatible with the currently deployed
+frontend. The old frontend continues serving traffic while the new backend is
+deployed and while the staged frontend is tested. It also remains live if any
+later deployment step fails.
 
-**Always safe to deploy:**
+Always safe to deploy:
 
-- New functions
-- New optional fields
-- Internal logic changes
-- Index changes
+- New functions.
+- New optional fields.
+- Internal logic changes that preserve existing behavior.
+- Index changes.
 
-**Requires expand-contract (two separate PRs):**
+Requires three separate deployments:
 
-- Removing a function
-- Renaming a function
-- Removing a required field from the schema
-- Making an optional field required
+- Removing or renaming a function.
+- Removing a field from the schema.
+- Making an optional field required.
+- Changing an existing function argument incompatibly.
 
 ### Expand-contract process
 
-1. **PR 1**: Add the new function or field alongside the old one. Deploy. Old frontend works, new code is ready. For field changes (e.g. renaming a field), the writer must write to both the old and new fields simultaneously during this phase — writing only to the new field will leave the old field stale, which can cause data loss.
-2. **PR 2**: Update the frontend to use the new function or field. Deploy.
-3. **PR 3**: Remove the old function or field. Deploy.
+1. Add the new function or field alongside the old one, then deploy. During a
+   field rename, writers must write both fields so the old value does not become
+   stale.
+2. Update the frontend to use the new function or field, then deploy.
+3. Remove the old function or field in a later commit and deploy again.
 
-Never remove a function in the same commit as the frontend that stops calling it.
-
----
+Never remove a function in the same deployment that updates the frontend to
+stop calling it.
 
 ## Migrations
 
-Migrations are run manually, not in CI. They're high-stakes and benefit from human attention. Convex has no database rollback — data written during a bad migration cannot be automatically undone.
+Migrations run manually rather than in CI. Convex has no automatic database
+rollback, so data written by an incorrect migration cannot be restored by
+redeploying old code.
 
-### Sequence
-
-1. **PR 1**: Deploy backward-compatible Convex changes (new optional field, new function alongside the old one). CI auto-deploys Convex and Vercel. Old frontend continues to work.
-2. **Run the migration manually**: `npx convex run migrations:run --prod` (or whatever function path you've registered). Monitor progress in the Convex dashboard. Verify the data looks correct before proceeding.
-3. **PR 2**: Deploy the frontend that depends on the new data shape, plus any Convex cleanup (remove old functions or fields). CI auto-deploys both.
-
----
+1. Deploy the backward-compatible Convex additions.
+2. Run `pnpm convex run migrations:run --prod` from `apps/convex`. Monitor the
+   migration and verify the resulting data in the Convex dashboard.
+3. Deploy the frontend that uses the new data shape.
+4. Remove old functions or fields only in a later cleanup deployment.
 
 ## Rollback
 
 ### Vercel
 
-Instant rollback via the Vercel dashboard. Promote any previous deployment to production in one click.
+Use Instant Rollback in the Vercel dashboard to point the production domain to
+the previous frontend deployment.
 
 ### Convex
 
-No UI rollback button. To revert: check out the previous commit and run `pnpm convex deploy --prod` with a valid `CONVEX_DEPLOY_KEY`. This takes a few minutes and requires credentials.
+Convex has no instant rollback. To restore earlier backend code, check out the
+known-good commit, set its production `CONVEX_DEPLOY_KEY`, change to
+`apps/convex`, and run:
 
-**Data written during a bad deploy is not rolled back.** Treat Convex rollbacks as high-stakes operations. The backward-compatibility rule and expand-contract process are the primary safety mechanisms — they ensure a partial deployment is always survivable without a rollback.
+```bash
+pnpm convex deploy
+```
+
+This redeploys code and schema; it does not restore data. It can also fail if
+production data no longer conforms to the earlier schema. Prefer a forward fix
+and use backward-compatible, expand-contract changes to keep partial deployments
+safe.

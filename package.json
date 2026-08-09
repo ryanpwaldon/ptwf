@@ -16,8 +16,7 @@
     "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
-    "lint:ws": "pnpm dlx sherif@latest",
-    "postinstall": "pnpm lint:ws",
+    "lint:ws": "sherif",
     "prepare": "lefthook install",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
@@ -29,8 +28,10 @@
     "dotenv-cli": "^10.0.0",
     "lefthook": "^1.11.13",
     "prettier": "catalog:",
+    "sherif": "1.13.0",
     "turbo": "^2.5.8",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vercel": "58.9.0"
   },
   "prettier": "@acme/prettier-config"
 }

@@ -2,11 +2,14 @@ name: CI
 
 on:
   push:
-    branches: ["*"]
+    branches: [main]
+
+permissions:
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: production-${{ github.ref }}
+  cancel-in-progress: false
 
 env:
   FORCE_COLOR: 3
@@ -21,10 +24,6 @@ jobs:
 
       - name: Setup
         uses: ./tooling/github/setup
-
-      - name: Copy env
-        shell: bash
-        run: cp .env.example .env
 
       - name: Lint
         run: pnpm lint && pnpm lint:ws
@@ -62,28 +61,56 @@ jobs:
       - name: Test
         run: pnpm test
 
-  deploy-convex:
-    name: deploy convex
+  deploy-production:
+    name: deploy production
     needs: [lint, format, typecheck, test]
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: Production
     timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: apps/convex
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v5
       - uses: ./tooling/github/setup
 
-      - name: deploy to convex
-        run: pnpm convex deploy
+      - name: Pull Vercel production configuration
+        run: pnpm exec vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build frontend
+        run: pnpm exec vercel build --prod --token="$VERCEL_TOKEN"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy backend
+        working-directory: apps/convex
+        run: pnpm convex deploy --typecheck enable
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
-  trigger-vercel:
-    name: trigger vercel deploy
-    needs: [deploy-convex]
-    runs-on: ubuntu-latest
-    steps:
-      - name: trigger vercel deploy hook
-        run: curl -fsSL -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
+      - name: Stage frontend
+        id: stage-frontend
+        shell: bash
+        run: |
+          deployment_url=$(pnpm exec vercel deploy --prebuilt --prod --skip-domain --no-color --token="$VERCEL_TOKEN")
+          echo "deployment_url=$deployment_url" >> "$GITHUB_OUTPUT"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Smoke test staged frontend
+        run: |
+          curl --fail --location --retry 5 --retry-all-errors --retry-delay 2 --max-time 30 \
+            --silent --show-error \
+            --header "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
+            "$DEPLOYMENT_URL"
+        env:
+          DEPLOYMENT_URL: ${{ steps.stage-frontend.outputs.deployment_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+
+      - name: Promote frontend
+        run: pnpm exec vercel promote "$DEPLOYMENT_URL" --yes --no-color --token="$VERCEL_TOKEN"
+        env:
+          DEPLOYMENT_URL: ${{ steps.stage-frontend.outputs.deployment_url }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
