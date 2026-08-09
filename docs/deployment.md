@@ -29,7 +29,7 @@ it or for the repository.
 | Secret                            | How to get it                                                                             |
 | --------------------------------- | ----------------------------------------------------------------------------------------- |
 | `CONVEX_DEPLOY_KEY`               | Convex dashboard → Settings → Deploy Keys. Grant only the `deployment:deploy` permission. |
-| `VERCEL_TOKEN`                    | Vercel account settings → Tokens. Create a token that can deploy the project.             |
+| `VERCEL_TOKEN`                    | Vercel account settings → Tokens. Create a Full Account token with No Expiration.         |
 | `VERCEL_AUTOMATION_BYPASS_SECRET` | Vercel project → Settings → Deployment Protection → Protection Bypass for Automation.     |
 
 ### Variables
@@ -40,9 +40,6 @@ it or for the repository.
 | `VERCEL_PROJECT_ID` | Run `vercel link`, then read `projectId` from the generated `.vercel/project.json`. |
 
 The `.vercel` directory is ignored by Git and must not be committed.
-
-After the CLI deployment succeeds once, remove the old
-`VERCEL_DEPLOY_HOOK_URL` secret and delete the unused deploy hook in Vercel.
 
 ## Vercel configuration
 
@@ -122,10 +119,12 @@ known-good commit, set its production `CONVEX_DEPLOY_KEY`, change to
 `apps/convex`, and run:
 
 ```bash
-pnpm convex deploy
+pnpm typecheck
+pnpm convex deploy --typecheck disable
 ```
 
-This redeploys code and schema; it does not restore data. It can also fail if
-production data no longer conforms to the earlier schema. Prefer a forward fix
-and use backward-compatible, expand-contract changes to keep partial deployments
-safe.
+The separate type check matches CI. Convex's built-in check is disabled because
+this project uses a custom functions directory. The deployment restores code and
+schema; it does not restore data. It can also fail if production data no longer
+conforms to the earlier schema. Prefer a forward fix and use backward-compatible,
+expand-contract changes to keep partial deployments safe.
