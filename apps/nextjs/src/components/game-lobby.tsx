@@ -10,7 +10,14 @@ import {
   LoaderCircleIcon,
 } from "lucide-react";
 
-import { api, getCharacterByValue } from "@acme/convex";
+import {
+  api,
+  getCharacterByValue,
+  isQuestionCount,
+  isTimeLimitSeconds,
+  QUESTION_COUNT_OPTIONS,
+  TIME_LIMIT_SECONDS_OPTIONS,
+} from "@acme/convex";
 import { AvatarBadge } from "@acme/ui/avatar";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
@@ -42,13 +49,37 @@ interface GameLobbyProps {
 }
 
 export function GameLobby({ game, players, me }: GameLobbyProps) {
+  const updateQuestionCount = useSessionMutation(
+    api.games.updateQuestionCount,
+  ).withOptimisticUpdate((localStore, args) => {
+    const currentGame = localStore.getQuery(api.games.byCode, {
+      code: game.code,
+    });
+    if (!currentGame) return;
+    localStore.setQuery(
+      api.games.byCode,
+      { code: game.code },
+      { ...currentGame, questionCount: args.questionCount },
+    );
+  });
   const updateQuizAnimal = useSessionMutation(api.games.updateQuizAnimal);
   const updateQuizTheme = useSessionMutation(api.games.updateQuizTheme);
+  const updateTimeLimitSeconds = useSessionMutation(
+    api.games.updateTimeLimitSeconds,
+  ).withOptimisticUpdate((localStore, args) => {
+    const currentGame = localStore.getQuery(api.games.byCode, {
+      code: game.code,
+    });
+    if (!currentGame) return;
+    localStore.setQuery(
+      api.games.byCode,
+      { code: game.code },
+      { ...currentGame, timeLimitSeconds: args.timeLimitSeconds },
+    );
+  });
   const updateCharacter = useSessionMutation(api.players.updateCharacter);
   const updateIsReady = useSessionMutation(api.players.updateIsReady);
   const [isUpdatingReady, setIsUpdatingReady] = useState(false);
-  const [questionCount, setQuestionCount] = useState("10");
-  const [timeLimitSeconds, setTimeLimitSeconds] = useState("60");
   const characters = players.map((p) => getCharacterByValue(p.character));
   const takenCharacterValues = players.filter((p) => p.character !== me.character).map((p) => p.character); // prettier-ignore
   const readyByCharacter = new Map(players.map((p) => [p.character, p.isReady])); // prettier-ignore
@@ -154,17 +185,22 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               <ToggleGroup
                 type="single"
                 size="sm"
-                value={questionCount}
+                value={String(game.questionCount)}
                 aria-label="Question count"
                 className="bg-muted gap-0.5 p-0.5"
                 onValueChange={(value) => {
-                  if (value) setQuestionCount(value);
+                  const questionCount = Number(value);
+                  if (!isQuestionCount(questionCount)) return;
+                  void updateQuestionCount({
+                    gameId: game._id,
+                    questionCount,
+                  });
                 }}
               >
-                {QUESTION_COUNTS.map((count) => (
+                {QUESTION_COUNT_OPTIONS.map((count) => (
                   <ToggleGroupItem
                     key={count}
-                    value={count}
+                    value={String(count)}
                     aria-label={`${count} questions`}
                     className="data-[state=on]:bg-card h-7 min-w-9 rounded-md px-2 data-[state=on]:shadow-sm"
                   >
@@ -181,17 +217,22 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               <ToggleGroup
                 type="single"
                 size="sm"
-                value={timeLimitSeconds}
+                value={String(game.timeLimitSeconds)}
                 aria-label="Time per question"
                 className="bg-muted gap-0.5 p-0.5"
                 onValueChange={(value) => {
-                  if (value) setTimeLimitSeconds(value);
+                  const timeLimitSeconds = Number(value);
+                  if (!isTimeLimitSeconds(timeLimitSeconds)) return;
+                  void updateTimeLimitSeconds({
+                    gameId: game._id,
+                    timeLimitSeconds,
+                  });
                 }}
               >
-                {TIME_LIMITS.map((seconds) => (
+                {TIME_LIMIT_SECONDS_OPTIONS.map((seconds) => (
                   <ToggleGroupItem
                     key={seconds}
-                    value={seconds}
+                    value={String(seconds)}
                     aria-label={`${seconds} seconds per question`}
                     className="data-[state=on]:bg-card h-7 min-w-9 rounded-md px-2 data-[state=on]:shadow-sm"
                   >
@@ -248,6 +289,3 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
     </PageShell>
   );
 }
-
-const QUESTION_COUNTS = ["5", "10", "15"] as const;
-const TIME_LIMITS = ["30", "60", "90"] as const;

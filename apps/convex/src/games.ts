@@ -6,6 +6,10 @@ import { ConvexError, v } from "convex/values";
 import type { DataModel, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { gameCodeValidator, gameCodeZodSchema } from "./fields/gameCode";
+import {
+  questionCountValidator,
+  timeLimitSecondsValidator,
+} from "./fields/gameSettings";
 import { quizAnimalValidator } from "./fields/quizAnimal";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
@@ -91,6 +95,19 @@ export const byCode = query({
 // Update
 // ========================================================================================
 
+export const updateQuestionCount = mutation({
+  args: {
+    ...SessionIdArg,
+    gameId: v.id("games"),
+    questionCount: questionCountValidator,
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await ensureParticipant(ctx, args.gameId, args.sessionId);
+    await ctx.db.patch(args.gameId, { questionCount: args.questionCount });
+  },
+});
+
 export const updateQuizAnimal = mutation({
   args: {
     ...SessionIdArg,
@@ -123,6 +140,21 @@ export const updateQuizTheme = mutation({
   handler: async (ctx, args) => {
     await ensureParticipant(ctx, args.gameId, args.sessionId);
     await ctx.db.patch(args.gameId, { quizTheme: args.quizTheme });
+  },
+});
+
+export const updateTimeLimitSeconds = mutation({
+  args: {
+    ...SessionIdArg,
+    gameId: v.id("games"),
+    timeLimitSeconds: timeLimitSecondsValidator,
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await ensureParticipant(ctx, args.gameId, args.sessionId);
+    await ctx.db.patch(args.gameId, {
+      timeLimitSeconds: args.timeLimitSeconds,
+    });
   },
 });
 
