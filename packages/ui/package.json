@@ -23,7 +23,9 @@
     "./dialog": "./src/dialog.tsx",
     "./input-group": "./src/input-group.tsx",
     "./textarea": "./src/textarea.tsx",
-    "./badge": "./src/badge.tsx"
+    "./badge": "./src/badge.tsx",
+    "./toggle": "./src/toggle.tsx",
+    "./toggle-group": "./src/toggle-group.tsx"
   },
   "license": "MIT",
   "scripts": {

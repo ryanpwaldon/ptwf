@@ -3,7 +3,12 @@
 import type { FunctionReturnType } from "convex/server";
 import { useState } from "react";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import { CheckIcon, LoaderCircleIcon } from "lucide-react";
+import {
+  CheckIcon,
+  Clock3Icon,
+  ListChecksIcon,
+  LoaderCircleIcon,
+} from "lucide-react";
 
 import { api, getCharacterByValue } from "@acme/convex";
 import { AvatarBadge } from "@acme/ui/avatar";
@@ -16,6 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
+import { ToggleGroup, ToggleGroupItem } from "@acme/ui/toggle-group";
 
 import { Header } from "~/components/header";
 import { InviteCodeField } from "~/components/invite-code-field";
@@ -41,6 +47,8 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   const updateCharacter = useSessionMutation(api.players.updateCharacter);
   const updateIsReady = useSessionMutation(api.players.updateIsReady);
   const [isUpdatingReady, setIsUpdatingReady] = useState(false);
+  const [questionCount, setQuestionCount] = useState("10");
+  const [timeLimitSeconds, setTimeLimitSeconds] = useState("60");
   const characters = players.map((p) => getCharacterByValue(p.character));
   const takenCharacterValues = players.filter((p) => p.character !== me.character).map((p) => p.character); // prettier-ignore
   const readyByCharacter = new Map(players.map((p) => [p.character, p.isReady])); // prettier-ignore
@@ -132,6 +140,68 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             />
           </CardContent>
         </Card>
+        <Card className="mt-4 gap-0 pb-0">
+          <CardHeader className="border-b">
+            <CardTitle>Game settings</CardTitle>
+            <CardDescription>Fine-tune the length and pace.</CardDescription>
+          </CardHeader>
+          <CardContent className="divide-y p-0!">
+            <div className="flex min-h-14 items-center gap-3 px-4 py-2">
+              <ListChecksIcon className="text-muted-foreground size-4" />
+              <span className="min-w-0 flex-1 text-sm font-medium">
+                Questions
+              </span>
+              <ToggleGroup
+                type="single"
+                size="sm"
+                value={questionCount}
+                aria-label="Question count"
+                className="bg-muted gap-0.5 p-0.5"
+                onValueChange={(value) => {
+                  if (value) setQuestionCount(value);
+                }}
+              >
+                {QUESTION_COUNTS.map((count) => (
+                  <ToggleGroupItem
+                    key={count}
+                    value={count}
+                    aria-label={`${count} questions`}
+                    className="data-[state=on]:bg-card h-7 min-w-9 rounded-md px-2 data-[state=on]:shadow-sm"
+                  >
+                    {count}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            </div>
+            <div className="flex min-h-14 items-center gap-3 px-4 py-2">
+              <Clock3Icon className="text-muted-foreground size-4" />
+              <span className="min-w-0 flex-1 text-sm font-medium">
+                Time per question
+              </span>
+              <ToggleGroup
+                type="single"
+                size="sm"
+                value={timeLimitSeconds}
+                aria-label="Time per question"
+                className="bg-muted gap-0.5 p-0.5"
+                onValueChange={(value) => {
+                  if (value) setTimeLimitSeconds(value);
+                }}
+              >
+                {TIME_LIMITS.map((seconds) => (
+                  <ToggleGroupItem
+                    key={seconds}
+                    value={seconds}
+                    aria-label={`${seconds} seconds per question`}
+                    className="data-[state=on]:bg-card h-7 min-w-9 rounded-md px-2 data-[state=on]:shadow-sm"
+                  >
+                    {seconds}s
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            </div>
+          </CardContent>
+        </Card>
       </main>
       <div className="bg-background/95 sticky bottom-0 z-10 mt-4 flex items-center justify-between gap-4 border-t p-4 backdrop-blur">
         <div className="flex flex-col items-start gap-2">
@@ -178,3 +248,6 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
     </PageShell>
   );
 }
+
+const QUESTION_COUNTS = ["5", "10", "15"] as const;
+const TIME_LIMITS = ["30", "60", "90"] as const;
