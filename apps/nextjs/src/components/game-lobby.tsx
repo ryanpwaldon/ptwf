@@ -71,19 +71,8 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             Choose a pet and a care topic, then invite your friends.
           </p>
         </div>
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Card className="w-full sm:col-span-2">
-            <CardHeader className="border-b">
-              <CardTitle>Invite your friends</CardTitle>
-              <CardDescription>
-                Share the code, or copy the link.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <InviteCodeField code={game.code} />
-            </CardContent>
-          </Card>
-          <Card className="sm:col-span-1">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-5">
+          <Card className="sm:col-span-2">
             <CardHeader className="border-b">
               <CardTitle>Your player</CardTitle>
               <CardDescription>Choose your character.</CardDescription>
@@ -96,6 +85,17 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
                   void updateCharacter({ gameId: game._id, character });
                 }}
               />
+            </CardContent>
+          </Card>
+          <Card className="w-full sm:col-span-3">
+            <CardHeader className="border-b">
+              <CardTitle>Invite your friends</CardTitle>
+              <CardDescription>
+                Share the code, or copy the link.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <InviteCodeField code={game.code} />
             </CardContent>
           </Card>
         </div>
