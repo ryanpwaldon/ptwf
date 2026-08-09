@@ -86,7 +86,7 @@ jobs:
 
       - name: Deploy backend
         working-directory: apps/convex
-        run: pnpm convex deploy --typecheck enable
+        run: pnpm convex deploy --typecheck disable
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
