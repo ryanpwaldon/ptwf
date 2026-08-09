@@ -30,7 +30,7 @@ export function ThemeInput({ value, onChange }: ThemeInputProps) {
       <CommandPickerTrigger asChild>
         <Button
           variant="outline"
-          className="h-22 w-full cursor-pointer justify-start gap-0 overflow-hidden p-0 whitespace-normal transition-colors!"
+          className="h-22 w-full cursor-pointer justify-start gap-0 overflow-hidden p-0 whitespace-normal transition-colors"
         >
           <div
             className={`flex aspect-square h-full shrink-0 items-center justify-center overflow-hidden p-1 ${selected.posterClassName}`}

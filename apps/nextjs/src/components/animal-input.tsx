@@ -49,7 +49,7 @@ export function AnimalInput({ value, onChange }: AnimalInputProps) {
       <CommandPickerTrigger asChild>
         <Button
           variant="outline"
-          className="h-22 w-full cursor-pointer justify-start gap-0 overflow-hidden p-0 whitespace-normal transition-colors!"
+          className="h-22 w-full cursor-pointer justify-start gap-0 overflow-hidden p-0 whitespace-normal transition-colors"
         >
           <ImageWithFallback
             fill

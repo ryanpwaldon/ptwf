@@ -30,7 +30,7 @@ export function ToneInput({ value, onChange }: ToneInputProps) {
       <CommandPickerTrigger asChild>
         <Button
           variant="outline"
-          className="h-22 w-full cursor-pointer justify-start gap-0 overflow-hidden p-0 whitespace-normal transition-colors!"
+          className="h-22 w-full cursor-pointer justify-start gap-0 overflow-hidden p-0 whitespace-normal transition-colors"
         >
           <div
             className={`aspect-2/3 h-full shrink-0 ${selected.posterClassName}`}
