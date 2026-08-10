@@ -6,7 +6,7 @@ export const QUIZ_THEME_OPTIONS = [
     label: "Diet & Nutrition",
     posterLabel: "Diet & Nutrition",
     description: "Learn what supports a balanced, species-appropriate diet.",
-    instructions:
+    promptGuidance:
       "Questions should focus on species-appropriate food, hydration, feeding routines, portion awareness, safe treats, and foods to avoid. Prefer broadly accepted care guidance, and avoid questions that depend on a particular commercial brand.",
     posterClassName: "bg-[#b4ed98]",
     posterTextClassName: "text-[#234e0e]",
@@ -16,7 +16,7 @@ export const QUIZ_THEME_OPTIONS = [
     label: "Grooming & Bathing",
     posterLabel: "Grooming & Bathing",
     description: "Brush up on coats, feathers, scales, nails, and hygiene.",
-    instructions:
+    promptGuidance:
       "Questions should focus on safe, species-appropriate grooming and hygiene, including brushing, bathing, nail or claw care, coat, feather, skin, and scale care, and recognising when professional help is appropriate.",
     posterClassName: "bg-[#87dae7]",
     posterTextClassName: "text-[#0f444c]",
@@ -26,7 +26,7 @@ export const QUIZ_THEME_OPTIONS = [
     label: "Health & Wellbeing",
     posterLabel: "Health & Wellbeing",
     description: "Spot the foundations of preventive care and wellbeing.",
-    instructions:
+    promptGuidance:
       "Questions should focus on preventive care, healthy routines, common signs that an animal may need veterinary attention, exercise, rest, and general wellbeing. Keep the content educational rather than diagnostic, and never suggest delaying professional care.",
     posterClassName: "bg-[#fdadd5]",
     posterTextClassName: "text-[#55072e]",
@@ -36,7 +36,7 @@ export const QUIZ_THEME_OPTIONS = [
     label: "Behaviour & Communication",
     posterLabel: "Behaviour & Comms",
     description: "Read the signals pets use to express comfort and concern.",
-    instructions:
+    promptGuidance:
       "Questions should focus on species-typical body language, vocalisations, social needs, stress signals, play, rest, and humane ways people can respond to animal behaviour.",
     posterClassName: "bg-[#c8b4fa]",
     posterTextClassName: "text-[#1d0755]",
@@ -46,7 +46,7 @@ export const QUIZ_THEME_OPTIONS = [
     label: "Training & Enrichment",
     posterLabel: "Training & Enrichment",
     description: "Keep clever minds active with humane learning and play.",
-    instructions:
+    promptGuidance:
       "Questions should focus on reward-based training, mental stimulation, play, foraging, exercise, environmental variety, and age-appropriate enrichment. Avoid punishment-based or aversive methods.",
     posterClassName: "bg-[#fde78f]",
     posterTextClassName: "text-[#554507]",
@@ -56,7 +56,7 @@ export const QUIZ_THEME_OPTIONS = [
     label: "Homes & Habitats",
     posterLabel: "Homes & Habitats",
     description: "Build a comfortable environment around each animal's needs.",
-    instructions:
+    promptGuidance:
       "Questions should focus on safe housing, temperature, lighting, bedding or substrate, water quality, space, shelter, perches, and other features of a species-appropriate home.",
     posterClassName: "bg-[#fdb575]",
     posterTextClassName: "text-[#552c07]",
@@ -66,7 +66,7 @@ export const QUIZ_THEME_OPTIONS = [
     label: "Safety & First Aid",
     posterLabel: "Safety & First Aid",
     description: "Prevent everyday hazards and know when to seek urgent help.",
-    instructions:
+    promptGuidance:
       "Questions should focus on preventing household and environmental hazards, safe transport and handling, emergency preparedness, and recognising situations that require prompt veterinary care. Do not ask players to perform invasive treatment or replace professional advice.",
     posterClassName: "bg-[#fd9088]",
     posterTextClassName: "text-[#550c07]",
