@@ -57,11 +57,10 @@ describe("transformQuestions", () => {
 });
 
 describe("buildPrompt", () => {
-  it("includes the animal label and care scope", () => {
+  it("includes the animal label", () => {
     const prompt = buildPrompt(BASE_CONFIG);
 
     expect(prompt).toContain(QUIZ_ANIMAL_OPTIONS[0].label);
-    expect(prompt).toContain(QUIZ_ANIMAL_OPTIONS[0].description);
   });
 
   it("includes the question count", () => {
@@ -74,6 +73,6 @@ describe("buildPrompt", () => {
     const prompt = buildPrompt(BASE_CONFIG);
 
     expect(prompt).toContain(DIET_THEME.label);
-    expect(prompt).toContain(DIET_THEME.instructions);
+    expect(prompt).toContain(DIET_THEME.promptGuidance);
   });
 });

@@ -15,8 +15,8 @@ import { getQuizThemeByValue } from "./fields/quizTheme";
 
 const openrouter = createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
 
-const model = openrouter("google/gemini-3-flash-preview", {
-  plugins: [{ id: "response-healing" }, { id: "web" }],
+const model = openrouter("google/gemini-3.6-flash", {
+  plugins: [{ id: "response-healing" }],
 });
 
 export const generateQuestions = internalAction({
@@ -117,27 +117,25 @@ export function buildPrompt(config: {
     ``,
     `## Animal`,
     `- Type: ${quizAnimal.label}`,
-    `- Scope: ${quizAnimal.description}`,
     ``,
     `## Care theme: ${quizTheme.label}`,
-    `${quizTheme.instructions}`,
+    `${quizTheme.promptGuidance}`,
     ``,
     `## Task`,
     `Generate exactly ${questionCount} multiple-choice pet-care trivia questions about ${quizAnimal.label.toLocaleLowerCase()}.`,
     ``,
     `## Rules`,
-    `- Every question must be specifically about caring for ${quizAnimal.label.toLocaleLowerCase()}.`,
+    `- Every question must be specifically about caring for ${quizAnimal.label.toLocaleLowerCase()} kept as pets.`,
     `- Every question must fall within the "${quizTheme.label}" care theme.`,
     `- Focus on practical, educational knowledge that helps people understand responsible pet care.`,
-    `- Use broadly accepted guidance from reputable veterinary and animal-welfare sources.`,
+    `- Avoid self-evident questions that a person could answer from everyday common sense alone, such as why a pet needs fresh water or whether overfeeding is unhealthy. Instead, test a useful misconception, practical decision, likely consequence, meaningful comparison, or overlooked care habit.`,
+    `- Before keeping a question, silently ask: "Would a responsible adult with no pet-specific knowledge find the correct answer immediately obvious?" If yes, replace it with a more informative question within the same theme.`,
+    `- Base questions and correct answers only on high-confidence, broadly accepted pet-care guidance. If uncertain about a fact or answer, choose a different question rather than guessing.`,
     `- Do not diagnose illness, prescribe treatment, or imply that trivia can replace advice from a qualified veterinarian.`,
     `- When care needs vary by species, breed, age, health, or location, avoid presenting one narrow recommendation as universal.`,
-    `- Do not reference any source in a question (e.g. do not write "according to a veterinary website" or similar).`,
     `- Do not repeat questions or ask the same question worded differently.`,
-    `- Write every question in your own words. Do not copy questions verbatim from any source. Questions must be clearly and simply worded — avoid awkward or confusing phrasing.`,
-    `- Every question and every answer choice must be factually accurate and verifiable. Do not fabricate or guess any facts.`,
+    `- Questions must be clearly and simply worded. Avoid awkward or confusing phrasing.`,
     `- Every question must end with a question mark.`,
-    `- Never use single quotation marks in question text or answer choices. Always use double quotation marks for any inline quote, term, or emphasis (e.g. "slider", "real world"). Within JSON strings, escape them as \\".`,
     `- Try to keep each question under 120 characters. Prefer concise phrasing.`,
     `- Each question must have exactly 4 answer choices.`,
     `- Exactly one choice must be correct. Set correctIndex to its 0-based position (0 = first choice, 1 = second, 2 = third, 3 = fourth).`,
