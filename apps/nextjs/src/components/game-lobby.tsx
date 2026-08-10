@@ -21,6 +21,7 @@ import { Header } from "~/components/header";
 import { InviteCodeField } from "~/components/invite-code-field";
 import { AnimalInput } from "./animal-input";
 import { AvatarInput } from "./avatar-input";
+import { GameSettingsInput } from "./game-settings-input";
 import { PageShell } from "./page-shell";
 import { PlayerGroup } from "./player-group";
 import { ThemeInput } from "./theme-input";
@@ -40,6 +41,35 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   const updateQuizTheme = useSessionMutation(api.games.updateQuizTheme);
   const updateCharacter = useSessionMutation(api.players.updateCharacter);
   const updateIsReady = useSessionMutation(api.players.updateIsReady);
+
+  const updateQuestionCount = useSessionMutation(
+    api.games.updateQuestionCount,
+  ).withOptimisticUpdate((localStore, args) => {
+    const currentGame = localStore.getQuery(api.games.byCode, {
+      code: game.code,
+    });
+    if (!currentGame) return;
+    localStore.setQuery(
+      api.games.byCode,
+      { code: game.code },
+      { ...currentGame, questionCount: args.questionCount },
+    );
+  });
+
+  const updateTimeLimitSeconds = useSessionMutation(
+    api.games.updateTimeLimitSeconds,
+  ).withOptimisticUpdate((localStore, args) => {
+    const currentGame = localStore.getQuery(api.games.byCode, {
+      code: game.code,
+    });
+    if (!currentGame) return;
+    localStore.setQuery(
+      api.games.byCode,
+      { code: game.code },
+      { ...currentGame, timeLimitSeconds: args.timeLimitSeconds },
+    );
+  });
+
   const [isUpdatingReady, setIsUpdatingReady] = useState(false);
   const characters = players.map((p) => getCharacterByValue(p.character));
   const takenCharacterValues = players.filter((p) => p.character !== me.character).map((p) => p.character); // prettier-ignore
@@ -128,6 +158,30 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               value={game.quizTheme}
               onChange={(quizTheme) => {
                 void updateQuizTheme({ gameId: game._id, quizTheme });
+              }}
+            />
+          </CardContent>
+        </Card>
+        <Card className="mt-4 gap-0 pb-0">
+          <CardHeader className="border-b">
+            <CardTitle>Game settings</CardTitle>
+            <CardDescription>Fine-tune the length and pace.</CardDescription>
+          </CardHeader>
+          <CardContent className="divide-y p-0!">
+            <GameSettingsInput
+              questionCount={game.questionCount}
+              timeLimitSeconds={game.timeLimitSeconds}
+              onQuestionCountChange={(questionCount) => {
+                void updateQuestionCount({
+                  gameId: game._id,
+                  questionCount,
+                });
+              }}
+              onTimeLimitSecondsChange={(timeLimitSeconds) => {
+                void updateTimeLimitSeconds({
+                  gameId: game._id,
+                  timeLimitSeconds,
+                });
               }}
             />
           </CardContent>

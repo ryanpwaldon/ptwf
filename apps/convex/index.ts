@@ -5,3 +5,4 @@ export * from "./src/fields/character";
 export * from "./src/fields/quizTheme";
 export * from "./src/fields/quizTone";
 export * from "./src/fields/gameCode";
+export * from "./src/fields/gameSettings";

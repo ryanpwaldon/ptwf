@@ -85,6 +85,70 @@ describe("games", () => {
     const updatedGame = await t.query(api.games.byCode, { code });
     expect(updatedGame?.quizAnimal).toBe("cats");
   });
+
+  it("updates game settings for a participant", async () => {
+    const t = convexTest(schema, modules);
+
+    const code = await t.mutation(api.games.create, { sessionId: SESSION_1 });
+    const game = await t.query(api.games.byCode, { code });
+    if (!game) throw new Error("Game not found.");
+
+    await t.mutation(api.games.updateQuestionCount, {
+      sessionId: SESSION_1,
+      gameId: game._id,
+      questionCount: 15,
+    });
+    await t.mutation(api.games.updateTimeLimitSeconds, {
+      sessionId: SESSION_1,
+      gameId: game._id,
+      timeLimitSeconds: 90,
+    });
+
+    const updatedGame = await t.query(api.games.byCode, { code });
+    expect(updatedGame).toMatchObject({
+      questionCount: 15,
+      timeLimitSeconds: 90,
+    });
+  });
+
+  it("rejects unsupported game setting values", async () => {
+    const t = convexTest(schema, modules);
+
+    const code = await t.mutation(api.games.create, { sessionId: SESSION_1 });
+    const game = await t.query(api.games.byCode, { code });
+    if (!game) throw new Error("Game not found.");
+
+    await expect(
+      t.mutation(api.games.updateQuestionCount, {
+        sessionId: SESSION_1,
+        gameId: game._id,
+        questionCount: 7 as 5,
+      }),
+    ).rejects.toThrow();
+    await expect(
+      t.mutation(api.games.updateTimeLimitSeconds, {
+        sessionId: SESSION_1,
+        gameId: game._id,
+        timeLimitSeconds: 45 as 30,
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("rejects game setting updates from non-participants", async () => {
+    const t = convexTest(schema, modules);
+
+    const code = await t.mutation(api.games.create, { sessionId: SESSION_1 });
+    const game = await t.query(api.games.byCode, { code });
+    if (!game) throw new Error("Game not found.");
+
+    await expect(
+      t.mutation(api.games.updateQuestionCount, {
+        sessionId: STRANGER,
+        gameId: game._id,
+        questionCount: 15,
+      }),
+    ).rejects.toThrowError("Not a participant.");
+  });
 });
 
 describe("games.playAgain", () => {
