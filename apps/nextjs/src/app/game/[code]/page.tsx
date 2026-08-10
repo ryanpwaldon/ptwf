@@ -20,7 +20,8 @@ import { GameResults } from "~/components/game-results";
 
 export default function GamePage() {
   const { code } = useParams<{ code: string }>();
-  const game = useQuery(api.games.byCode, { code });
+  const normalizedCode = code.trim().toUpperCase();
+  const game = useQuery(api.games.byCode, { code: normalizedCode });
   const me = useSessionQuery(api.players.me, game ? { gameId: game._id } : "skip"); // prettier-ignore
   const players = useQuery(api.players.allByGameId, game ? { gameId: game._id } : "skip"); // prettier-ignore
   const questions = useQuery(api.questions.allByGameId, game ? { gameId: game._id } : "skip"); // prettier-ignore
