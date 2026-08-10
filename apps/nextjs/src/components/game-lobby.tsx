@@ -3,21 +3,9 @@
 import type { FunctionReturnType } from "convex/server";
 import { useState } from "react";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import {
-  CheckIcon,
-  Clock3Icon,
-  ListChecksIcon,
-  LoaderCircleIcon,
-} from "lucide-react";
+import { CheckIcon, LoaderCircleIcon } from "lucide-react";
 
-import {
-  api,
-  getCharacterByValue,
-  isQuestionCount,
-  isTimeLimitSeconds,
-  QUESTION_COUNT_OPTIONS,
-  TIME_LIMIT_SECONDS_OPTIONS,
-} from "@acme/convex";
+import { api, getCharacterByValue } from "@acme/convex";
 import { AvatarBadge } from "@acme/ui/avatar";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
@@ -28,12 +16,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
-import { ToggleGroup, ToggleGroupItem } from "@acme/ui/toggle-group";
 
 import { Header } from "~/components/header";
 import { InviteCodeField } from "~/components/invite-code-field";
 import { AnimalInput } from "./animal-input";
 import { AvatarInput } from "./avatar-input";
+import { GameSettingsInput } from "./game-settings-input";
 import { PageShell } from "./page-shell";
 import { PlayerGroup } from "./player-group";
 import { ThemeInput } from "./theme-input";
@@ -49,6 +37,11 @@ interface GameLobbyProps {
 }
 
 export function GameLobby({ game, players, me }: GameLobbyProps) {
+  const updateQuizAnimal = useSessionMutation(api.games.updateQuizAnimal);
+  const updateQuizTheme = useSessionMutation(api.games.updateQuizTheme);
+  const updateCharacter = useSessionMutation(api.players.updateCharacter);
+  const updateIsReady = useSessionMutation(api.players.updateIsReady);
+
   const updateQuestionCount = useSessionMutation(
     api.games.updateQuestionCount,
   ).withOptimisticUpdate((localStore, args) => {
@@ -62,8 +55,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
       { ...currentGame, questionCount: args.questionCount },
     );
   });
-  const updateQuizAnimal = useSessionMutation(api.games.updateQuizAnimal);
-  const updateQuizTheme = useSessionMutation(api.games.updateQuizTheme);
+
   const updateTimeLimitSeconds = useSessionMutation(
     api.games.updateTimeLimitSeconds,
   ).withOptimisticUpdate((localStore, args) => {
@@ -77,8 +69,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
       { ...currentGame, timeLimitSeconds: args.timeLimitSeconds },
     );
   });
-  const updateCharacter = useSessionMutation(api.players.updateCharacter);
-  const updateIsReady = useSessionMutation(api.players.updateIsReady);
+
   const [isUpdatingReady, setIsUpdatingReady] = useState(false);
   const characters = players.map((p) => getCharacterByValue(p.character));
   const takenCharacterValues = players.filter((p) => p.character !== me.character).map((p) => p.character); // prettier-ignore
@@ -177,70 +168,22 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             <CardDescription>Fine-tune the length and pace.</CardDescription>
           </CardHeader>
           <CardContent className="divide-y p-0!">
-            <div className="flex min-h-14 items-center gap-3 px-4 py-2">
-              <ListChecksIcon className="text-muted-foreground size-4" />
-              <span className="min-w-0 flex-1 text-sm font-medium">
-                Questions
-              </span>
-              <ToggleGroup
-                type="single"
-                size="sm"
-                value={String(game.questionCount)}
-                aria-label="Question count"
-                className="bg-muted gap-0.5 p-0.5"
-                onValueChange={(value) => {
-                  const questionCount = Number(value);
-                  if (!isQuestionCount(questionCount)) return;
-                  void updateQuestionCount({
-                    gameId: game._id,
-                    questionCount,
-                  });
-                }}
-              >
-                {QUESTION_COUNT_OPTIONS.map((count) => (
-                  <ToggleGroupItem
-                    key={count}
-                    value={String(count)}
-                    aria-label={`${count} questions`}
-                    className="data-[state=on]:bg-card h-7 min-w-9 rounded-md px-2 data-[state=on]:shadow-sm"
-                  >
-                    {count}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </div>
-            <div className="flex min-h-14 items-center gap-3 px-4 py-2">
-              <Clock3Icon className="text-muted-foreground size-4" />
-              <span className="min-w-0 flex-1 text-sm font-medium">
-                Time per question
-              </span>
-              <ToggleGroup
-                type="single"
-                size="sm"
-                value={String(game.timeLimitSeconds)}
-                aria-label="Time per question"
-                className="bg-muted gap-0.5 p-0.5"
-                onValueChange={(value) => {
-                  const timeLimitSeconds = Number(value);
-                  if (!isTimeLimitSeconds(timeLimitSeconds)) return;
-                  void updateTimeLimitSeconds({
-                    gameId: game._id,
-                    timeLimitSeconds,
-                  });
-                }}
-              >
-                {TIME_LIMIT_SECONDS_OPTIONS.map((seconds) => (
-                  <ToggleGroupItem
-                    key={seconds}
-                    value={String(seconds)}
-                    aria-label={`${seconds} seconds per question`}
-                    className="data-[state=on]:bg-card h-7 min-w-9 rounded-md px-2 data-[state=on]:shadow-sm"
-                  >
-                    {seconds}s
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </div>
+            <GameSettingsInput
+              questionCount={game.questionCount}
+              timeLimitSeconds={game.timeLimitSeconds}
+              onQuestionCountChange={(questionCount) => {
+                void updateQuestionCount({
+                  gameId: game._id,
+                  questionCount,
+                });
+              }}
+              onTimeLimitSecondsChange={(timeLimitSeconds) => {
+                void updateTimeLimitSeconds({
+                  gameId: game._id,
+                  timeLimitSeconds,
+                });
+              }}
+            />
           </CardContent>
         </Card>
       </main>
