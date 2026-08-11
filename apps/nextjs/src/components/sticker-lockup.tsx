@@ -16,44 +16,24 @@ import {
 } from "./homepage-entrance";
 import { stickerAssets } from "./sticker-assets";
 
-const accessoryStickerIds = ["ball", "bowl", "bone", "fish"] as const;
+const heroSticker = stickerAssets["toilet-paper-cat"];
 
-type AccessoryStickerId = (typeof accessoryStickerIds)[number];
+const accessoryStickers = [
+  { asset: stickerAssets.ball, x: -40, y: -30, size: 25, rotate: 0 },
+  { asset: stickerAssets.bowl, x: 40, y: -45, size: 25, rotate: 20 },
+  { asset: stickerAssets.bone, x: 50, y: 40, size: 25, rotate: 20 },
+  { asset: stickerAssets.fish, x: -55, y: 50, size: 30, rotate: 0 },
+] as const;
 
-interface AccessoryPlacement {
-  x: number;
-  y: number;
-  size: number;
-  rotate: number;
-}
-
-interface StickerLockupConfig {
-  height: number;
-  accessories: Record<AccessoryStickerId, AccessoryPlacement>;
-}
-
-const stickerLockupConfig = {
-  height: 90,
-  accessories: {
-    ball: { x: -40, y: -30, size: 25, rotate: 0 },
-    bowl: { x: 40, y: -45, size: 25, rotate: 20 },
-    bone: { x: 50, y: 40, size: 25, rotate: 20 },
-    fish: { x: -55, y: 50, size: 30, rotate: 0 },
-  },
-} satisfies StickerLockupConfig;
-
-const stickerShadowClassName = "drop-shadow-[0_6px_14px_rgb(0_0_0/0.18)]";
-const archShadowClassName = "drop-shadow-[0_4px_10px_rgb(0_0_0/0.12)]";
+const stickerClassName = "size-full drop-shadow-[0_6px_14px_rgb(0_0_0/0.18)]";
 
 export function StickerLockup({
   className,
   entranceDelay = 0,
   ...props
 }: ComponentProps<"div"> & { entranceDelay?: number }) {
-  const config = stickerLockupConfig;
-  const heroSticker = stickerAssets["toilet-paper-cat"];
-  const aspectRatio = heroSticker.width / heroSticker.height;
   const shouldReduceMotion = useReducedMotion();
+
   return (
     <div
       className={cn(
@@ -66,8 +46,8 @@ export function StickerLockup({
         <div
           className="relative"
           style={{
-            aspectRatio,
-            width: `${aspectRatio * config.height}cqh`,
+            aspectRatio: heroSticker.width / heroSticker.height,
+            height: "90cqh",
           }}
           role="img"
           aria-label="Playful pet stickers"
@@ -77,12 +57,12 @@ export function StickerLockup({
               className="h-full"
               {...getHomepageEntrance(
                 entranceDelay +
-                  (accessoryStickerIds.length + 1) * homepageStickerStagger,
+                  (accessoryStickers.length + 1) * homepageStickerStagger,
                 shouldReduceMotion,
                 { y: 48 },
               )}
             >
-              <ArchedBadge className={cn("h-full", archShadowClassName)} />
+              <ArchedBadge className="h-full drop-shadow-[0_4px_10px_rgb(0_0_0/0.12)]" />
             </motion.div>
           </div>
           <motion.div
@@ -91,7 +71,7 @@ export function StickerLockup({
           >
             <HolographicSticker
               asset={heroSticker}
-              className={cn("size-full", stickerShadowClassName)}
+              className={stickerClassName}
               mouseTiltIntensity={1}
               circularTiltIntensity={0.1}
               foilIntensity={1}
@@ -99,19 +79,19 @@ export function StickerLockup({
               priority
             />
           </motion.div>
-          {accessoryStickerIds.map((accessoryId, index) => {
-            const accessory = stickerAssets[accessoryId];
-            const placement = config.accessories[accessoryId];
+          {accessoryStickers.map(({ asset, x, y, size, rotate }, index) => {
+            const aspectRatio = asset.width / asset.height;
+
             return (
               <div
-                key={accessoryId}
+                key={asset.id}
                 className="absolute"
                 style={{
-                  top: `${50 + placement.y}%`,
-                  left: `${50 + placement.x}%`,
-                  width: `${placement.size}cqh`,
-                  aspectRatio: accessory.width / accessory.height,
-                  transform: `translate(-50%, -50%) rotate(${placement.rotate}deg)`,
+                  top: `${50 + y}%`,
+                  left: `${50 + x}%`,
+                  width: `${size}cqh`,
+                  aspectRatio,
+                  transform: `translate(-50%, -50%) rotate(${rotate}deg)`,
                 }}
               >
                 <motion.div
@@ -120,14 +100,14 @@ export function StickerLockup({
                     entranceDelay + (index + 1) * homepageStickerStagger,
                     shouldReduceMotion,
                     {
-                      x: placement.x < 0 ? 32 : -32,
+                      x: x < 0 ? 32 : -32,
                       y: 48,
                     },
                   )}
                 >
                   <HolographicSticker
-                    asset={accessory}
-                    className={cn("size-full", stickerShadowClassName)}
+                    asset={asset}
+                    className={stickerClassName}
                     mouseTiltIntensity={3}
                     circularTiltIntensity={1}
                     foilIntensity={0.4}
