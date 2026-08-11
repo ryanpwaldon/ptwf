@@ -552,7 +552,7 @@ export function HolographicSticker({
             var(--background-x) var(--background-y),
             var(--background-x) var(--background-y);
           background-size:
-            64cqi 64cqi,
+            16.4cqi 16.4cqi,
             200% 700%,
             300% 100%,
             200% 100%;
@@ -573,7 +573,7 @@ export function HolographicSticker({
             var(--background-x-inverse) var(--background-y-inverse),
             var(--background-x) var(--background-y);
           background-size:
-            64cqi 100%,
+            16.4cqi 25.6%,
             200% 400%,
             195% 100%,
             200% 100%;
