@@ -32,55 +32,15 @@ interface StickerLockupConfig {
   accessories: Record<AccessoryStickerId, AccessoryPlacement>;
 }
 
-const stickerLockupConfigs = {
-  "toilet-paper-cat": {
-    height: 90,
-    accessories: {
-      ball: { x: -40, y: -30, size: 25, rotate: 0 },
-      bowl: { x: 40, y: -45, size: 25, rotate: 20 },
-      bone: { x: 50, y: 40, size: 25, rotate: 20 },
-      fish: { x: -55, y: 50, size: 30, rotate: 0 },
-    },
+const stickerLockupConfig = {
+  height: 90,
+  accessories: {
+    ball: { x: -40, y: -30, size: 25, rotate: 0 },
+    bowl: { x: 40, y: -45, size: 25, rotate: 20 },
+    bone: { x: 50, y: 40, size: 25, rotate: 20 },
+    fish: { x: -55, y: 50, size: 30, rotate: 0 },
   },
-  "cat-in-box": {
-    height: 100,
-    accessories: {
-      ball: { x: -55, y: -30, size: 25, rotate: 0 },
-      bowl: { x: 55, y: -20, size: 25, rotate: 0 },
-      bone: { x: -60, y: 40, size: 30, rotate: 0 },
-      fish: { x: 70, y: 40, size: 30, rotate: 20 },
-    },
-  },
-  "paper-bag-cat": {
-    height: 100,
-    accessories: {
-      ball: { x: -65, y: -30, size: 25, rotate: 0 },
-      bowl: { x: 75, y: -20, size: 25, rotate: 0 },
-      bone: { x: -70, y: 40, size: 30, rotate: 0 },
-      fish: { x: 70, y: 40, size: 30, rotate: 20 },
-    },
-  },
-  "post-bath-dog": {
-    height: 100,
-    accessories: {
-      ball: { x: -55, y: -40, size: 25, rotate: 0 },
-      bowl: { x: 55, y: -40, size: 25, rotate: 30 },
-      bone: { x: -60, y: 40, size: 30, rotate: 45 },
-      fish: { x: 55, y: 45, size: 30, rotate: -20 },
-    },
-  },
-  "sock-thief-dog": {
-    height: 100,
-    accessories: {
-      ball: { x: -40, y: -25, size: 25, rotate: 0 },
-      bowl: { x: 55, y: -10, size: 30, rotate: 10 },
-      bone: { x: -45, y: 40, size: 35, rotate: 20 },
-      fish: { x: 50, y: 40, size: 30, rotate: -20 },
-    },
-  },
-} satisfies Record<string, StickerLockupConfig>;
-
-const heroStickerId = "toilet-paper-cat" as keyof typeof stickerLockupConfigs;
+} satisfies StickerLockupConfig;
 
 const stickerShadowClassName = "drop-shadow-[0_6px_14px_rgb(0_0_0/0.18)]";
 const archShadowClassName = "drop-shadow-[0_4px_10px_rgb(0_0_0/0.12)]";
@@ -90,8 +50,8 @@ export function StickerLockup({
   entranceDelay = 0,
   ...props
 }: ComponentProps<"div"> & { entranceDelay?: number }) {
-  const config = stickerLockupConfigs[heroStickerId];
-  const heroSticker = stickerAssets[heroStickerId];
+  const config = stickerLockupConfig;
+  const heroSticker = stickerAssets["toilet-paper-cat"];
   const aspectRatio = heroSticker.width / heroSticker.height;
   const shouldReduceMotion = useReducedMotion();
   return (
