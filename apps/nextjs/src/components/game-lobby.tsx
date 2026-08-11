@@ -167,7 +167,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             <CardTitle>Game settings</CardTitle>
             <CardDescription>Fine-tune the length and pace.</CardDescription>
           </CardHeader>
-          <CardContent className="divide-y p-0!">
+          <CardContent className="divide-y">
             <GameSettingsInput
               questionCount={game.questionCount}
               timeLimitSeconds={game.timeLimitSeconds}

@@ -26,7 +26,7 @@ export function GameSettingsInput({
 }: GameSettingsInputProps) {
   return (
     <>
-      <div className="flex min-h-14 items-center gap-3 px-4 py-2">
+      <div className="flex min-h-14 items-center gap-3">
         <ListChecksIcon className="text-muted-foreground size-4" />
         <span className="min-w-0 flex-1 text-sm font-medium">Questions</span>
         <ToggleGroup
@@ -53,7 +53,7 @@ export function GameSettingsInput({
           ))}
         </ToggleGroup>
       </div>
-      <div className="flex min-h-14 items-center gap-3 px-4 py-2">
+      <div className="flex min-h-14 items-center gap-3">
         <Clock3Icon className="text-muted-foreground size-4" />
         <span className="min-w-0 flex-1 text-sm font-medium">
           Time per question
