@@ -19,6 +19,8 @@
     "@number-flow/react": "^0.5.12",
     "@t3-oss/env-nextjs": "^0.13.10",
     "@tanstack/react-form": "catalog:",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "convex": "catalog:",
     "convex-helpers": "^0.1.111",
     "lucide-react": "^0.563.0",
