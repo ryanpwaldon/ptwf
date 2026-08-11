@@ -103,7 +103,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-5">
           <Card className="sm:col-span-2">
-            <CardHeader className="border-b">
+            <CardHeader>
               <CardTitle>Your player</CardTitle>
               <CardDescription>Choose your character.</CardDescription>
             </CardHeader>
@@ -118,7 +118,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             </CardContent>
           </Card>
           <Card className="w-full sm:col-span-3">
-            <CardHeader className="border-b">
+            <CardHeader>
               <CardTitle>Invite your friends</CardTitle>
               <CardDescription>
                 Share the code, or copy the link.
@@ -130,7 +130,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </Card>
         </div>
         <Card className="mt-4">
-          <CardHeader className="border-b">
+          <CardHeader>
             <CardTitle>Choose a pet</CardTitle>
             <CardDescription>
               Which pet should the questions be about?
@@ -149,7 +149,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </CardContent>
         </Card>
         <Card className="mt-4">
-          <CardHeader className="border-b">
+          <CardHeader>
             <CardTitle>Choose a care topic</CardTitle>
             <CardDescription>What should the questions cover?</CardDescription>
           </CardHeader>
@@ -163,7 +163,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </CardContent>
         </Card>
         <Card className="mt-4 gap-0 pb-0">
-          <CardHeader className="border-b">
+          <CardHeader>
             <CardTitle>Game settings</CardTitle>
             <CardDescription>Fine-tune the length and pace.</CardDescription>
           </CardHeader>
