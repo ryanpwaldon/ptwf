@@ -4,52 +4,52 @@ export const CHARACTER_OPTIONS = [
   {
     value: "apricot",
     label: "Apricot",
-    image: "/players/apricot.png",
+    image: "/players/apricot.webp",
   },
   {
     value: "aqua",
     label: "Aqua",
-    image: "/players/aqua.png",
+    image: "/players/aqua.webp",
   },
   {
     value: "coral",
     label: "Coral",
-    image: "/players/coral.png",
+    image: "/players/coral.webp",
   },
   {
     value: "lavender",
     label: "Lavender",
-    image: "/players/lavender.png",
+    image: "/players/lavender.webp",
   },
   {
     value: "lemon",
     label: "Lemon",
-    image: "/players/lemon.png",
+    image: "/players/lemon.webp",
   },
   {
     value: "lime",
     label: "Lime",
-    image: "/players/lime.png",
+    image: "/players/lime.webp",
   },
   {
     value: "mint",
     label: "Mint",
-    image: "/players/mint.png",
+    image: "/players/mint.webp",
   },
   {
     value: "peach",
     label: "Peach",
-    image: "/players/peach.png",
+    image: "/players/peach.webp",
   },
   {
     value: "rose",
     label: "Rose",
-    image: "/players/rose.png",
+    image: "/players/rose.webp",
   },
   {
     value: "violet",
     label: "Violet",
-    image: "/players/violet.png",
+    image: "/players/violet.webp",
   },
 ] as const;
 
