@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PawPrint } from "lucide-react";
+import { ChevronDownIcon, PawPrint } from "lucide-react";
 
 import type { QuizAnimal } from "@acme/convex";
 import { getQuizAnimalByValue, QUIZ_ANIMAL_OPTIONS } from "@acme/convex";
@@ -58,7 +58,7 @@ export function AnimalInput({ value, onChange }: AnimalInputProps) {
             icon={<PawPrint className="text-muted-foreground size-1/3" />}
             containerClassName="aspect-square h-full shrink-0"
           />
-          <div className="min-w-0 px-3">
+          <div className="min-w-0 flex-1 px-3">
             <div className="truncate text-left font-medium">
               {selected.label}
             </div>
@@ -66,6 +66,7 @@ export function AnimalInput({ value, onChange }: AnimalInputProps) {
               {selected.description}
             </p>
           </div>
+          <ChevronDownIcon className="text-muted-foreground mr-3 size-4 shrink-0" />
         </Button>
       </CommandPickerTrigger>
 

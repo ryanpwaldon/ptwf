@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDownIcon } from "lucide-react";
 
 import type { QuizTheme } from "@acme/convex";
 import { getQuizThemeByValue, QUIZ_THEME_OPTIONS } from "@acme/convex";
@@ -41,7 +42,7 @@ export function ThemeInput({ value, onChange }: ThemeInputProps) {
               {selected.posterLabel}
             </p>
           </div>
-          <div className="min-w-0 px-3">
+          <div className="min-w-0 flex-1 px-3">
             <div className="truncate text-left font-medium">
               {selected.label}
             </div>
@@ -49,6 +50,7 @@ export function ThemeInput({ value, onChange }: ThemeInputProps) {
               {selected.description}
             </p>
           </div>
+          <ChevronDownIcon className="text-muted-foreground mr-3 size-4 shrink-0" />
         </Button>
       </CommandPickerTrigger>
       <CommandPickerContent title="Choose a care topic">
