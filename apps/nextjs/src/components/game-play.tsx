@@ -202,7 +202,7 @@ function GamePlayInner({
             >
               <PlayerGroup
                 maxVisible={10}
-                avatarSize="default"
+                avatarSize="md"
                 characters={playerCharacters}
                 renderBadge={(character) => {
                   if (!answerCorrectness.has(character.value)) return null;

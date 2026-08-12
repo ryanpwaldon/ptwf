@@ -13,7 +13,7 @@ function Avatar({
   tooltip,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Root> & {
-  size?: "2xs" | "xs" | "default" | "sm" | "lg";
+  size?: "2xs" | "xs" | "sm" | "default" | "md" | "lg";
   tooltip?: React.ReactNode;
 }) {
   const avatar = (
@@ -21,7 +21,7 @@ function Avatar({
       data-slot="avatar"
       data-size={size}
       className={cn(
-        "group/avatar relative flex size-8 shrink-0 rounded-full select-none data-[size=2xs]:size-4 data-[size=lg]:size-12 data-[size=sm]:size-6 data-[size=xs]:size-5",
+        "group/avatar relative flex size-8 shrink-0 rounded-full select-none data-[size=2xs]:size-4 data-[size=lg]:size-12 data-[size=md]:size-9 data-[size=sm]:size-6 data-[size=xs]:size-5",
         className,
       )}
       {...props}
@@ -103,6 +103,7 @@ function AvatarBadge({
         "group-data-[size=xs]/avatar:size-1.5 group-data-[size=xs]/avatar:[&>svg]:hidden",
         "group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden",
         "group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2",
+        "group-data-[size=md]/avatar:size-3 group-data-[size=md]/avatar:[&>svg]:size-2",
         "group-data-[size=lg]/avatar:size-4 group-data-[size=lg]/avatar:[&>svg]:size-2.5",
         className,
       )}
@@ -116,7 +117,7 @@ function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="avatar-group"
       className={cn(
-        "*:data-[slot=avatar]:ring-background group/avatar-group flex -space-x-2 has-data-[size=2xs]:-space-x-1 *:data-[slot=avatar]:ring-2",
+        "*:data-[slot=avatar]:ring-background group/avatar-group flex -space-x-2 has-data-[size=2xs]:-space-x-1 has-data-[size=md]:-space-x-3 *:data-[slot=avatar]:ring-2",
         className,
       )}
       {...props}
@@ -132,7 +133,7 @@ function AvatarGroupCount({
     <div
       data-slot="avatar-group-count"
       className={cn(
-        "bg-muted text-muted-foreground ring-background relative flex size-8 shrink-0 items-center justify-center rounded-full text-sm ring-2 group-has-data-[size=2xs]/avatar-group:size-4 group-has-data-[size=2xs]/avatar-group:text-[8px] group-has-data-[size=lg]/avatar-group:size-12 group-has-data-[size=sm]/avatar-group:size-6 group-has-data-[size=xs]/avatar-group:size-5 group-has-data-[size=xs]/avatar-group:text-[10px] [&>svg]:size-4 group-has-data-[size=2xs]/avatar-group:[&>svg]:size-2 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3 group-has-data-[size=xs]/avatar-group:[&>svg]:size-2.5",
+        "bg-muted text-muted-foreground ring-background relative flex size-8 shrink-0 items-center justify-center rounded-full text-sm ring-2 group-has-data-[size=2xs]/avatar-group:size-4 group-has-data-[size=2xs]/avatar-group:text-[8px] group-has-data-[size=lg]/avatar-group:size-12 group-has-data-[size=md]/avatar-group:size-9 group-has-data-[size=sm]/avatar-group:size-6 group-has-data-[size=xs]/avatar-group:size-5 group-has-data-[size=xs]/avatar-group:text-[10px] [&>svg]:size-4 group-has-data-[size=2xs]/avatar-group:[&>svg]:size-2 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=md]/avatar-group:[&>svg]:size-4 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3 group-has-data-[size=xs]/avatar-group:[&>svg]:size-2.5",
         className,
       )}
       {...props}
