@@ -13,6 +13,11 @@ import { AvatarBadge } from "@acme/ui/avatar";
 import { RadioGroup } from "@acme/ui/radio-group";
 
 import { Choice } from "~/components/choice";
+import {
+  gameHeaderVariants,
+  questionContentVariants,
+  questionExit,
+} from "~/components/game-transition";
 import { PlayerGroup } from "~/components/player-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
 import { TimeRemainingBar } from "~/components/time-remaining-bar";
@@ -156,7 +161,10 @@ function GamePlayInner({
 
   return (
     <PageShell>
-      <header className="flex h-16 items-center justify-between">
+      <motion.header
+        variants={gameHeaderVariants}
+        className="flex h-16 items-center justify-between"
+      >
         <div className="flex h-full w-20 items-center justify-center">
           <div className="bg-secondary text-muted-foreground flex size-7 items-center justify-center rounded-md text-center text-sm font-medium">
             Q{game.currentQuestionIndex + 1}
@@ -186,8 +194,11 @@ function GamePlayInner({
             <NumberFlow value={secondsLeft} />
           </div>
         </div>
-      </header>
-      <main className="flex-1 px-4 pb-16">
+      </motion.header>
+      <motion.main
+        variants={questionContentVariants}
+        className="flex-1 px-4 pb-16"
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={game.currentQuestionIndex}
@@ -269,7 +280,7 @@ function GamePlayInner({
             </div>
           </motion.div>
         </AnimatePresence>
-      </main>
+      </motion.main>
     </PageShell>
   );
 }
@@ -281,7 +292,7 @@ function GamePlayInner({
 const questionVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
-  exit: { opacity: 0, y: -20 },
+  exit: questionExit,
 };
 
 const itemVariants = {

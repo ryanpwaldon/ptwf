@@ -8,6 +8,7 @@ import {
 } from "convex-helpers/react/sessions";
 import { useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
+import { AnimatePresence, motion } from "motion/react";
 
 import { api } from "@acme/convex";
 
@@ -17,6 +18,10 @@ import { GameGenerating } from "~/components/game-generating";
 import { GameLobby } from "~/components/game-lobby";
 import { GamePlay } from "~/components/game-play";
 import { GameResults } from "~/components/game-results";
+import {
+  gamePlayVariants,
+  gameResultsEntrance,
+} from "~/components/game-transition";
 
 export default function GamePage() {
   const { code } = useParams<{ code: string }>();
@@ -70,13 +75,43 @@ export default function GamePage() {
     return <FullScreenLoader />;
   }
 
+  if (game.status === "lobby") {
+    return <GameLobby game={game} players={players} me={me} />;
+  }
+
+  if (game.status === "generating") {
+    return <GameGenerating />;
+  }
+
   return (
-    // prettier-ignore
-    <>
-      {game.status === "lobby" && <GameLobby game={game} players={players} me={me} />}
-      {game.status === "generating" && <GameGenerating />}
-      {game.status === "active" && <GamePlay game={game} me={me} players={players} questions={questions} answers={answers} />}
-      {game.status === "finished" && <GameResults game={game} me={me} players={players} questions={questions} answers={answers} />}
-    </>
+    <AnimatePresence initial={false} mode="wait">
+      {game.status === "active" ? (
+        <motion.div
+          key="game-play"
+          variants={gamePlayVariants}
+          initial="visible"
+          animate="visible"
+          exit="exit"
+        >
+          <GamePlay
+            game={game}
+            me={me}
+            players={players}
+            questions={questions}
+            answers={answers}
+          />
+        </motion.div>
+      ) : (
+        <motion.div key="game-results" {...gameResultsEntrance}>
+          <GameResults
+            game={game}
+            me={me}
+            players={players}
+            questions={questions}
+            answers={answers}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
