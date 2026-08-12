@@ -35,20 +35,21 @@ export function Leaderboard({
   return (
     <Table className={cn(className)}>
       <TableHeader>
-        <TableRow>
+        <TableRow className="border-border transition-none hover:bg-transparent">
           <TableHead>Player</TableHead>
           <TableHead className="text-right">Correct</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {entries.map((entry, i) => (
-          <TableRow key={entry.character.value}>
-            <TableCell>
+          <TableRow
+            key={entry.character.value}
+            className="border-border transition-none hover:bg-transparent"
+          >
+            <TableCell className="py-2.5">
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground w-3.5 font-medium">
-                  {i + 1}.
-                </span>
-                <Avatar size="2xs" tooltip={entry.character.label}>
+                <span className="text-muted-foreground w-3.5">{i + 1}.</span>
+                <Avatar size="sm" tooltip={entry.character.label}>
                   <AvatarImage
                     src={entry.character.image}
                     alt={`${entry.character.label} avatar`}
@@ -60,17 +61,20 @@ export function Leaderboard({
                 </Avatar>
                 <span>{entry.character.label}</span>
                 {myCharacterValue === entry.character.value && (
-                  <Badge variant="outline">You</Badge>
+                  <Badge>You</Badge>
                 )}
               </div>
             </TableCell>
-            <TableCell className="text-right">
+            <TableCell className="py-2.5 text-right">
               {entry.correctAnswers}/{totalQuestions}
             </TableCell>
           </TableRow>
         ))}
         {Array.from({ length: emptyRowCount }, (_, index) => (
-          <TableRow key={`empty-${index}`} className="select-none">
+          <TableRow
+            key={`empty-${index}`}
+            className="border-border transition-none select-none hover:bg-transparent"
+          >
             <TableCell>&nbsp;</TableCell>
             <TableCell>&nbsp;</TableCell>
           </TableRow>

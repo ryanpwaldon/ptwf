@@ -50,7 +50,7 @@ export default function HomePage() {
             entranceDelay={homepageEntranceDelays.first}
           />
           <motion.h2
-            className="mt-8 text-4xl leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl"
+            className="mt-8 text-[2.5rem] leading-[0.95] font-medium tracking-[-0.07em] sm:text-5xl"
             {...getHomepageEntrance(
               homepageEntranceDelays.title,
               shouldReduceMotion,
@@ -59,7 +59,7 @@ export default function HomePage() {
             All about pets!
           </motion.h2>
           <motion.p
-            className="text-muted-foreground mt-4 max-w-md text-base leading-relaxed sm:text-xl"
+            className="text-muted-foreground mt-6 max-w-[25rem] text-lg leading-relaxed text-pretty sm:max-w-md sm:text-xl"
             {...getHomepageEntrance(
               homepageEntranceDelays.description,
               shouldReduceMotion,
@@ -69,36 +69,40 @@ export default function HomePage() {
             game of trivia.
           </motion.p>
           <motion.div
-            className="mt-8 flex w-full max-w-xs flex-col gap-3 sm:max-w-md sm:flex-row"
+            className="mt-6 flex w-full max-w-68 flex-col gap-3 sm:max-w-md sm:flex-row"
             {...getHomepageEntrance(
               homepageEntranceDelays.final,
               shouldReduceMotion,
             )}
           >
-            <Button
-              size="xl"
-              onClick={handleCreate}
-              disabled={isCreating}
-              className="disabled:opacity-100 sm:flex-1"
-            >
-              {isCreating ? (
-                <LoaderCircleIcon className="animate-spin" />
-              ) : (
-                <>
-                  <PawPrintIcon />
-                  Start a game
-                </>
-              )}
-            </Button>
-            <Button
-              variant="secondary"
-              size="xl"
-              onClick={() => router.push("/join")}
-              className="sm:flex-1"
-            >
-              <KeyRoundIcon />
-              Join with a code
-            </Button>
+            <div className="w-full sm:flex-1">
+              <Button
+                size="xl"
+                onClick={handleCreate}
+                disabled={isCreating}
+                className="w-full rounded-full disabled:opacity-100"
+              >
+                {isCreating ? (
+                  <LoaderCircleIcon className="animate-spin" />
+                ) : (
+                  <>
+                    <PawPrintIcon />
+                    Start a game
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="w-full sm:flex-1">
+              <Button
+                variant="secondary"
+                size="xl"
+                onClick={() => router.push("/join")}
+                className="w-full rounded-full"
+              >
+                <KeyRoundIcon />
+                Join with a code
+              </Button>
+            </div>
           </motion.div>
         </div>
       </main>

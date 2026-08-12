@@ -26,7 +26,7 @@ export function GameSettingsInput({
 }: GameSettingsInputProps) {
   return (
     <>
-      <div className="flex min-h-14 items-center gap-3 px-4 py-2">
+      <div className="flex min-h-14 items-center gap-3">
         <ListChecksIcon className="text-muted-foreground size-4" />
         <span className="min-w-0 flex-1 text-sm font-medium">Questions</span>
         <ToggleGroup
@@ -34,7 +34,7 @@ export function GameSettingsInput({
           size="sm"
           value={String(questionCount)}
           aria-label="Question count"
-          className="bg-muted gap-0.5 p-0.5"
+          className="bg-muted gap-0.5 p-[3px]"
           onValueChange={(value) => {
             const nextQuestionCount = Number(value);
             if (!isQuestionCount(nextQuestionCount)) return;
@@ -46,14 +46,14 @@ export function GameSettingsInput({
               key={count}
               value={String(count)}
               aria-label={`${count} questions`}
-              className="data-[state=on]:bg-card h-7 min-w-9 rounded-md px-2 data-[state=on]:shadow-sm"
+              className="data-[state=on]:bg-card h-7 min-w-9 rounded-[5px] px-2 data-[state=on]:shadow-sm"
             >
               {count}
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
       </div>
-      <div className="flex min-h-14 items-center gap-3 px-4 py-2">
+      <div className="flex min-h-14 items-center gap-3">
         <Clock3Icon className="text-muted-foreground size-4" />
         <span className="min-w-0 flex-1 text-sm font-medium">
           Time per question
@@ -63,7 +63,7 @@ export function GameSettingsInput({
           size="sm"
           value={String(timeLimitSeconds)}
           aria-label="Time per question"
-          className="bg-muted gap-0.5 p-0.5"
+          className="bg-muted gap-0.5 p-[3px]"
           onValueChange={(value) => {
             const nextTimeLimitSeconds = Number(value);
             if (!isTimeLimitSeconds(nextTimeLimitSeconds)) return;
@@ -75,7 +75,7 @@ export function GameSettingsInput({
               key={seconds}
               value={String(seconds)}
               aria-label={`${seconds} seconds per question`}
-              className="data-[state=on]:bg-card h-7 min-w-9 rounded-md px-2 data-[state=on]:shadow-sm"
+              className="data-[state=on]:bg-card h-7 min-w-9 rounded-[5px] px-2 data-[state=on]:shadow-sm"
             >
               {seconds}s
             </ToggleGroupItem>

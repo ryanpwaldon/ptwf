@@ -93,8 +93,8 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
     <PageShell>
       <Header title="Game lobby" />
       <main className="flex-1 px-4 pb-16">
-        <div className="mt-8">
-          <h1 className="text-2xl font-extrabold tracking-tight">
+        <div className="mt-8 space-y-1">
+          <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
             Get ready to play
           </h1>
           <p className="text-muted-foreground">
@@ -103,11 +103,11 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-5">
           <Card className="sm:col-span-2">
-            <CardHeader className="border-b">
+            <CardHeader>
               <CardTitle>Your player</CardTitle>
               <CardDescription>Choose your character.</CardDescription>
             </CardHeader>
-            <CardContent className="flex h-full items-center justify-center">
+            <CardContent className="flex h-full items-center">
               <AvatarInput
                 value={me.character}
                 takenValues={takenCharacterValues}
@@ -118,10 +118,10 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             </CardContent>
           </Card>
           <Card className="w-full sm:col-span-3">
-            <CardHeader className="border-b">
+            <CardHeader>
               <CardTitle>Invite your friends</CardTitle>
               <CardDescription>
-                Share the code, or copy the link.
+                Share the code or copy the invite link.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center">
@@ -130,7 +130,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </Card>
         </div>
         <Card className="mt-4">
-          <CardHeader className="border-b">
+          <CardHeader>
             <CardTitle>Choose a pet</CardTitle>
             <CardDescription>
               Which pet should the questions be about?
@@ -149,7 +149,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </CardContent>
         </Card>
         <Card className="mt-4">
-          <CardHeader className="border-b">
+          <CardHeader>
             <CardTitle>Choose a care topic</CardTitle>
             <CardDescription>What should the questions cover?</CardDescription>
           </CardHeader>
@@ -163,11 +163,11 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </CardContent>
         </Card>
         <Card className="mt-4 gap-0 pb-0">
-          <CardHeader className="border-b">
-            <CardTitle>Game settings</CardTitle>
+          <CardHeader>
+            <CardTitle>Game format</CardTitle>
             <CardDescription>Fine-tune the length and pace.</CardDescription>
           </CardHeader>
-          <CardContent className="divide-y p-0!">
+          <CardContent className="divide-y">
             <GameSettingsInput
               questionCount={game.questionCount}
               timeLimitSeconds={game.timeLimitSeconds}
@@ -191,7 +191,12 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         <div className="flex flex-col items-start gap-2">
           <div className="flex items-center gap-2">
             <p className="font-medium">Players</p>
-            <Badge variant="secondary">{players.length}</Badge>
+            <Badge
+              variant="secondary"
+              className="size-6 rounded-full p-0 leading-none tabular-nums"
+            >
+              {players.length}
+            </Badge>
           </div>
           <PlayerGroup
             maxVisible={8}

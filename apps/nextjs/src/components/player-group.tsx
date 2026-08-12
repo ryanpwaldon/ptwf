@@ -10,7 +10,7 @@ import {
   AvatarImage,
 } from "@acme/ui/avatar";
 
-type AvatarSize = "2xs" | "xs" | "default" | "sm" | "lg";
+type AvatarSize = "2xs" | "xs" | "sm" | "default" | "md" | "lg";
 
 const STAGGER_DELAY = 0.06;
 

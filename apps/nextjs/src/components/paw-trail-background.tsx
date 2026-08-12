@@ -68,8 +68,9 @@ export interface PawTrailBackgroundProps {
   pawSpacing?: number;
   pawSize?: number;
   pawOffset?: number;
-  opacity?: number;
   color?: string;
+  stepColor?: string;
+  colorTransitionDuration?: number;
   showPaws?: boolean;
   showSpacingDebug?: boolean;
 }
@@ -89,7 +90,6 @@ interface PawTrailSettings {
   pawSpacing: number;
   pawSize: number;
   pawOffset: number;
-  opacity: number;
   color: string;
   showPaws: boolean;
   showSpacingDebug: boolean;
@@ -151,8 +151,6 @@ const controlDescriptions = {
   pawSize: "The visual scale of every footprint.",
   pawOffset:
     "How far alternating left and right footprints sit from the trail's centre line.",
-  opacity:
-    "The maximum visibility of the footprint layer. Fade animations remain relative to this value.",
   color: "The colour used to draw every footprint.",
   showPaws: "Shows or hides the rendered footprints.",
   showSpacingDebug:
@@ -467,16 +465,6 @@ function PawTrailControls({
                 format={(value) => `${value}px`}
                 onChange={(value) => onSettingsChange("pawOffset", value)}
               />
-              <RangeControl
-                label="Footprint opacity"
-                description={controlDescriptions.opacity}
-                value={settings.opacity}
-                min={0}
-                max={1}
-                step={0.01}
-                format={(value) => `${Math.round(value * 100)}%`}
-                onChange={(value) => onSettingsChange("opacity", value)}
-              />
               <div className="grid gap-1.5 text-xs font-medium">
                 <span className="flex items-center gap-1.5">
                   <label htmlFor={colorControlId}>Paw color</label>
@@ -599,6 +587,8 @@ function PawTrailControls({
 }
 
 const svgNamespace = "http://www.w3.org/2000/svg";
+const minimumTrailSpawnDelay = 300;
+const maximumTrailSpawnDelay = 900;
 
 function random(min: number, max: number) {
   return min + Math.random() * (max - min);
@@ -710,12 +700,13 @@ export function PawTrailBackground({
   fadeOutDuration = 180,
   fadeInEasing = "cubic-bezier(0.16, 1, 0.3, 1)",
   fadeOutEasing = "cubic-bezier(0.42, 0, 1, 1)",
-  overscan = 220,
+  overscan = 100,
   pawSpacing = 62,
   pawSize = 0.68,
   pawOffset = 11,
-  opacity = 0.1,
-  color = "currentColor",
+  color = "color-mix(in oklch, var(--muted-foreground) 14%, var(--background))",
+  stepColor = "color-mix(in oklch, var(--muted-foreground) 28%, var(--background))",
+  colorTransitionDuration = 800,
   showPaws = true,
   showSpacingDebug = false,
 }: PawTrailBackgroundProps) {
@@ -740,7 +731,6 @@ export function PawTrailBackground({
       pawSpacing,
       pawSize,
       pawOffset,
-      opacity,
       color,
       showPaws,
       showSpacingDebug,
@@ -754,7 +744,6 @@ export function PawTrailBackground({
       fadeOutDuration,
       fadeOutEasing,
       footprintDuration,
-      opacity,
       overscan,
       pawOffset,
       pawSize,
@@ -822,6 +811,7 @@ export function PawTrailBackground({
     let trailSequence = 0;
     let consecutiveMisses = 0;
     let resetTimeout: number | undefined;
+    let schedulerTimeout: number | undefined;
 
     function updateGeometry() {
       geometry = {
@@ -939,6 +929,9 @@ export function PawTrailBackground({
           const footprint = document.createElementNS(svgNamespace, "use");
           footprint.setAttribute("href", `#${footprintId}`);
           footprint.style.opacity = reducedMotion.matches ? "1" : "0";
+          footprint.style.fill = reducedMotion.matches
+            ? "currentColor"
+            : stepColor;
           footprint.style.transformBox = "fill-box";
           footprint.style.transformOrigin = "center";
           const fadeOutGroup = document.createElementNS(svgNamespace, "g");
@@ -1030,7 +1023,20 @@ export function PawTrailBackground({
             easing: activeFadeOutEasing,
           },
         );
-        trail.animations.push(fadeInAnimation, fadeOutAnimation);
+        const colorAnimation = paw.element.animate(
+          [{ fill: stepColor }, { fill: "currentColor" }],
+          {
+            duration: colorTransitionDuration,
+            delay: delay + activeFadeInDuration,
+            fill: "forwards",
+            easing: "cubic-bezier(0.77, 0, 0.175, 1)",
+          },
+        );
+        trail.animations.push(
+          fadeInAnimation,
+          colorAnimation,
+          fadeOutAnimation,
+        );
       }
     }
 
@@ -1121,6 +1127,16 @@ export function PawTrailBackground({
       }
     }
 
+    function scheduleNextTrail() {
+      schedulerTimeout = window.setTimeout(
+        () => {
+          schedulerTick();
+          scheduleNextTrail();
+        },
+        random(minimumTrailSpawnDelay, maximumTrailSpawnDelay),
+      );
+    }
+
     function clearScene() {
       for (const trail of [...activeTrails.values()]) removeTrail(trail.id);
       spatialHash = new SpatialHash(activeSpacing);
@@ -1134,12 +1150,12 @@ export function PawTrailBackground({
     }
 
     updateGeometry();
-    const scheduler = window.setInterval(schedulerTick, 170);
     window.addEventListener("resize", scheduleReset);
     schedulerTick();
+    scheduleNextTrail();
 
     return () => {
-      window.clearInterval(scheduler);
+      window.clearTimeout(schedulerTimeout);
       window.clearTimeout(resetTimeout);
       window.removeEventListener("resize", scheduleReset);
       for (const trail of [...activeTrails.values()]) removeTrail(trail.id);
@@ -1161,8 +1177,10 @@ export function PawTrailBackground({
     activeSpacing,
     activeTrailLength,
     activeWalkInDuration,
+    colorTransitionDuration,
     footprintId,
     seed,
+    stepColor,
   ]);
 
   return (
@@ -1175,7 +1193,6 @@ export function PawTrailBackground({
         )}
         style={{
           color: settings.color === "currentColor" ? undefined : settings.color,
-          opacity: settings.opacity,
         }}
       >
         <svg
