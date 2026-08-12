@@ -12,8 +12,10 @@ export async function generateMetadata(
   const { code } = await params;
   const normalizedCode = code.trim().toUpperCase();
   const parentMetadata = await parent;
-  const title = "You're invited to play!";
-  const description = `Join game ${normalizedCode} for a round of pet-care trivia.`;
+  const title = `Game ${normalizedCode} | All about pets!`;
+  const description = `Play a round of pet-care trivia in game ${normalizedCode}.`;
+  const inviteTitle = "You're invited to play!";
+  const inviteDescription = `Join game ${normalizedCode} for a round of pet-care trivia.`;
 
   return {
     title,
@@ -21,8 +23,8 @@ export async function generateMetadata(
     openGraph: {
       type: "website",
       url: `/game/${encodeURIComponent(normalizedCode)}`,
-      title,
-      description,
+      title: inviteTitle,
+      description: inviteDescription,
       images: parentMetadata.openGraph?.images,
     },
   };
