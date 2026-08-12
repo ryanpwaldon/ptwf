@@ -76,9 +76,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   const readyByCharacter = new Map(players.map((p) => [p.character, p.isReady])); // prettier-ignore
   const readyPlayerCount = players.filter((player) => player.isReady).length;
   const readyButtonLabel =
-    players.length === 1
-      ? "Play"
-      : `Ready ${readyPlayerCount}/${players.length}`;
+    players.length === 1 ? "Play" : me.isReady ? "Cancel" : "Ready";
 
   async function handleReadyToggle() {
     setIsUpdatingReady(true);
@@ -193,9 +191,15 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             <p className="font-medium">Players</p>
             <Badge
               variant="secondary"
-              className="size-6 rounded-full p-0 leading-none tabular-nums"
+              className={
+                players.length === 1
+                  ? "size-6 rounded-full p-0 leading-none tabular-nums"
+                  : "h-6 px-2 leading-none tabular-nums"
+              }
             >
-              {players.length}
+              {players.length === 1
+                ? players.length
+                : `${readyPlayerCount}/${players.length} ready`}
             </Badge>
           </div>
           <PlayerGroup
@@ -213,17 +217,18 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </div>
         <Button
           size="xl"
+          aria-pressed={players.length > 1 ? me.isReady : undefined}
           disabled={isUpdatingReady}
           className="transition-none disabled:opacity-100"
           onClick={() => void handleReadyToggle()}
-          variant={me.isReady ? "outline" : "default"}
+          variant={players.length > 1 && me.isReady ? "outline" : "default"}
         >
           <span className="grid place-items-center">
             <span
               className={
                 isUpdatingReady
-                  ? "invisible col-start-1 row-start-1 tabular-nums"
-                  : "col-start-1 row-start-1 tabular-nums"
+                  ? "invisible col-start-1 row-start-1"
+                  : "col-start-1 row-start-1"
               }
             >
               {readyButtonLabel}
