@@ -10,7 +10,6 @@ import { z } from "zod";
 
 import { api, gameCodeZodSchema } from "@acme/convex";
 import { Button } from "@acme/ui/button";
-import { Card, CardContent } from "@acme/ui/card";
 import { Field, FieldError, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 
@@ -51,67 +50,61 @@ export default function JoinPage() {
             Enter the code your friend shared.
           </p>
         </div>
-        <Card className="mt-6 w-full">
-          <CardContent className="flex justify-center">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void form.handleSubmit();
-              }}
-              className="flex w-full flex-col gap-2"
-            >
-              <form.Field name="code">
-                {(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
-                  const hasError = isInvalid || !!serverError;
-                  return (
-                    <Field data-invalid={hasError || undefined}>
-                      <FieldLabel className="sr-only">Game code</FieldLabel>
-                      <div className="flex w-full items-center gap-2">
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          placeholder="Enter your code"
-                          aria-invalid={hasError || undefined}
-                          className="h-12 font-mono text-base! uppercase placeholder:normal-case"
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => {
-                            field.handleChange(e.target.value);
-                            setServerError(null);
-                          }}
-                        />
-                        <form.Subscribe selector={(s) => s.isSubmitting}>
-                          {(isSubmitting) => (
-                            <Button
-                              size="xl"
-                              type="submit"
-                              disabled={isSubmitting}
-                              className="disabled:opacity-100"
-                            >
-                              {isSubmitting ? (
-                                <LoaderCircleIcon className="animate-spin" />
-                              ) : (
-                                "Join"
-                              )}
-                            </Button>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void form.handleSubmit();
+          }}
+          className="mt-6 flex w-full flex-col gap-2"
+        >
+          <form.Field name="code">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              const hasError = isInvalid || !!serverError;
+              return (
+                <Field data-invalid={hasError || undefined}>
+                  <FieldLabel className="sr-only">Game code</FieldLabel>
+                  <div className="flex w-full items-center gap-2">
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      placeholder="Enter your code"
+                      aria-invalid={hasError || undefined}
+                      className="bg-card h-12 font-mono text-base! uppercase placeholder:normal-case"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                        setServerError(null);
+                      }}
+                    />
+                    <form.Subscribe selector={(s) => s.isSubmitting}>
+                      {(isSubmitting) => (
+                        <Button
+                          size="xl"
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="disabled:opacity-100"
+                        >
+                          {isSubmitting ? (
+                            <LoaderCircleIcon className="animate-spin" />
+                          ) : (
+                            "Join"
                           )}
-                        </form.Subscribe>
-                      </div>
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
+                        </Button>
                       )}
-                      {!isInvalid && serverError && (
-                        <FieldError>{serverError}</FieldError>
-                      )}
-                    </Field>
-                  );
-                }}
-              </form.Field>
-            </form>
-          </CardContent>
-        </Card>
+                    </form.Subscribe>
+                  </div>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  {!isInvalid && serverError && (
+                    <FieldError>{serverError}</FieldError>
+                  )}
+                </Field>
+              );
+            }}
+          </form.Field>
+        </form>
       </main>
     </PageShell>
   );
