@@ -96,7 +96,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             Get ready to play
           </h1>
           <p className="text-muted-foreground">
-            Choose a pet and a care topic, then invite your friends.
+            Choose your character, set up the quiz, and invite your friends.
           </p>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-5">
