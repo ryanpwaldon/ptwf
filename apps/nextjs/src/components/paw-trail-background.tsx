@@ -599,6 +599,8 @@ function PawTrailControls({
 }
 
 const svgNamespace = "http://www.w3.org/2000/svg";
+const minimumTrailSpawnDelay = 300;
+const maximumTrailSpawnDelay = 900;
 
 function random(min: number, max: number) {
   return min + Math.random() * (max - min);
@@ -710,7 +712,7 @@ export function PawTrailBackground({
   fadeOutDuration = 180,
   fadeInEasing = "cubic-bezier(0.16, 1, 0.3, 1)",
   fadeOutEasing = "cubic-bezier(0.42, 0, 1, 1)",
-  overscan = 220,
+  overscan = 100,
   pawSpacing = 62,
   pawSize = 0.68,
   pawOffset = 11,
@@ -822,6 +824,7 @@ export function PawTrailBackground({
     let trailSequence = 0;
     let consecutiveMisses = 0;
     let resetTimeout: number | undefined;
+    let schedulerTimeout: number | undefined;
 
     function updateGeometry() {
       geometry = {
@@ -1121,6 +1124,16 @@ export function PawTrailBackground({
       }
     }
 
+    function scheduleNextTrail() {
+      schedulerTimeout = window.setTimeout(
+        () => {
+          schedulerTick();
+          scheduleNextTrail();
+        },
+        random(minimumTrailSpawnDelay, maximumTrailSpawnDelay),
+      );
+    }
+
     function clearScene() {
       for (const trail of [...activeTrails.values()]) removeTrail(trail.id);
       spatialHash = new SpatialHash(activeSpacing);
@@ -1134,12 +1147,12 @@ export function PawTrailBackground({
     }
 
     updateGeometry();
-    const scheduler = window.setInterval(schedulerTick, 170);
     window.addEventListener("resize", scheduleReset);
     schedulerTick();
+    scheduleNextTrail();
 
     return () => {
-      window.clearInterval(scheduler);
+      window.clearTimeout(schedulerTimeout);
       window.clearTimeout(resetTimeout);
       window.removeEventListener("resize", scheduleReset);
       for (const trail of [...activeTrails.values()]) removeTrail(trail.id);
