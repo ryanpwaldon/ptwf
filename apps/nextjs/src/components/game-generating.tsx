@@ -5,6 +5,7 @@ export function GameGenerating() {
     <FullScreenLoader
       title="Paws for a moment..."
       description="We’re getting your pet-care challenge ready."
+      showPawTrail
     />
   );
 }

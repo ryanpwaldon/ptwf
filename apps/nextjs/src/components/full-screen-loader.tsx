@@ -7,15 +7,17 @@ import { PawTrailBackground } from "./paw-trail-background";
 interface FullScreenLoaderProps {
   title?: string;
   description?: string;
+  showPawTrail?: boolean;
 }
 
 export function FullScreenLoader({
   title,
   description,
+  showPawTrail = false,
 }: FullScreenLoaderProps) {
   return (
     <PageShell>
-      <PawTrailBackground />
+      {showPawTrail && <PawTrailBackground />}
       <main className="relative z-10 flex flex-1 flex-col items-center justify-center">
         <Loader />
         {title && description && (
