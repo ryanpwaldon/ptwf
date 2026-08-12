@@ -1,16 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil } from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
 
 import type { CharacterValue } from "@acme/convex";
 import { CHARACTER_OPTIONS, getCharacterByValue } from "@acme/convex";
-import {
-  Avatar,
-  AvatarBadge,
-  AvatarFallback,
-  AvatarImage,
-} from "@acme/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import {
@@ -43,20 +38,21 @@ export function AvatarInput({
     <CommandPicker open={open} onOpenChange={setOpen}>
       <CommandPickerTrigger asChild>
         <Button
-          variant="ghost"
-          className="size-auto cursor-pointer rounded-full p-0"
+          variant="outline"
+          className="h-12 w-full cursor-pointer justify-start gap-3 px-2 pr-3 transition-colors"
         >
-          <Avatar size="lg" tooltip={character.label}>
+          <Avatar className="size-9">
             <AvatarImage
               src={character.image}
               alt={`${character.label} avatar`}
               className="object-cover"
             />
             <AvatarFallback>{character.label.slice(0, 2)}</AvatarFallback>
-            <AvatarBadge>
-              <Pencil />
-            </AvatarBadge>
           </Avatar>
+          <span className="min-w-0 flex-1 truncate text-left text-sm font-medium">
+            {character.label}
+          </span>
+          <ChevronDownIcon className="text-muted-foreground size-4" />
         </Button>
       </CommandPickerTrigger>
       <CommandPickerContent title="Choose a character">

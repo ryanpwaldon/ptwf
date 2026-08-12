@@ -107,7 +107,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               <CardTitle>Your player</CardTitle>
               <CardDescription>Choose your character.</CardDescription>
             </CardHeader>
-            <CardContent className="flex h-full items-center justify-center">
+            <CardContent className="flex h-full items-center">
               <AvatarInput
                 value={me.character}
                 takenValues={takenCharacterValues}
