@@ -45,9 +45,7 @@ export function Leaderboard({
           <TableRow key={entry.character.value}>
             <TableCell>
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground w-3.5 font-medium">
-                  {i + 1}.
-                </span>
+                <span className="text-muted-foreground w-3.5">{i + 1}.</span>
                 <Avatar size="2xs" tooltip={entry.character.label}>
                   <AvatarImage
                     src={entry.character.image}
