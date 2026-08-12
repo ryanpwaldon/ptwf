@@ -39,7 +39,7 @@ export function AvatarInput({
       <CommandPickerTrigger asChild>
         <Button
           variant="outline"
-          className="h-12 w-full cursor-pointer justify-start gap-3 px-2 pr-3 transition-colors"
+          className="h-12 w-full cursor-pointer justify-start gap-3 rounded-full pr-3 pl-[5px] transition-colors"
         >
           <Avatar className="size-9">
             <AvatarImage
