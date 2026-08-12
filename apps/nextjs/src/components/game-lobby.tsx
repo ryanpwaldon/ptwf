@@ -121,7 +121,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             <CardHeader>
               <CardTitle>Invite your friends</CardTitle>
               <CardDescription>
-                Share the code, or copy the link.
+                Share the code or copy the invite link.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center">
@@ -164,7 +164,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </Card>
         <Card className="mt-4 gap-0 pb-0">
           <CardHeader>
-            <CardTitle>Game settings</CardTitle>
+            <CardTitle>Game format</CardTitle>
             <CardDescription>Fine-tune the length and pace.</CardDescription>
           </CardHeader>
           <CardContent className="divide-y">
