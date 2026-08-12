@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import { LoaderCircleIcon, RotateCcwIcon } from "lucide-react";
+import { LoaderCircleIcon } from "lucide-react";
 
 import { api, getCharacterByValue } from "@acme/convex";
 import { Button } from "@acme/ui/button";
@@ -50,8 +50,9 @@ export function GameResults({
     try {
       const code = await playAgain({ gameId: game._id });
       router.push(`/game/${code}`);
-    } finally {
+    } catch (error) {
       setIsStartingReplay(false);
+      throw error;
     }
   }
 
@@ -143,12 +144,20 @@ export function GameResults({
           className="disabled:opacity-100"
           onClick={() => void handlePlayAgain()}
         >
-          {isStartingReplay ? (
-            <LoaderCircleIcon className="animate-spin" />
-          ) : (
-            <RotateCcwIcon />
-          )}
-          {playAgainLabel}
+          <span className="grid place-items-center">
+            <span
+              className={
+                isStartingReplay
+                  ? "invisible col-start-1 row-start-1 tabular-nums"
+                  : "col-start-1 row-start-1 tabular-nums"
+              }
+            >
+              {playAgainLabel}
+            </span>
+            {isStartingReplay && (
+              <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
+            )}
+          </span>
         </Button>
       </div>
     </PageShell>
