@@ -217,8 +217,8 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             <span
               className={
                 isUpdatingReady
-                  ? "invisible col-start-1 row-start-1"
-                  : "col-start-1 row-start-1"
+                  ? "invisible col-start-1 row-start-1 tabular-nums"
+                  : "col-start-1 row-start-1 tabular-nums"
               }
             >
               {readyButtonLabel}
