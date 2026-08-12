@@ -237,13 +237,13 @@ function GamePlayInner({
             </motion.div>
             <motion.h2
               variants={itemVariants}
-              className="text-muted-foreground mt-3 text-center text-base font-medium"
+              className="text-muted-foreground mt-3 text-center text-sm font-medium"
             >
               Question {game.currentQuestionIndex + 1} of {questionCount}
             </motion.h2>
             <motion.h1
               variants={itemVariants}
-              className="mt-1 text-center text-2xl font-extrabold tracking-tight"
+              className="mt-1 text-center text-2xl leading-8 font-bold tracking-tight"
             >
               {currentQuestion.text}
             </motion.h1>
