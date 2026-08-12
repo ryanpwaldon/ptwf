@@ -43,8 +43,8 @@ export default function JoinPage() {
     <PageShell>
       <Header title="Join game" />
       <main className="flex-1 px-4">
-        <div className="mt-8">
-          <h1 className="text-2xl font-extrabold tracking-tight">
+        <div className="mt-8 space-y-1">
+          <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
             Join a game
           </h1>
           <p className="text-muted-foreground">

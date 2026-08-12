@@ -93,8 +93,8 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
     <PageShell>
       <Header title="Game lobby" />
       <main className="flex-1 px-4 pb-16">
-        <div className="mt-8">
-          <h1 className="text-2xl font-extrabold tracking-tight">
+        <div className="mt-8 space-y-1">
+          <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
             Get ready to play
           </h1>
           <p className="text-muted-foreground">
