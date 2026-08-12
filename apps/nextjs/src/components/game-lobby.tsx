@@ -191,7 +191,12 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         <div className="flex flex-col items-start gap-2">
           <div className="flex items-center gap-2">
             <p className="font-medium">Players</p>
-            <Badge variant="secondary">{players.length}</Badge>
+            <Badge
+              variant="secondary"
+              className="size-6 rounded-full p-0 leading-none tabular-nums"
+            >
+              {players.length}
+            </Badge>
           </div>
           <PlayerGroup
             maxVisible={8}
