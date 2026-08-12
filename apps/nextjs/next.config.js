@@ -7,6 +7,8 @@ await jiti.import("./src/env");
 
 /** @type {import("next").NextConfig} */
 const config = {
+  allowedDevOrigins: ["ryan.local"],
+
   transpilePackages: ["@acme/ui", "@acme/validators", "@acme/convex"],
 
   /** We already do linting and typechecking as separate tasks in CI */
