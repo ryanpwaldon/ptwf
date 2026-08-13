@@ -1,6 +1,5 @@
 "use client";
 
-import type { FunctionReturnType } from "convex/server";
 import { useState } from "react";
 import { useSessionMutation } from "convex-helpers/react/sessions";
 import { CheckIcon } from "lucide-react";
@@ -16,6 +15,7 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
+import type { Game, Me, Player } from "~/lib/game-data";
 import { GameInviteField } from "~/components/game-invite-field";
 import { LoadingButton } from "~/components/loading-button";
 import { PageHeader } from "~/components/page-header";
@@ -26,10 +26,6 @@ import { GameFormatControls } from "./game-format-controls";
 import { PageFooter } from "./page-footer";
 import { PetPicker } from "./pet-picker";
 import { PlayerAvatarGroup } from "./player-avatar-group";
-
-type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
-type Player = FunctionReturnType<typeof api.players.allByGameId>[number];
-type Me = NonNullable<FunctionReturnType<typeof api.players.me>>;
 
 interface GameLobbyProps {
   game: Game;
