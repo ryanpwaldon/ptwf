@@ -14,7 +14,7 @@ export function AppShell({ className, ...props }: ComponentProps<"div">) {
 export function PageContainer({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
-      className={cn("mx-auto w-full max-w-xl sm:px-4", className)}
+      className={cn("mx-auto w-full max-w-136 sm:max-w-xl sm:px-4", className)}
       {...props}
     />
   );
