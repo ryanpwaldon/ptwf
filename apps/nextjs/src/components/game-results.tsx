@@ -12,7 +12,7 @@ import { Card, CardContent } from "@acme/ui/card";
 import { Header } from "~/components/header";
 import { Leaderboard } from "~/components/leaderboard";
 import { QuestionResult } from "~/components/question-result";
-import { PageShell } from "./page-shell";
+import { AppShell, PageContainer } from "./app-shell";
 
 type Me = NonNullable<FunctionReturnType<typeof api.players.me>>;
 type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
@@ -103,63 +103,69 @@ export function GameResults({
   }, [sortedQuestions, answers, me._id]);
 
   return (
-    <PageShell>
+    <AppShell>
       <Header title="Game results" />
-      <main className="flex-1 px-4 pb-16">
-        <div className="mt-8 space-y-1">
-          <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
-            Great game!
-          </h1>
-          <p className="text-muted-foreground">Here are the final results.</p>
-        </div>
-        <Card className="mt-6 py-0">
-          <CardContent className="p-0">
-            <Leaderboard
-              entries={leaderboardEntries}
-              totalQuestions={questions.length}
-              myCharacterValue={me.character}
+      <PageContainer className="flex flex-1 flex-col">
+        <main className="flex-1 px-4 pb-16">
+          <div className="mt-8 space-y-1">
+            <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
+              Great game!
+            </h1>
+            <p className="text-muted-foreground">Here are the final results.</p>
+          </div>
+          <Card className="mt-6 py-0">
+            <CardContent className="p-0">
+              <Leaderboard
+                entries={leaderboardEntries}
+                totalQuestions={questions.length}
+                myCharacterValue={me.character}
+              />
+            </CardContent>
+          </Card>
+          <h2 className="mt-6 text-lg font-medium">Score breakdown</h2>
+          {questionResults.map((result) => (
+            <QuestionResult
+              key={result.id}
+              className="mt-6"
+              question={result.question}
+              questionIndex={result.questionIndex}
+              choices={result.choices}
+              correctIndex={result.correctIndex}
+              myChoiceIndex={result.myChoiceIndex}
             />
-          </CardContent>
-        </Card>
-        <h2 className="mt-6 text-lg font-medium">Score breakdown</h2>
-        {questionResults.map((result) => (
-          <QuestionResult
-            key={result.id}
-            className="mt-6"
-            question={result.question}
-            questionIndex={result.questionIndex}
-            choices={result.choices}
-            correctIndex={result.correctIndex}
-            myChoiceIndex={result.myChoiceIndex}
-          />
-        ))}
-      </main>
-      <div className="bg-background/95 sticky bottom-0 mt-4 flex justify-end gap-4 border-t p-4 backdrop-blur">
-        <Button size="xl" variant="secondary" asChild>
-          <Link href="/">Return home</Link>
-        </Button>
-        <Button
-          size="xl"
-          disabled={isStartingReplay}
-          className="disabled:opacity-100"
-          onClick={() => void handlePlayAgain()}
-        >
-          <span className="grid place-items-center">
-            <span
-              className={
-                isStartingReplay
-                  ? "invisible col-start-1 row-start-1 tabular-nums"
-                  : "col-start-1 row-start-1 tabular-nums"
-              }
+          ))}
+        </main>
+      </PageContainer>
+      <footer className="bg-background/75 sticky bottom-0 z-10 mt-4 backdrop-blur-xl backdrop-saturate-150">
+        <PageContainer>
+          <div className="flex justify-end gap-4 border-t p-4">
+            <Button size="xl" variant="secondary" asChild>
+              <Link href="/">Return home</Link>
+            </Button>
+            <Button
+              size="xl"
+              disabled={isStartingReplay}
+              className="disabled:opacity-100"
+              onClick={() => void handlePlayAgain()}
             >
-              {playAgainLabel}
-            </span>
-            {isStartingReplay && (
-              <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
-            )}
-          </span>
-        </Button>
-      </div>
-    </PageShell>
+              <span className="grid place-items-center">
+                <span
+                  className={
+                    isStartingReplay
+                      ? "invisible col-start-1 row-start-1 tabular-nums"
+                      : "col-start-1 row-start-1 tabular-nums"
+                  }
+                >
+                  {playAgainLabel}
+                </span>
+                {isStartingReplay && (
+                  <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
+                )}
+              </span>
+            </Button>
+          </div>
+        </PageContainer>
+      </footer>
+    </AppShell>
   );
 }

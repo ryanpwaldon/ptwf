@@ -1,7 +1,7 @@
 "use client";
 
+import { AppShell, PageContainer } from "./app-shell";
 import { Loader } from "./loader";
-import { PageShell } from "./page-shell";
 import { PawTrailBackground } from "./paw-trail-background";
 
 interface FullScreenLoaderProps {
@@ -16,17 +16,19 @@ export function FullScreenLoader({
   showPawTrail = false,
 }: FullScreenLoaderProps) {
   return (
-    <PageShell>
+    <AppShell>
       {showPawTrail && <PawTrailBackground />}
-      <main className="relative z-10 flex flex-1 flex-col items-center justify-center">
-        <Loader />
-        {title && description && (
-          <div className="mt-4 flex flex-col items-center gap-1 text-center">
-            <h1 className="text-xl font-semibold">{title}</h1>
-            <p className="text-muted-foreground text-sm">{description}</p>
-          </div>
-        )}
-      </main>
-    </PageShell>
+      <PageContainer className="relative z-10 flex flex-1 flex-col">
+        <main className="flex flex-1 flex-col items-center justify-center">
+          <Loader />
+          {title && description && (
+            <div className="mt-4 flex flex-col items-center gap-1 text-center">
+              <h1 className="text-xl font-semibold">{title}</h1>
+              <p className="text-muted-foreground text-sm">{description}</p>
+            </div>
+          )}
+        </main>
+      </PageContainer>
+    </AppShell>
   );
 }
