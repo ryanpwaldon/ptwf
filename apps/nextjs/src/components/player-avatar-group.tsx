@@ -2,13 +2,9 @@ import type { ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
 import type { Character } from "@acme/convex";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarGroup,
-  AvatarGroupCount,
-  AvatarImage,
-} from "@acme/ui/avatar";
+import { AvatarGroup, AvatarGroupCount } from "@acme/ui/avatar";
+
+import { CharacterAvatar } from "~/components/character-avatar";
 
 type AvatarSize = "2xs" | "xs" | "sm" | "default" | "md" | "lg";
 
@@ -35,18 +31,13 @@ export function PlayerAvatarGroup({
       {visibleCharacters.map((character, index) => {
         const badge = renderBadge?.(character);
         const avatar = (
-          <Avatar
+          <CharacterAvatar
+            character={character}
             size={avatarSize}
             key={character.value}
-            tooltip={character.label}
+            tooltip
             className={animateEntrance ? "ring-background ring-2" : undefined}
           >
-            <AvatarImage
-              src={character.image}
-              alt={`${character.label} avatar`}
-              className="object-cover"
-            />
-            <AvatarFallback>{character.label.slice(0, 2)}</AvatarFallback>
             <AnimatePresence>
               {badge && (
                 <motion.div
@@ -60,7 +51,7 @@ export function PlayerAvatarGroup({
                 </motion.div>
               )}
             </AnimatePresence>
-          </Avatar>
+          </CharacterAvatar>
         );
 
         if (animateEntrance) {

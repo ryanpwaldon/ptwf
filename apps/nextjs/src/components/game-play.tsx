@@ -6,7 +6,8 @@ import { useSessionMutation } from "convex-helpers/react/sessions";
 import { CheckIcon, CircleSmallIcon, XIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { api, CHARACTER_OPTIONS } from "@acme/convex";
+import type { Character } from "@acme/convex";
+import { api, getCharacterByValue } from "@acme/convex";
 import { cn } from "@acme/ui";
 import { AvatarBadge } from "@acme/ui/avatar";
 import { RadioGroup } from "@acme/ui/radio-group";
@@ -58,7 +59,7 @@ export function GamePlay({
   // Build answer summary per choice.
   const answerSummary = currentQuestion.choices.map((choice) => {
     const choiceAnswers = currentAnswerIndex?.bySelectedLabel.get(choice.label) ?? []; // prettier-ignore
-    const voters = choiceAnswers.map((a) => CHARACTER_OPTIONS.find((c) => c.value === a.character) ?? null).filter((c) => c !== null); // prettier-ignore
+    const voters = choiceAnswers.map((a) => getCharacterByValue(a.character));
     return {
       label: choice.label,
       text: choice.text,
@@ -83,10 +84,8 @@ export function GamePlay({
     currentAnswers.map((a) => [a.character, a.isCorrect]),
   );
 
-  // Map player character values to full CHARACTER_OPTIONS objects.
-  const playerCharacters = players
-    .map((p) => CHARACTER_OPTIONS.find((c) => c.value === p.character))
-    .filter((c) => c != null);
+  // Map player character values to full character objects.
+  const playerCharacters = players.map((p) => getCharacterByValue(p.character));
 
   return (
     <GamePlayInner
@@ -126,11 +125,11 @@ function GamePlayInner({
     text: string;
     count: number;
     isCorrect: boolean;
-    voters: (typeof CHARACTER_OPTIONS)[number][];
+    voters: Character[];
   }[];
   questionResults: ("correct" | "incorrect" | "skipped" | "incomplete")[];
   questionCount: number;
-  playerCharacters: (typeof CHARACTER_OPTIONS)[number][];
+  playerCharacters: Character[];
   answerCorrectness: Map<string, boolean>;
   submitAnswer: (label: string) => void;
 }) {
