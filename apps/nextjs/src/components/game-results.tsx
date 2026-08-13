@@ -13,6 +13,7 @@ import { Header } from "~/components/header";
 import { Leaderboard } from "~/components/leaderboard";
 import { QuestionResult } from "~/components/question-result";
 import { AppShell, PageContainer } from "./app-shell";
+import { Footer } from "./footer";
 
 type Me = NonNullable<FunctionReturnType<typeof api.players.me>>;
 type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
@@ -136,36 +137,32 @@ export function GameResults({
           ))}
         </main>
       </PageContainer>
-      <footer className="bg-background/75 sticky bottom-0 z-10 mt-4 backdrop-blur-xl backdrop-saturate-150">
-        <PageContainer>
-          <div className="flex justify-end gap-4 border-t p-4">
-            <Button size="xl" variant="secondary" asChild>
-              <Link href="/">Return home</Link>
-            </Button>
-            <Button
-              size="xl"
-              disabled={isStartingReplay}
-              className="disabled:opacity-100"
-              onClick={() => void handlePlayAgain()}
+      <Footer contentClassName="justify-end">
+        <Button size="xl" variant="secondary" asChild>
+          <Link href="/">Return home</Link>
+        </Button>
+        <Button
+          size="xl"
+          disabled={isStartingReplay}
+          className="disabled:opacity-100"
+          onClick={() => void handlePlayAgain()}
+        >
+          <span className="grid place-items-center">
+            <span
+              className={
+                isStartingReplay
+                  ? "invisible col-start-1 row-start-1 tabular-nums"
+                  : "col-start-1 row-start-1 tabular-nums"
+              }
             >
-              <span className="grid place-items-center">
-                <span
-                  className={
-                    isStartingReplay
-                      ? "invisible col-start-1 row-start-1 tabular-nums"
-                      : "col-start-1 row-start-1 tabular-nums"
-                  }
-                >
-                  {playAgainLabel}
-                </span>
-                {isStartingReplay && (
-                  <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
-                )}
-              </span>
-            </Button>
-          </div>
-        </PageContainer>
-      </footer>
+              {playAgainLabel}
+            </span>
+            {isStartingReplay && (
+              <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
+            )}
+          </span>
+        </Button>
+      </Footer>
     </AppShell>
   );
 }

@@ -22,6 +22,7 @@ import { InviteCodeField } from "~/components/invite-code-field";
 import { AnimalInput } from "./animal-input";
 import { AppShell, PageContainer } from "./app-shell";
 import { AvatarInput } from "./avatar-input";
+import { Footer } from "./footer";
 import { GameSettingsInput } from "./game-settings-input";
 import { PlayerGroup } from "./player-group";
 import { ThemeInput } from "./theme-input";
@@ -189,64 +190,60 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </Card>
         </main>
       </PageContainer>
-      <footer className="bg-background/75 sticky bottom-0 z-10 mt-4 backdrop-blur-xl backdrop-saturate-150">
-        <PageContainer>
-          <div className="flex items-center justify-between gap-4 border-t p-4">
-            <div className="flex flex-col items-start gap-2">
-              <div className="flex items-center gap-2">
-                <p className="font-medium">Players</p>
-                <Badge
-                  variant="secondary"
-                  className={
-                    players.length === 1
-                      ? "size-6 rounded-full p-0 leading-none tabular-nums"
-                      : "h-6 px-2 leading-none tabular-nums"
-                  }
-                >
-                  {players.length === 1
-                    ? players.length
-                    : `${readyPlayerCount}/${players.length} ready`}
-                </Badge>
-              </div>
-              <PlayerGroup
-                maxVisible={8}
-                avatarSize="default"
-                characters={characters}
-                renderBadge={(character) =>
-                  readyByCharacter.get(character.value) ? (
-                    <AvatarBadge position="top-left" className="bg-lime-400">
-                      <CheckIcon className="stroke-lime-900 stroke-5" />
-                    </AvatarBadge>
-                  ) : null
-                }
-              />
-            </div>
-            <Button
-              size="xl"
-              aria-pressed={players.length > 1 ? me.isReady : undefined}
-              disabled={isUpdatingReady}
-              className="transition-none disabled:opacity-100"
-              onClick={() => void handleReadyToggle()}
-              variant={players.length > 1 && me.isReady ? "outline" : "default"}
+      <Footer contentClassName="justify-between">
+        <div className="flex flex-col items-start gap-2">
+          <div className="flex items-center gap-2">
+            <p className="font-medium">Players</p>
+            <Badge
+              variant="secondary"
+              className={
+                players.length === 1
+                  ? "size-6 rounded-full p-0 leading-none tabular-nums"
+                  : "h-6 px-2 leading-none tabular-nums"
+              }
             >
-              <span className="grid place-items-center">
-                <span
-                  className={
-                    isUpdatingReady
-                      ? "invisible col-start-1 row-start-1"
-                      : "col-start-1 row-start-1"
-                  }
-                >
-                  {readyButtonLabel}
-                </span>
-                {isUpdatingReady && (
-                  <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
-                )}
-              </span>
-            </Button>
+              {players.length === 1
+                ? players.length
+                : `${readyPlayerCount}/${players.length} ready`}
+            </Badge>
           </div>
-        </PageContainer>
-      </footer>
+          <PlayerGroup
+            maxVisible={8}
+            avatarSize="default"
+            characters={characters}
+            renderBadge={(character) =>
+              readyByCharacter.get(character.value) ? (
+                <AvatarBadge position="top-left" className="bg-lime-400">
+                  <CheckIcon className="stroke-lime-900 stroke-5" />
+                </AvatarBadge>
+              ) : null
+            }
+          />
+        </div>
+        <Button
+          size="xl"
+          aria-pressed={players.length > 1 ? me.isReady : undefined}
+          disabled={isUpdatingReady}
+          className="transition-none disabled:opacity-100"
+          onClick={() => void handleReadyToggle()}
+          variant={players.length > 1 && me.isReady ? "outline" : "default"}
+        >
+          <span className="grid place-items-center">
+            <span
+              className={
+                isUpdatingReady
+                  ? "invisible col-start-1 row-start-1"
+                  : "col-start-1 row-start-1"
+              }
+            >
+              {readyButtonLabel}
+            </span>
+            {isUpdatingReady && (
+              <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
+            )}
+          </span>
+        </Button>
+      </Footer>
     </AppShell>
   );
 }
