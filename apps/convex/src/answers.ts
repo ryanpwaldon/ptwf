@@ -5,6 +5,7 @@ import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 import { characterValidator } from "./fields/character";
+import { requireParticipant } from "./playerHelpers";
 import schema from "./schema";
 
 // ========================================================================================
@@ -53,13 +54,7 @@ export const submit = mutation({
     if (game.status !== "active" || game.phase !== "answering") return null;
 
     // Find the player.
-    const player = await ctx.db
-      .query("players")
-      .withIndex("by_gameId_and_sessionId", (q) =>
-        q.eq("gameId", args.gameId).eq("sessionId", args.sessionId),
-      )
-      .unique();
-    if (!player) throw new ConvexError("Not a participant.");
+    const player = await requireParticipant(ctx, args.gameId, args.sessionId);
 
     // Find the current question.
     const question = await ctx.db

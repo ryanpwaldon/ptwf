@@ -1,9 +1,7 @@
-import type { GenericDatabaseReader } from "convex/server";
 import { SessionIdArg } from "convex-helpers/server/sessions";
 import { doc } from "convex-helpers/validators";
 import { ConvexError, v } from "convex/values";
 
-import type { DataModel, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { gameCodeValidator, gameCodeZodSchema } from "./fields/gameCode";
 import {
@@ -14,6 +12,7 @@ import { quizAnimalValidator } from "./fields/quizAnimal";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
 import { addPlayerToLobby, createGameWithPlayer } from "./gameHelpers";
+import { requireParticipant } from "./playerHelpers";
 import schema from "./schema";
 
 // ========================================================================================
@@ -39,13 +38,7 @@ export const playAgain = mutation({
       throw new ConvexError("Game is not finished.");
     }
 
-    const player = await ctx.db
-      .query("players")
-      .withIndex("by_gameId_and_sessionId", (q) =>
-        q.eq("gameId", args.gameId).eq("sessionId", args.sessionId),
-      )
-      .unique();
-    if (!player) throw new ConvexError("Not a participant.");
+    const player = await requireParticipant(ctx, args.gameId, args.sessionId);
 
     if (player.replayRequested) {
       if (!game.replayGameId) throw new Error("Replay game not found.");
@@ -117,7 +110,7 @@ export const updateQuestionCount = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ensureParticipant(ctx, args.gameId, args.sessionId);
+    await requireParticipant(ctx, args.gameId, args.sessionId);
     await ctx.db.patch(args.gameId, { questionCount: args.questionCount });
   },
 });
@@ -130,7 +123,7 @@ export const updateQuizAnimal = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ensureParticipant(ctx, args.gameId, args.sessionId);
+    await requireParticipant(ctx, args.gameId, args.sessionId);
     await ctx.db.patch(args.gameId, { quizAnimal: args.quizAnimal });
   },
 });
@@ -139,7 +132,7 @@ export const updateQuizTone = mutation({
   args: { ...SessionIdArg, gameId: v.id("games"), quizTone: quizToneValidator },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ensureParticipant(ctx, args.gameId, args.sessionId);
+    await requireParticipant(ctx, args.gameId, args.sessionId);
     await ctx.db.patch(args.gameId, { quizTone: args.quizTone });
   },
 });
@@ -152,7 +145,7 @@ export const updateQuizTheme = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ensureParticipant(ctx, args.gameId, args.sessionId);
+    await requireParticipant(ctx, args.gameId, args.sessionId);
     await ctx.db.patch(args.gameId, { quizTheme: args.quizTheme });
   },
 });
@@ -165,29 +158,9 @@ export const updateTimeLimitSeconds = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ensureParticipant(ctx, args.gameId, args.sessionId);
+    await requireParticipant(ctx, args.gameId, args.sessionId);
     await ctx.db.patch(args.gameId, {
       timeLimitSeconds: args.timeLimitSeconds,
     });
   },
 });
-
-// ========================================================================================
-// Helpers
-// ========================================================================================
-
-// Ensure the player is a participant in the game.
-async function ensureParticipant(
-  ctx: { db: GenericDatabaseReader<DataModel> },
-  gameId: Id<"games">,
-  sessionId: string,
-) {
-  const player = await ctx.db
-    .query("players")
-    .withIndex("by_gameId_and_sessionId", (q) =>
-      q.eq("gameId", gameId).eq("sessionId", sessionId),
-    )
-    .unique();
-  if (!player) throw new ConvexError("Not a participant.");
-  return player;
-}

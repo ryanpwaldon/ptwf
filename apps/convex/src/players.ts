@@ -7,6 +7,7 @@ import { mutation, query } from "./_generated/server";
 import { characterValidator } from "./fields/character";
 import { gameCodeValidator, parseGameCode } from "./fields/gameCode";
 import { addPlayerToLobby } from "./gameHelpers";
+import { findPlayerBySession } from "./playerHelpers";
 import schema from "./schema";
 
 // ========================================================================================
@@ -45,12 +46,7 @@ export const me = query({
     }),
   ),
   handler: async (ctx, args) => {
-    const player = await ctx.db
-      .query("players")
-      .withIndex("by_gameId_and_sessionId", (q) =>
-        q.eq("gameId", args.gameId).eq("sessionId", args.sessionId),
-      )
-      .unique();
+    const player = await findPlayerBySession(ctx, args.gameId, args.sessionId);
     if (!player) return null;
     return {
       _id: player._id,
@@ -91,12 +87,7 @@ export const updateIsReady = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const player = await ctx.db
-      .query("players")
-      .withIndex("by_gameId_and_sessionId", (q) =>
-        q.eq("gameId", args.gameId).eq("sessionId", args.sessionId),
-      )
-      .unique();
+    const player = await findPlayerBySession(ctx, args.gameId, args.sessionId);
     if (!player) throw new ConvexError("Player not found.");
     await ctx.db.patch(player._id, { isReady: args.isReady });
 
@@ -134,12 +125,7 @@ export const updateCharacter = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const player = await ctx.db
-      .query("players")
-      .withIndex("by_gameId_and_sessionId", (q) =>
-        q.eq("gameId", args.gameId).eq("sessionId", args.sessionId),
-      )
-      .unique();
+    const player = await findPlayerBySession(ctx, args.gameId, args.sessionId);
     if (!player) throw new ConvexError("Player not found.");
 
     // Check the character isn't taken by another player.

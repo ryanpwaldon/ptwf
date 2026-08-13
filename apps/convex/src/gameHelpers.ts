@@ -5,6 +5,7 @@ import type { MutationCtx } from "./_generated/server";
 import type { CharacterValue } from "./fields/character";
 import { CHARACTER_OPTIONS } from "./fields/character";
 import { generateGameCode } from "./fields/gameCode";
+import { findPlayerBySession } from "./playerHelpers";
 
 type GameSettings = Pick<
   Doc<"games">,
@@ -57,12 +58,7 @@ export async function addPlayerToLobby(
   if (!game) throw new ConvexError("Game not found.");
   if (game.status !== "lobby") throw new ConvexError("Game is not in lobby.");
 
-  const existing = await ctx.db
-    .query("players")
-    .withIndex("by_gameId_and_sessionId", (q) =>
-      q.eq("gameId", gameId).eq("sessionId", sessionId),
-    )
-    .unique();
+  const existing = await findPlayerBySession(ctx, gameId, sessionId);
   if (existing) return existing._id;
 
   const players = await ctx.db
