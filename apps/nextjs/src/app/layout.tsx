@@ -12,7 +12,9 @@ import "~/app/styles.css";
 import { TooltipProvider } from "@acme/ui/tooltip";
 
 import { ConvexProvider } from "~/components/convex-provider";
+import { ThemeColorSync } from "~/components/theme-color-sync";
 import { UncaughtErrorToastListener } from "~/components/uncaught-error-toast-listener";
+import { themeColors } from "~/lib/theme";
 
 const title = "All about pets!";
 const description =
@@ -53,8 +55,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f5f5" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: light)", color: themeColors.light },
+    { media: "(prefers-color-scheme: dark)", color: themeColors.dark },
   ],
 };
 
@@ -77,6 +79,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
               enableSystem
               disableTransitionOnChange
             >
+              <ThemeColorSync />
               <UncaughtErrorToastListener />
               <div className="relative z-30">{props.children}</div>
               <Toaster />
