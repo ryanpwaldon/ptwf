@@ -11,19 +11,19 @@ import {
 } from "@acme/convex";
 import { ToggleGroup, ToggleGroupItem } from "@acme/ui/toggle-group";
 
-interface GameSettingsInputProps {
+interface GameFormatControlsProps {
   questionCount: number;
   timeLimitSeconds: number;
   onQuestionCountChange: (questionCount: QuestionCount) => void;
   onTimeLimitSecondsChange: (timeLimitSeconds: TimeLimitSeconds) => void;
 }
 
-export function GameSettingsInput({
+export function GameFormatControls({
   questionCount,
   timeLimitSeconds,
   onQuestionCountChange,
   onTimeLimitSecondsChange,
-}: GameSettingsInputProps) {
+}: GameFormatControlsProps) {
   return (
     <>
       <div className="flex min-h-14 items-center gap-3">

@@ -6,7 +6,7 @@ import { Check, Link } from "lucide-react";
 import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
-export function InviteCodeField({ code }: { code: string }) {
+export function GameInviteField({ code }: { code: string }) {
   const [isCopied, setIsCopied] = useState(false);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

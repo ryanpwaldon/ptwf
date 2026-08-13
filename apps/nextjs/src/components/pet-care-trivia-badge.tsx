@@ -2,12 +2,15 @@ import type { SVGProps } from "react";
 
 import { cn } from "@acme/ui";
 
-export type ArchedBadgeProps = Omit<
+export type PetCareTriviaBadgeProps = Omit<
   SVGProps<SVGSVGElement>,
   "children" | "height" | "width"
 >;
 
-export function ArchedBadge({ className, ...props }: ArchedBadgeProps) {
+export function PetCareTriviaBadge({
+  className,
+  ...props
+}: PetCareTriviaBadgeProps) {
   return (
     <svg
       {...props}

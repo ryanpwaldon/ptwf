@@ -19,8 +19,8 @@ import {
   getHomepageEntrance,
   homepageEntranceDelays,
 } from "~/components/homepage-entrance";
+import { HomepageStickerLockup } from "~/components/homepage-sticker-lockup";
 import { PawTrailBackground } from "~/components/paw-trail-background";
-import { StickerLockup } from "~/components/sticker-lockup";
 import { ThemeToggle } from "~/components/theme-toggle";
 
 export default function HomePage() {
@@ -46,7 +46,7 @@ export default function HomePage() {
         <main className="flex flex-1 items-center px-4 py-16">
           <div className="flex w-full flex-col items-center text-center">
             <h1 className="sr-only">Pet Care Trivia</h1>
-            <StickerLockup
+            <HomepageStickerLockup
               className="mt-[4.5rem] h-40"
               entranceDelay={homepageEntranceDelays.first}
             />

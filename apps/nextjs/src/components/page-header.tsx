@@ -9,11 +9,11 @@ import { Separator } from "@acme/ui/separator";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { PageContainer } from "./app-shell";
 
-interface HeaderProps {
+interface PageHeaderProps {
   title: string;
 }
 
-export function Header({ title }: HeaderProps) {
+export function PageHeader({ title }: PageHeaderProps) {
   return (
     <header className="bg-background/75 sticky top-0 z-10 backdrop-blur-xl backdrop-saturate-150">
       <PageContainer>

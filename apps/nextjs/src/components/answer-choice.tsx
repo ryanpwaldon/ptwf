@@ -9,9 +9,9 @@ import {
 } from "@acme/ui/field";
 import { RadioGroupItem } from "@acme/ui/radio-group";
 
-import { PlayerGroup } from "./player-group";
+import { PlayerAvatarGroup } from "./player-avatar-group";
 
-export function Choice({
+export function AnswerChoice({
   id,
   value,
   showResults,
@@ -46,7 +46,7 @@ export function Choice({
               {value}
             </FieldTitle>
             {showResults ? (
-              <PlayerGroup
+              <PlayerAvatarGroup
                 characters={voters}
                 avatarSize="2xs"
                 maxVisible={10}

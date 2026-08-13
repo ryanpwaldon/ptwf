@@ -9,11 +9,11 @@ import { api, getCharacterByValue } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
 
-import { Header } from "~/components/header";
 import { Leaderboard } from "~/components/leaderboard";
+import { PageHeader } from "~/components/page-header";
 import { QuestionResult } from "~/components/question-result";
 import { AppShell, PageContainer } from "./app-shell";
-import { Footer } from "./footer";
+import { PageFooter } from "./page-footer";
 
 type Me = NonNullable<FunctionReturnType<typeof api.players.me>>;
 type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
@@ -105,7 +105,7 @@ export function GameResults({
 
   return (
     <AppShell>
-      <Header title="Game results" />
+      <PageHeader title="Game results" />
       <PageContainer className="flex flex-1 flex-col">
         <main className="flex-1 px-4 pb-16">
           <div className="mt-8 space-y-1">
@@ -137,7 +137,7 @@ export function GameResults({
           ))}
         </main>
       </PageContainer>
-      <Footer contentClassName="justify-end">
+      <PageFooter contentClassName="justify-end">
         <Button size="xl" variant="secondary" asChild>
           <Link href="/">Return home</Link>
         </Button>
@@ -162,7 +162,7 @@ export function GameResults({
             )}
           </span>
         </Button>
-      </Footer>
+      </PageFooter>
     </AppShell>
   );
 }

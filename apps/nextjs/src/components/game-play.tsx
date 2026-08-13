@@ -12,13 +12,13 @@ import { cn } from "@acme/ui";
 import { AvatarBadge } from "@acme/ui/avatar";
 import { RadioGroup } from "@acme/ui/radio-group";
 
-import { Choice } from "~/components/choice";
+import { AnswerChoice } from "~/components/answer-choice";
 import {
   gameHeaderVariants,
   questionContentVariants,
   questionExit,
 } from "~/components/game-transition";
-import { PlayerGroup } from "~/components/player-group";
+import { PlayerAvatarGroup } from "~/components/player-avatar-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
 import { TimeRemainingBar } from "~/components/time-remaining-bar";
 import { AppShell, PageContainer } from "./app-shell";
@@ -212,7 +212,7 @@ function GamePlayInner({
                 variants={itemVariants}
                 className="mt-8 flex justify-center"
               >
-                <PlayerGroup
+                <PlayerAvatarGroup
                   maxVisible={10}
                   avatarSize="md"
                   characters={playerCharacters}
@@ -266,7 +266,7 @@ function GamePlayInner({
                 >
                   {answerSummary.map((choice) => (
                     <motion.div key={choice.label} variants={itemVariants}>
-                      <Choice
+                      <AnswerChoice
                         id={`choice-${choice.label.toLowerCase()}`}
                         value={choice.label}
                         description={choice.text}

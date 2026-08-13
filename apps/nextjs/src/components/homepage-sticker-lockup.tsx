@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@acme/ui";
 
-import { ArchedBadge } from "./arched-badge";
 import {
   HolographicPointerProvider,
   HolographicSticker,
@@ -14,6 +13,7 @@ import {
   getHomepageEntrance,
   homepageStickerStagger,
 } from "./homepage-entrance";
+import { PetCareTriviaBadge } from "./pet-care-trivia-badge";
 import { stickerAssets } from "./sticker-assets";
 
 const heroSticker = stickerAssets["toilet-paper-cat"];
@@ -27,7 +27,7 @@ const accessoryStickers = [
 
 const stickerClassName = "size-full drop-shadow-[0_6px_14px_rgb(0_0_0/0.18)]";
 
-export function StickerLockup({
+export function HomepageStickerLockup({
   className,
   entranceDelay = 0,
   ...props
@@ -62,7 +62,7 @@ export function StickerLockup({
                 { y: 48 },
               )}
             >
-              <ArchedBadge className="h-full drop-shadow-[0_4px_10px_rgb(0_0_0/0.12)]" />
+              <PetCareTriviaBadge className="h-full drop-shadow-[0_4px_10px_rgb(0_0_0/0.12)]" />
             </motion.div>
           </div>
           <motion.div

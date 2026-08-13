@@ -20,17 +20,17 @@ import {
   CommandPickerTrigger,
 } from "@acme/ui/command-picker";
 
-interface AvatarInputProps {
+interface CharacterPickerProps {
   value: CharacterValue;
   takenValues: CharacterValue[];
   onChange: (value: CharacterValue) => void;
 }
 
-export function AvatarInput({
+export function CharacterPicker({
   value,
   takenValues,
   onChange,
-}: AvatarInputProps) {
+}: CharacterPickerProps) {
   const [open, setOpen] = useState(false);
   const character = getCharacterByValue(value);
 

@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
-import { PlayerGroup } from "./player-group";
+import { PlayerAvatarGroup } from "./player-avatar-group";
 
 export interface QuestionResultChoice {
   text: string;
@@ -65,7 +65,7 @@ export function QuestionResult({
               </span>
               <div className="relative flex items-center gap-2">
                 {choice.voters.length > 0 && (
-                  <PlayerGroup
+                  <PlayerAvatarGroup
                     characters={choice.voters}
                     avatarSize="2xs"
                     maxVisible={10}

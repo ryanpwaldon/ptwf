@@ -17,12 +17,12 @@ import {
   CommandPickerTrigger,
 } from "@acme/ui/command-picker";
 
-interface ThemeInputProps {
+interface CareTopicPickerProps {
   value: QuizTheme;
   onChange: (value: QuizTheme) => void;
 }
 
-export function ThemeInput({ value, onChange }: ThemeInputProps) {
+export function CareTopicPicker({ value, onChange }: CareTopicPickerProps) {
   const [open, setOpen] = useState(false);
   const selected = getQuizThemeByValue(value);
 
