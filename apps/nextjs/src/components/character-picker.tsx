@@ -5,7 +5,6 @@ import { ChevronDownIcon } from "lucide-react";
 
 import type { CharacterValue } from "@acme/convex";
 import { CHARACTER_OPTIONS, getCharacterByValue } from "@acme/convex";
-import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import {
@@ -19,6 +18,8 @@ import {
   CommandPickerList,
   CommandPickerTrigger,
 } from "@acme/ui/command-picker";
+
+import { CharacterAvatar } from "~/components/character-avatar";
 
 interface CharacterPickerProps {
   value: CharacterValue;
@@ -41,14 +42,7 @@ export function CharacterPicker({
           variant="outline"
           className="h-12 w-full cursor-pointer justify-start gap-3 rounded-full pr-3 pl-[5px] transition-colors"
         >
-          <Avatar className="size-9">
-            <AvatarImage
-              src={character.image}
-              alt={`${character.label} avatar`}
-              className="object-cover"
-            />
-            <AvatarFallback>{character.label.slice(0, 2)}</AvatarFallback>
-          </Avatar>
+          <CharacterAvatar character={character} className="size-9" />
           <span className="min-w-0 flex-1 truncate text-left text-sm font-medium">
             {character.label}
           </span>
@@ -71,14 +65,7 @@ export function CharacterPicker({
                   setOpen(false);
                 }}
               >
-                <Avatar>
-                  <AvatarImage
-                    src={option.image}
-                    alt=""
-                    className="object-cover"
-                  />
-                  <AvatarFallback>{option.label.slice(0, 2)}</AvatarFallback>
-                </Avatar>
+                <CharacterAvatar character={option} alt="" />
                 <span className="text-sm font-medium">{option.label}</span>
                 {takenValues.includes(option.value) ? (
                   <CommandItemEnd>

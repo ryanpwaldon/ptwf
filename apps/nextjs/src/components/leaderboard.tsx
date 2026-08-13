@@ -1,6 +1,5 @@
 import type { Character } from "@acme/convex";
 import { cn } from "@acme/ui";
-import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Badge } from "@acme/ui/badge";
 import {
   Table,
@@ -10,6 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@acme/ui/table";
+
+import { CharacterAvatar } from "~/components/character-avatar";
 
 interface LeaderboardEntry {
   character: Character;
@@ -46,16 +47,11 @@ export function Leaderboard({
             <TableCell className="py-2.5">
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground w-3.5">{i + 1}.</span>
-                <Avatar size="sm" tooltip={entry.character.label}>
-                  <AvatarImage
-                    src={entry.character.image}
-                    alt={`${entry.character.label} avatar`}
-                    className="object-cover"
-                  />
-                  <AvatarFallback>
-                    {entry.character.label.slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
+                <CharacterAvatar
+                  character={entry.character}
+                  size="sm"
+                  tooltip
+                />
                 <span>{entry.character.label}</span>
                 {myCharacterValue === entry.character.value && (
                   <Badge>You</Badge>
