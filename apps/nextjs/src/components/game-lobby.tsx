@@ -20,9 +20,10 @@ import {
 import { Header } from "~/components/header";
 import { InviteCodeField } from "~/components/invite-code-field";
 import { AnimalInput } from "./animal-input";
+import { AppShell, PageContainer } from "./app-shell";
 import { AvatarInput } from "./avatar-input";
+import { Footer } from "./footer";
 import { GameSettingsInput } from "./game-settings-input";
-import { PageShell } from "./page-shell";
 import { PlayerGroup } from "./player-group";
 import { ThemeInput } from "./theme-input";
 
@@ -76,9 +77,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   const readyByCharacter = new Map(players.map((p) => [p.character, p.isReady])); // prettier-ignore
   const readyPlayerCount = players.filter((player) => player.isReady).length;
   const readyButtonLabel =
-    players.length === 1
-      ? "Play"
-      : `Ready ${readyPlayerCount}/${players.length}`;
+    players.length === 1 ? "Play" : me.isReady ? "Cancel" : "Ready";
 
   async function handleReadyToggle() {
     setIsUpdatingReady(true);
@@ -90,112 +89,122 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
   }
 
   return (
-    <PageShell>
+    <AppShell>
       <Header title="Game lobby" />
-      <main className="flex-1 px-4 pb-16">
-        <div className="mt-8 space-y-1">
-          <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
-            Get ready to play
-          </h1>
-          <p className="text-muted-foreground">
-            Choose a pet and a care topic, then invite your friends.
-          </p>
-        </div>
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-5">
-          <Card className="sm:col-span-2">
+      <PageContainer className="flex flex-1 flex-col">
+        <main className="flex-1 px-4 pb-16">
+          <div className="mt-8 space-y-1">
+            <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
+              Get ready to play
+            </h1>
+            <p className="text-muted-foreground">
+              Choose your character, set up the quiz, and invite your friends.
+            </p>
+          </div>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-5">
+            <Card className="sm:col-span-2">
+              <CardHeader>
+                <CardTitle>Your player</CardTitle>
+                <CardDescription>Choose your character.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex h-full items-center">
+                <AvatarInput
+                  value={me.character}
+                  takenValues={takenCharacterValues}
+                  onChange={(character) => {
+                    void updateCharacter({ gameId: game._id, character });
+                  }}
+                />
+              </CardContent>
+            </Card>
+            <Card className="w-full sm:col-span-3">
+              <CardHeader>
+                <CardTitle>Invite your friends</CardTitle>
+                <CardDescription>
+                  Share the code or copy the invite link.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <InviteCodeField code={game.code} />
+              </CardContent>
+            </Card>
+          </div>
+          <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Your player</CardTitle>
-              <CardDescription>Choose your character.</CardDescription>
+              <CardTitle>Choose a pet</CardTitle>
+              <CardDescription>
+                Which pet should the questions be about?
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex h-full items-center">
-              <AvatarInput
-                value={me.character}
-                takenValues={takenCharacterValues}
-                onChange={(character) => {
-                  void updateCharacter({ gameId: game._id, character });
+              <AnimalInput
+                value={game.quizAnimal}
+                onChange={(quizAnimal) => {
+                  void updateQuizAnimal({
+                    gameId: game._id,
+                    quizAnimal,
+                  });
                 }}
               />
             </CardContent>
           </Card>
-          <Card className="w-full sm:col-span-3">
+          <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Invite your friends</CardTitle>
+              <CardTitle>Choose a care topic</CardTitle>
               <CardDescription>
-                Share the code or copy the invite link.
+                What should the questions cover?
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center">
-              <InviteCodeField code={game.code} />
+            <CardContent className="flex h-full items-center">
+              <ThemeInput
+                value={game.quizTheme}
+                onChange={(quizTheme) => {
+                  void updateQuizTheme({ gameId: game._id, quizTheme });
+                }}
+              />
             </CardContent>
           </Card>
-        </div>
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle>Choose a pet</CardTitle>
-            <CardDescription>
-              Which pet should the questions be about?
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-full items-center">
-            <AnimalInput
-              value={game.quizAnimal}
-              onChange={(quizAnimal) => {
-                void updateQuizAnimal({
-                  gameId: game._id,
-                  quizAnimal,
-                });
-              }}
-            />
-          </CardContent>
-        </Card>
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle>Choose a care topic</CardTitle>
-            <CardDescription>What should the questions cover?</CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-full items-center">
-            <ThemeInput
-              value={game.quizTheme}
-              onChange={(quizTheme) => {
-                void updateQuizTheme({ gameId: game._id, quizTheme });
-              }}
-            />
-          </CardContent>
-        </Card>
-        <Card className="mt-4 gap-0 pb-0">
-          <CardHeader>
-            <CardTitle>Game format</CardTitle>
-            <CardDescription>Fine-tune the length and pace.</CardDescription>
-          </CardHeader>
-          <CardContent className="divide-y">
-            <GameSettingsInput
-              questionCount={game.questionCount}
-              timeLimitSeconds={game.timeLimitSeconds}
-              onQuestionCountChange={(questionCount) => {
-                void updateQuestionCount({
-                  gameId: game._id,
-                  questionCount,
-                });
-              }}
-              onTimeLimitSecondsChange={(timeLimitSeconds) => {
-                void updateTimeLimitSeconds({
-                  gameId: game._id,
-                  timeLimitSeconds,
-                });
-              }}
-            />
-          </CardContent>
-        </Card>
-      </main>
-      <div className="bg-background/95 sticky bottom-0 z-10 mt-4 flex items-center justify-between gap-4 border-t p-4 backdrop-blur">
+          <Card className="mt-4 gap-0 pb-0">
+            <CardHeader>
+              <CardTitle>Game format</CardTitle>
+              <CardDescription>Fine-tune the length and pace.</CardDescription>
+            </CardHeader>
+            <CardContent className="divide-y">
+              <GameSettingsInput
+                questionCount={game.questionCount}
+                timeLimitSeconds={game.timeLimitSeconds}
+                onQuestionCountChange={(questionCount) => {
+                  void updateQuestionCount({
+                    gameId: game._id,
+                    questionCount,
+                  });
+                }}
+                onTimeLimitSecondsChange={(timeLimitSeconds) => {
+                  void updateTimeLimitSeconds({
+                    gameId: game._id,
+                    timeLimitSeconds,
+                  });
+                }}
+              />
+            </CardContent>
+          </Card>
+        </main>
+      </PageContainer>
+      <Footer contentClassName="justify-between">
         <div className="flex flex-col items-start gap-2">
           <div className="flex items-center gap-2">
             <p className="font-medium">Players</p>
             <Badge
               variant="secondary"
-              className="size-6 rounded-full p-0 leading-none tabular-nums"
+              className={
+                players.length === 1
+                  ? "size-6 rounded-full p-0 leading-none tabular-nums"
+                  : "h-6 px-2 leading-none tabular-nums"
+              }
             >
-              {players.length}
+              {players.length === 1
+                ? players.length
+                : `${readyPlayerCount}/${players.length} ready`}
             </Badge>
           </div>
           <PlayerGroup
@@ -213,17 +222,18 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
         </div>
         <Button
           size="xl"
+          aria-pressed={players.length > 1 ? me.isReady : undefined}
           disabled={isUpdatingReady}
           className="transition-none disabled:opacity-100"
           onClick={() => void handleReadyToggle()}
-          variant={me.isReady ? "outline" : "default"}
+          variant={players.length > 1 && me.isReady ? "outline" : "default"}
         >
           <span className="grid place-items-center">
             <span
               className={
                 isUpdatingReady
-                  ? "invisible col-start-1 row-start-1 tabular-nums"
-                  : "col-start-1 row-start-1 tabular-nums"
+                  ? "invisible col-start-1 row-start-1"
+                  : "col-start-1 row-start-1"
               }
             >
               {readyButtonLabel}
@@ -233,7 +243,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             )}
           </span>
         </Button>
-      </div>
-    </PageShell>
+      </Footer>
+    </AppShell>
   );
 }

@@ -13,8 +13,8 @@ import { Button } from "@acme/ui/button";
 import { Field, FieldError, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 
+import { AppShell, PageContainer } from "~/components/app-shell";
 import { Header } from "~/components/header";
-import { PageShell } from "~/components/page-shell";
 
 export default function JoinPage() {
   const router = useRouter();
@@ -39,73 +39,77 @@ export default function JoinPage() {
   });
 
   return (
-    <PageShell>
+    <AppShell>
       <Header title="Join game" />
-      <main className="flex-1 px-4">
-        <div className="mt-8 space-y-1">
-          <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
-            Join a game
-          </h1>
-          <p className="text-muted-foreground">
-            Enter the code your friend shared.
-          </p>
-        </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void form.handleSubmit();
-          }}
-          className="mt-6 flex w-full flex-col gap-2"
-        >
-          <form.Field name="code">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              const hasError = isInvalid || !!serverError;
-              return (
-                <Field data-invalid={hasError || undefined}>
-                  <FieldLabel className="sr-only">Game code</FieldLabel>
-                  <div className="flex w-full items-center gap-2">
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      placeholder="Enter your code"
-                      aria-invalid={hasError || undefined}
-                      className="bg-card h-12 font-mono text-base! uppercase placeholder:normal-case"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => {
-                        field.handleChange(e.target.value);
-                        setServerError(null);
-                      }}
-                    />
-                    <form.Subscribe selector={(s) => s.isSubmitting}>
-                      {(isSubmitting) => (
-                        <Button
-                          size="xl"
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="disabled:opacity-100"
-                        >
-                          {isSubmitting ? (
-                            <LoaderCircleIcon className="animate-spin" />
-                          ) : (
-                            "Join"
-                          )}
-                        </Button>
-                      )}
-                    </form.Subscribe>
-                  </div>
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                  {!isInvalid && serverError && (
-                    <FieldError>{serverError}</FieldError>
-                  )}
-                </Field>
-              );
+      <PageContainer className="flex flex-1 flex-col">
+        <main className="flex-1 px-4">
+          <div className="mt-8 space-y-1">
+            <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight">
+              Join a game
+            </h1>
+            <p className="text-muted-foreground">
+              Enter the code your friend shared.
+            </p>
+          </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void form.handleSubmit();
             }}
-          </form.Field>
-        </form>
-      </main>
-    </PageShell>
+            className="mt-6 flex w-full flex-col gap-2"
+          >
+            <form.Field name="code">
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                const hasError = isInvalid || !!serverError;
+                return (
+                  <Field data-invalid={hasError || undefined}>
+                    <FieldLabel className="sr-only">Game code</FieldLabel>
+                    <div className="flex w-full items-center gap-2">
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        placeholder="Enter your code"
+                        aria-invalid={hasError || undefined}
+                        className="bg-card h-12 font-mono text-base! uppercase placeholder:normal-case"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                          setServerError(null);
+                        }}
+                      />
+                      <form.Subscribe selector={(s) => s.isSubmitting}>
+                        {(isSubmitting) => (
+                          <Button
+                            size="xl"
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="disabled:opacity-100"
+                          >
+                            {isSubmitting ? (
+                              <LoaderCircleIcon className="animate-spin" />
+                            ) : (
+                              "Join"
+                            )}
+                          </Button>
+                        )}
+                      </form.Subscribe>
+                    </div>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                    {!isInvalid && serverError && (
+                      <FieldError>{serverError}</FieldError>
+                    )}
+                  </Field>
+                );
+              }}
+            </form.Field>
+          </form>
+        </main>
+      </PageContainer>
+    </AppShell>
   );
 }

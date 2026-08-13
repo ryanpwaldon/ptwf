@@ -21,7 +21,7 @@ import {
 import { PlayerGroup } from "~/components/player-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
 import { TimeRemainingBar } from "~/components/time-remaining-bar";
-import { PageShell } from "./page-shell";
+import { AppShell, PageContainer } from "./app-shell";
 
 type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
 type Me = NonNullable<FunctionReturnType<typeof api.players.me>>;
@@ -160,128 +160,130 @@ function GamePlayInner({
   };
 
   return (
-    <PageShell>
-      <motion.header
-        variants={gameHeaderVariants}
-        className="flex h-16 items-center justify-between"
-      >
-        <div className="flex h-full w-20 items-center justify-center">
-          <div className="bg-secondary text-muted-foreground flex size-7 items-center justify-center rounded-md text-center text-sm font-medium">
-            Q{game.currentQuestionIndex + 1}
+    <AppShell>
+      <PageContainer className="flex flex-1 flex-col">
+        <motion.header
+          variants={gameHeaderVariants}
+          className="flex h-16 items-center justify-between"
+        >
+          <div className="flex h-full w-20 items-center justify-center">
+            <div className="bg-secondary text-muted-foreground flex size-7 items-center justify-center rounded-md text-center text-sm font-medium">
+              Q{game.currentQuestionIndex + 1}
+            </div>
           </div>
-        </div>
-        <div className="flex w-full flex-col items-center justify-center gap-2">
-          <QuestionStatusTrack
-            className="w-full"
-            steps={questionResults}
-            activeIndex={game.currentQuestionIndex}
-          />
-          <motion.div
-            className="w-full"
-            key={game.currentQuestionIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            <TimeRemainingBar
-              phase={phase}
-              durationSeconds={game.timeLimitSeconds}
+          <div className="flex w-full flex-col items-center justify-center gap-2">
+            <QuestionStatusTrack
+              className="w-full"
+              steps={questionResults}
+              activeIndex={game.currentQuestionIndex}
             />
-          </motion.div>
-        </div>
-        <div className="flex h-full w-20 items-center justify-center">
-          <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md text-center text-sm font-medium">
-            <NumberFlow value={secondsLeft} />
-          </div>
-        </div>
-      </motion.header>
-      <motion.main
-        variants={questionContentVariants}
-        className="flex-1 px-4 pb-16"
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={game.currentQuestionIndex}
-            variants={questionVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
             <motion.div
-              variants={itemVariants}
-              className="mt-8 flex justify-center"
+              className="w-full"
+              key={game.currentQuestionIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
             >
-              <PlayerGroup
-                maxVisible={10}
-                avatarSize="md"
-                characters={playerCharacters}
-                renderBadge={(character) => {
-                  if (!answerCorrectness.has(character.value)) return null;
-                  if (phase === "answering") {
+              <TimeRemainingBar
+                phase={phase}
+                durationSeconds={game.timeLimitSeconds}
+              />
+            </motion.div>
+          </div>
+          <div className="flex h-full w-20 items-center justify-center">
+            <div className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-md text-center text-sm font-medium">
+              <NumberFlow value={secondsLeft} />
+            </div>
+          </div>
+        </motion.header>
+        <motion.main
+          variants={questionContentVariants}
+          className="flex-1 px-4 pb-16"
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={game.currentQuestionIndex}
+              variants={questionVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <motion.div
+                variants={itemVariants}
+                className="mt-8 flex justify-center"
+              >
+                <PlayerGroup
+                  maxVisible={10}
+                  avatarSize="md"
+                  characters={playerCharacters}
+                  renderBadge={(character) => {
+                    if (!answerCorrectness.has(character.value)) return null;
+                    if (phase === "answering") {
+                      return (
+                        <AvatarBadge
+                          position="top-left"
+                          className="bg-background border-primary/20 size-3! border"
+                        >
+                          <CircleSmallIcon className="fill-primary" />
+                        </AvatarBadge>
+                      );
+                    }
+                    const isCorrect = answerCorrectness.get(character.value);
                     return (
                       <AvatarBadge
                         position="top-left"
-                        className="bg-background border-primary/20 size-3! border"
+                        className={cn(
+                          "size-3!",
+                          isCorrect ? "bg-correct" : "bg-incorrect",
+                        )}
                       >
-                        <CircleSmallIcon className="fill-primary" />
+                        {isCorrect ? (
+                          <CheckIcon className="stroke-black stroke-5" />
+                        ) : (
+                          <XIcon className="stroke-black stroke-5" />
+                        )}
                       </AvatarBadge>
                     );
-                  }
-                  const isCorrect = answerCorrectness.get(character.value);
-                  return (
-                    <AvatarBadge
-                      position="top-left"
-                      className={cn(
-                        "size-3!",
-                        isCorrect ? "bg-correct" : "bg-incorrect",
-                      )}
-                    >
-                      {isCorrect ? (
-                        <CheckIcon className="stroke-black stroke-5" />
-                      ) : (
-                        <XIcon className="stroke-black stroke-5" />
-                      )}
-                    </AvatarBadge>
-                  );
-                }}
-              />
-            </motion.div>
-            <motion.h2
-              variants={itemVariants}
-              className="text-muted-foreground mt-3 text-center text-sm font-medium"
-            >
-              Question {game.currentQuestionIndex + 1} of {questionCount}
-            </motion.h2>
-            <motion.h1
-              variants={itemVariants}
-              className="mt-1 text-center text-2xl leading-8 font-bold tracking-tight"
-            >
-              {currentQuestion.text}
-            </motion.h1>
-            <div className="mt-8">
-              <RadioGroup
-                value={selectedLabel ?? ""}
-                onValueChange={isAnswering ? handleSelect : undefined}
+                  }}
+                />
+              </motion.div>
+              <motion.h2
+                variants={itemVariants}
+                className="text-muted-foreground mt-3 text-center text-sm font-medium"
               >
-                {answerSummary.map((choice) => (
-                  <motion.div key={choice.label} variants={itemVariants}>
-                    <Choice
-                      id={`choice-${choice.label.toLowerCase()}`}
-                      value={choice.label}
-                      description={choice.text}
-                      disabled={!isAnswering}
-                      showResults={showResults}
-                      isCorrectAnswer={choice.isCorrect}
-                      voters={choice.voters}
-                    />
-                  </motion.div>
-                ))}
-              </RadioGroup>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </motion.main>
-    </PageShell>
+                Question {game.currentQuestionIndex + 1} of {questionCount}
+              </motion.h2>
+              <motion.h1
+                variants={itemVariants}
+                className="mt-1 text-center text-2xl leading-8 font-bold tracking-tight"
+              >
+                {currentQuestion.text}
+              </motion.h1>
+              <div className="mt-8">
+                <RadioGroup
+                  value={selectedLabel ?? ""}
+                  onValueChange={isAnswering ? handleSelect : undefined}
+                >
+                  {answerSummary.map((choice) => (
+                    <motion.div key={choice.label} variants={itemVariants}>
+                      <Choice
+                        id={`choice-${choice.label.toLowerCase()}`}
+                        value={choice.label}
+                        description={choice.text}
+                        disabled={!isAnswering}
+                        showResults={showResults}
+                        isCorrectAnswer={choice.isCorrect}
+                        voters={choice.voters}
+                      />
+                    </motion.div>
+                  ))}
+                </RadioGroup>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </motion.main>
+      </PageContainer>
+    </AppShell>
   );
 }
 

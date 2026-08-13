@@ -65,13 +65,13 @@ function CommandPickerContent({
           event.preventDefault();
         }
       }}
-      className="bg-muted inset-0 h-(--visual-viewport-height,100dvh) max-h-none w-full max-w-full! translate-0 rounded-none p-0 ring-0 sm:p-0"
+      className="bg-muted sm:bg-card inset-0 h-(--visual-viewport-height,100dvh) max-h-none w-full max-w-full! translate-0 rounded-none p-0 ring-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-[calc(100%-2rem)] sm:max-w-[34rem]! sm:-translate-x-1/2 sm:-translate-y-1/2 sm:overflow-hidden sm:rounded-xl sm:ring-1"
     >
       <DialogTitle className="sr-only">{title}</DialogTitle>
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-xl min-w-0 flex-col sm:p-4">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-xl min-w-0 flex-col sm:h-auto">
         <Command
           className={cn(
-            "bg-card! dark:bg-background! rounded-none! p-0!",
+            "bg-card! dark:bg-background! rounded-none! p-0! sm:h-auto! sm:rounded-xl!",
             className,
           )}
           {...commandProps}
@@ -115,7 +115,10 @@ function CommandPickerList({
 }: React.ComponentProps<typeof CommandList>) {
   return (
     <CommandList
-      className={cn("h-0! max-h-none! min-h-0! flex-1 px-4 pb-12", className)}
+      className={cn(
+        "h-0! max-h-none! min-h-0! flex-1 px-4 pb-12 sm:h-auto! sm:max-h-[calc(100dvh-8rem)]! sm:flex-none sm:pb-4",
+        className,
+      )}
       {...props}
     />
   );

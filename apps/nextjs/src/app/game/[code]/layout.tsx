@@ -12,18 +12,34 @@ export async function generateMetadata(
   const { code } = await params;
   const normalizedCode = code.trim().toUpperCase();
   const parentMetadata = await parent;
-  const title = "You're invited to play!";
-  const description = `Join game ${normalizedCode} for a round of pet-care trivia.`;
+  const title = `Game ${normalizedCode}`;
+  const description = `Play a round of pet-care trivia in game ${normalizedCode}.`;
+  const inviteTitle = "You're invited to play!";
+  const inviteDescription = `Join game ${normalizedCode} for a round of pet-care trivia.`;
+  const url = `/game/${encodeURIComponent(normalizedCode)}`;
 
   return {
     title,
     description,
+    alternates: {
+      canonical: url,
+    },
+    robots: {
+      index: false,
+      follow: false,
+    },
     openGraph: {
       type: "website",
-      url: `/game/${encodeURIComponent(normalizedCode)}`,
-      title,
-      description,
+      url,
+      title: inviteTitle,
+      description: inviteDescription,
       images: parentMetadata.openGraph?.images,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: inviteTitle,
+      description: inviteDescription,
+      images: parentMetadata.twitter?.images,
     },
   };
 }

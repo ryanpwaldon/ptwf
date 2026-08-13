@@ -20,8 +20,14 @@ const description =
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ptwf.vercel.app"),
-  title,
+  title: {
+    default: title,
+    template: "%s | All about pets!",
+  },
   description,
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     url: "/",
@@ -36,6 +42,12 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/meta/opengraph-image.png"],
   },
 };
 
