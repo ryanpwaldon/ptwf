@@ -59,10 +59,24 @@ export const playAgain = mutation({
     if (replayGameId) {
       const replayGame = await ctx.db.get(replayGameId);
       if (!replayGame) throw new Error("Replay game not found.");
-      await addPlayerToLobby(ctx, replayGameId, args.sessionId);
+      await addPlayerToLobby(
+        ctx,
+        replayGameId,
+        args.sessionId,
+        player.character,
+      );
       replayCode = replayGame.code;
     } else {
-      const replayGame = await createGameWithPlayer(ctx, args.sessionId);
+      const replayGame = await createGameWithPlayer(ctx, args.sessionId, {
+        settings: {
+          quizAnimal: game.quizAnimal,
+          quizTone: game.quizTone,
+          quizTheme: game.quizTheme,
+          questionCount: game.questionCount,
+          timeLimitSeconds: game.timeLimitSeconds,
+        },
+        preferredCharacter: player.character,
+      });
       replayGameId = replayGame.gameId;
       replayCode = replayGame.code;
       await ctx.db.patch(game._id, { replayGameId });

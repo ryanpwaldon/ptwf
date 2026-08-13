@@ -16,8 +16,8 @@ async function setupFinishedGame(t: ReturnType<typeof convexTest>) {
       code: "FINISH",
       status: "finished",
       quizAnimal: "cats",
-      quizTone: "standard",
-      quizTheme: "diet-and-nutrition",
+      quizTone: "wholesome",
+      quizTheme: "health-and-wellbeing",
       questionCount: 5,
       timeLimitSeconds: 30,
       currentQuestionIndex: 4,
@@ -152,7 +152,7 @@ describe("games", () => {
 });
 
 describe("games.playAgain", () => {
-  it("creates a new default game and joins the first player", async () => {
+  it("copies the settings and character into the replay game", async () => {
     const t = convexTest(schema, modules);
     const { gameId, player1Id } = await setupFinishedGame(t);
 
@@ -164,11 +164,11 @@ describe("games.playAgain", () => {
     const replayGame = await t.query(api.games.byCode, { code });
     expect(replayGame).toMatchObject({
       status: "lobby",
-      quizAnimal: "dogs",
-      quizTone: "standard",
-      quizTheme: "diet-and-nutrition",
-      questionCount: 10,
-      timeLimitSeconds: 60,
+      quizAnimal: "cats",
+      quizTone: "wholesome",
+      quizTheme: "health-and-wellbeing",
+      questionCount: 5,
+      timeLimitSeconds: 30,
     });
 
     const state = await t.run(async (ctx) => ({
@@ -186,6 +186,7 @@ describe("games.playAgain", () => {
     expect(state.replayPlayers).toHaveLength(1);
     expect(state.replayPlayers[0]).toMatchObject({
       sessionId: SESSION_1,
+      character: "apricot",
       isReady: false,
     });
   });
@@ -222,7 +223,57 @@ describe("games.playAgain", () => {
     expect(state.games).toHaveLength(2);
     expect(state.originalPlayers.filter((player) => player.replayRequested)).toHaveLength(2); // prettier-ignore
     expect(state.replayPlayers).toHaveLength(2);
-    expect(new Set(state.replayPlayers.map((player) => player.character)).size).toBe(2); // prettier-ignore
+    expect(state.replayPlayers).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          sessionId: SESSION_1,
+          character: "apricot",
+        }),
+        expect.objectContaining({
+          sessionId: SESSION_2,
+          character: "aqua",
+        }),
+      ]),
+    );
+  });
+
+  it("uses an available character when the preferred one is taken", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupFinishedGame(t);
+
+    const code = await t.mutation(api.games.playAgain, {
+      sessionId: SESSION_1,
+      gameId,
+    });
+    const replayGame = await t.query(api.games.byCode, { code });
+    if (!replayGame) throw new Error("Replay game not found.");
+
+    await t.mutation(api.players.updateCharacter, {
+      sessionId: SESSION_1,
+      gameId: replayGame._id,
+      character: "aqua",
+    });
+    await t.mutation(api.games.playAgain, {
+      sessionId: SESSION_2,
+      gameId,
+    });
+
+    const replayPlayers = await t.run((ctx) =>
+      ctx.db
+        .query("players")
+        .withIndex("by_gameId", (q) => q.eq("gameId", replayGame._id))
+        .collect(),
+    );
+    const firstPlayer = replayPlayers.find(
+      (player) => player.sessionId === SESSION_1,
+    );
+    const secondPlayer = replayPlayers.find(
+      (player) => player.sessionId === SESSION_2,
+    );
+
+    expect(firstPlayer?.character).toBe("aqua");
+    expect(secondPlayer?.character).not.toBe("aqua");
+    expect(secondPlayer?.character).toBeDefined();
   });
 
   it("does not duplicate a player's replay request", async () => {
