@@ -3,12 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import {
-  GithubIcon,
-  KeyRoundIcon,
-  LoaderCircleIcon,
-  PawPrintIcon,
-} from "lucide-react";
+import { GithubIcon, KeyRoundIcon, PawPrintIcon } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 
 import { api } from "@acme/convex";
@@ -20,6 +15,7 @@ import {
   homepageEntranceDelays,
 } from "~/components/homepage-entrance";
 import { HomepageStickerLockup } from "~/components/homepage-sticker-lockup";
+import { LoadingButton } from "~/components/loading-button";
 import { PawTrailBackground } from "~/components/paw-trail-background";
 import { ThemeToggle } from "~/components/theme-toggle";
 
@@ -77,21 +73,15 @@ export default function HomePage() {
               )}
             >
               <div className="w-full sm:flex-1">
-                <Button
+                <LoadingButton
                   size="xl"
                   onClick={handleCreate}
-                  disabled={isCreating}
+                  isLoading={isCreating}
                   className="w-full rounded-full disabled:opacity-100"
                 >
-                  {isCreating ? (
-                    <LoaderCircleIcon className="animate-spin" />
-                  ) : (
-                    <>
-                      <PawPrintIcon />
-                      Start a game
-                    </>
-                  )}
-                </Button>
+                  <PawPrintIcon />
+                  Start a game
+                </LoadingButton>
               </div>
               <div className="w-full sm:flex-1">
                 <Button

@@ -5,15 +5,14 @@ import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { useSessionMutation } from "convex-helpers/react/sessions";
 import { ConvexError } from "convex/values";
-import { LoaderCircleIcon } from "lucide-react";
 import { z } from "zod";
 
 import { api, gameCodeZodSchema } from "@acme/convex";
-import { Button } from "@acme/ui/button";
 import { Field, FieldError, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 
 import { AppShell, PageContainer } from "~/components/app-shell";
+import { LoadingButton } from "~/components/loading-button";
 import { PageHeader } from "~/components/page-header";
 
 export default function JoinPage() {
@@ -82,18 +81,14 @@ export default function JoinPage() {
                       />
                       <form.Subscribe selector={(s) => s.isSubmitting}>
                         {(isSubmitting) => (
-                          <Button
+                          <LoadingButton
                             size="xl"
                             type="submit"
-                            disabled={isSubmitting}
+                            isLoading={isSubmitting}
                             className="disabled:opacity-100"
                           >
-                            {isSubmitting ? (
-                              <LoaderCircleIcon className="animate-spin" />
-                            ) : (
-                              "Join"
-                            )}
-                          </Button>
+                            Join
+                          </LoadingButton>
                         )}
                       </form.Subscribe>
                     </div>
