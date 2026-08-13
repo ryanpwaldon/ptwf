@@ -1,7 +1,6 @@
 "use client";
 
-import type { FunctionReturnType } from "convex/server";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NumberFlow from "@number-flow/react";
 import { useSessionMutation } from "convex-helpers/react/sessions";
 import { CheckIcon, CircleSmallIcon, XIcon } from "lucide-react";
@@ -12,6 +11,7 @@ import { cn } from "@acme/ui";
 import { AvatarBadge } from "@acme/ui/avatar";
 import { RadioGroup } from "@acme/ui/radio-group";
 
+import type { Answer, Game, Me, Player, Question } from "~/lib/game-data";
 import { AnswerChoice } from "~/components/answer-choice";
 import {
   gameHeaderVariants,
@@ -21,13 +21,8 @@ import {
 import { PlayerAvatarGroup } from "~/components/player-avatar-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
 import { TimeRemainingBar } from "~/components/time-remaining-bar";
+import { createAnswerIndex } from "~/lib/game-data";
 import { AppShell, PageContainer } from "./app-shell";
-
-type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
-type Me = NonNullable<FunctionReturnType<typeof api.players.me>>;
-type Question = FunctionReturnType<typeof api.questions.allByGameId>[number];
-type Player = FunctionReturnType<typeof api.players.allByGameId>[number];
-type Answer = FunctionReturnType<typeof api.answers.allByGameId>[number];
 
 interface GamePlayProps {
   game: Game;
@@ -45,6 +40,7 @@ export function GamePlay({
   answers,
 }: GamePlayProps) {
   const submitAnswer = useSessionMutation(api.answers.submit);
+  const answerIndex = useMemo(() => createAnswerIndex(answers), [answers]);
   const phase = game.phase;
   if (!phase) return null;
 
@@ -55,18 +51,13 @@ export function GamePlay({
   if (!currentQuestion) return null;
 
   // Derive my answer for the current question.
-  const myAnswerDoc = answers.find(
-    (a) => a.questionId === currentQuestion._id && a.playerId === me._id,
-  );
-
-  // Build answer summary per choice.
-  const currentAnswers = answers.filter(
-    (a) => a.questionId === currentQuestion._id,
-  );
+  const currentAnswerIndex = answerIndex.byQuestionId.get(currentQuestion._id);
+  const myAnswerDoc = currentAnswerIndex?.byPlayerId.get(me._id);
+  const currentAnswers = currentAnswerIndex?.answers ?? [];
 
   // Build answer summary per choice.
   const answerSummary = currentQuestion.choices.map((choice) => {
-    const choiceAnswers = currentAnswers.filter((a) => a.selectedLabel === choice.label); // prettier-ignore
+    const choiceAnswers = currentAnswerIndex?.bySelectedLabel.get(choice.label) ?? []; // prettier-ignore
     const voters = choiceAnswers.map((a) => CHARACTER_OPTIONS.find((c) => c.value === a.character) ?? null).filter((c) => c !== null); // prettier-ignore
     return {
       label: choice.label,
@@ -82,7 +73,7 @@ export function GamePlay({
     if (q.index > game.currentQuestionIndex) return "incomplete" as const;
     if (q.index === game.currentQuestionIndex && phase !== "results") return "incomplete" as const; // prettier-ignore
     // For past questions and current during results, check player's answer.
-    const ans = answers.find((a) => a.questionId === q._id && a.playerId === me._id); // prettier-ignore
+    const ans = answerIndex.byQuestionId.get(q._id)?.byPlayerId.get(me._id);
     if (!ans) return "skipped" as const;
     return ans.isCorrect ? ("correct" as const) : ("incorrect" as const);
   });

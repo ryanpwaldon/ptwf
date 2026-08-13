@@ -1,4 +1,3 @@
-import type { FunctionReturnType } from "convex/server";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,17 +8,13 @@ import { api, getCharacterByValue } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
 
+import type { Answer, Game, Me, Player, Question } from "~/lib/game-data";
 import { Leaderboard } from "~/components/leaderboard";
 import { PageHeader } from "~/components/page-header";
 import { QuestionResult } from "~/components/question-result";
+import { createAnswerIndex } from "~/lib/game-data";
 import { AppShell, PageContainer } from "./app-shell";
 import { PageFooter } from "./page-footer";
-
-type Me = NonNullable<FunctionReturnType<typeof api.players.me>>;
-type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
-type Player = FunctionReturnType<typeof api.players.allByGameId>[number];
-type Question = FunctionReturnType<typeof api.questions.allByGameId>[number];
-type Answer = FunctionReturnType<typeof api.answers.allByGameId>[number];
 
 interface GameResultsProps {
   game: Game;
@@ -39,6 +34,7 @@ export function GameResults({
   const router = useRouter();
   const playAgain = useSessionMutation(api.games.playAgain);
   const [isStartingReplay, setIsStartingReplay] = useState(false);
+  const answerIndex = useMemo(() => createAnswerIndex(answers), [answers]);
   const sortedQuestions = useMemo(() => [...questions].sort((a, b) => a.index - b.index), [questions]); // prettier-ignore
   const replayCount = players.filter((player) => player.replayRequested).length;
   const playAgainLabel =
@@ -62,46 +58,40 @@ export function GameResults({
       players
         .map((player) => ({
           character: getCharacterByValue(player.character),
-          correctAnswers: answers.filter(
-            (a) => a.playerId === player._id && a.isCorrect,
-          ).length,
+          correctAnswers:
+            answerIndex.correctCountByPlayerId.get(player._id) ?? 0,
         }))
         .sort((a, b) => b.correctAnswers - a.correctAnswers),
-    [players, answers],
+    [players, answerIndex],
   );
 
-  const questionResults = useMemo(() => {
-    const answersByQuestion = new Map<string, Answer[]>();
-    for (const a of answers) {
-      const list = answersByQuestion.get(a.questionId) ?? [];
-      list.push(a);
-      answersByQuestion.set(a.questionId, list);
-    }
+  const questionResults = useMemo(
+    () =>
+      sortedQuestions.map((question) => {
+        const questionAnswers = answerIndex.byQuestionId.get(question._id);
 
-    return sortedQuestions.map((question) => {
-      const questionAnswers = answersByQuestion.get(question._id) ?? [];
+        const choices = question.choices.map((choice) => ({
+          text: choice.text,
+          voters: (
+            questionAnswers?.bySelectedLabel.get(choice.label) ?? []
+          ).map((answer) => getCharacterByValue(answer.character)),
+        }));
 
-      const choices = question.choices.map((choice) => ({
-        text: choice.text,
-        voters: questionAnswers
-          .filter((a) => a.selectedLabel === choice.label)
-          .map((a) => getCharacterByValue(a.character)),
-      }));
+        const correctIndex = question.choices.findIndex((ch) => ch.label === question.correctLabel); // prettier-ignore
+        const myAnswer = questionAnswers?.byPlayerId.get(me._id);
+        const myChoiceIndex = myAnswer ? question.choices.findIndex((ch) => ch.label === myAnswer.selectedLabel) : -1; // prettier-ignore
 
-      const correctIndex = question.choices.findIndex((ch) => ch.label === question.correctLabel); // prettier-ignore
-      const myAnswer = questionAnswers.find((a) => a.playerId === me._id);
-      const myChoiceIndex = myAnswer ? question.choices.findIndex((ch) => ch.label === myAnswer.selectedLabel) : -1; // prettier-ignore
-
-      return {
-        id: question._id,
-        question: question.text,
-        questionIndex: question.index,
-        choices,
-        correctIndex,
-        myChoiceIndex,
-      };
-    });
-  }, [sortedQuestions, answers, me._id]);
+        return {
+          id: question._id,
+          question: question.text,
+          questionIndex: question.index,
+          choices,
+          correctIndex,
+          myChoiceIndex,
+        };
+      }),
+    [sortedQuestions, answerIndex, me._id],
+  );
 
   return (
     <AppShell>
