@@ -1,6 +1,6 @@
 import { cn } from "@acme/ui";
 
-export type QuestionStatus = "incomplete" | "correct" | "incorrect" | "skipped";
+type QuestionStatus = "incomplete" | "correct" | "incorrect" | "skipped";
 
 interface QuestionStatusTrackProps extends React.ComponentProps<"div"> {
   steps: QuestionStatus[];

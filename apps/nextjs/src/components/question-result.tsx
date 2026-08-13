@@ -10,7 +10,7 @@ import {
 
 import { PlayerAvatarGroup } from "./player-avatar-group";
 
-export interface QuestionResultChoice {
+interface QuestionResultChoice {
   text: string;
   voters: Character[];
 }

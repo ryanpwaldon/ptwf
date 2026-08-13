@@ -10,7 +10,7 @@ const UNCAUGHT_ERROR_TOAST_COOLDOWN_MS = 4000;
 
 let lastUncaughtErrorToastTimestamp = 0;
 
-export function notifyUncaughtError(
+function notifyUncaughtError(
   message = "Something went wrong. Please try again.",
 ) {
   const now = Date.now();

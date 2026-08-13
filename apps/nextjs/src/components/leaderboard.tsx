@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@acme/ui/table";
 
-export interface LeaderboardEntry {
+interface LeaderboardEntry {
   character: Character;
   correctAnswers: number;
 }
@@ -29,9 +29,6 @@ export function Leaderboard({
   myCharacterValue,
   className,
 }: LeaderboardProps) {
-  const minimumRows = 0;
-  const emptyRowCount = Math.max(0, minimumRows - entries.length);
-
   return (
     <Table className={cn(className)}>
       <TableHeader>
@@ -68,15 +65,6 @@ export function Leaderboard({
             <TableCell className="py-2.5 text-right">
               {entry.correctAnswers}/{totalQuestions}
             </TableCell>
-          </TableRow>
-        ))}
-        {Array.from({ length: emptyRowCount }, (_, index) => (
-          <TableRow
-            key={`empty-${index}`}
-            className="border-border transition-none select-none hover:bg-transparent"
-          >
-            <TableCell>&nbsp;</TableCell>
-            <TableCell>&nbsp;</TableCell>
           </TableRow>
         ))}
       </TableBody>

@@ -2,7 +2,7 @@ import type { SVGProps } from "react";
 
 import { cn } from "@acme/ui";
 
-export type PetCareTriviaBadgeProps = Omit<
+type PetCareTriviaBadgeProps = Omit<
   SVGProps<SVGSVGElement>,
   "children" | "height" | "width"
 >;

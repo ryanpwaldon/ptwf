@@ -27,7 +27,7 @@ import { useTheme } from "@acme/ui/theme";
 import type { StickerAsset } from "./sticker-assets";
 import { getStickerSource } from "./sticker-assets";
 
-export interface HolographicStickerProps {
+interface HolographicStickerProps {
   asset: StickerAsset;
   circularTiltIntensity?: number;
   circularTiltSpeed?: number;
