@@ -19,6 +19,7 @@ import type * as gameEngine from "../gameEngine.js";
 import type * as gameHelpers from "../gameHelpers.js";
 import type * as games from "../games.js";
 import type * as migrations from "../migrations.js";
+import type * as playerHelpers from "../playerHelpers.js";
 import type * as players from "../players.js";
 import type * as questions from "../questions.js";
 import type * as quizmaster from "../quizmaster.js";
@@ -41,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   gameHelpers: typeof gameHelpers;
   games: typeof games;
   migrations: typeof migrations;
+  playerHelpers: typeof playerHelpers;
   players: typeof players;
   questions: typeof questions;
   quizmaster: typeof quizmaster;
