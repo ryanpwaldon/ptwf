@@ -3,13 +3,13 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import { LoaderCircleIcon } from "lucide-react";
 
 import { api, getCharacterByValue } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
 
 import { Leaderboard } from "~/components/leaderboard";
+import { LoadingButton } from "~/components/loading-button";
 import { PageHeader } from "~/components/page-header";
 import { QuestionResult } from "~/components/question-result";
 import { AppShell, PageContainer } from "./app-shell";
@@ -141,27 +141,16 @@ export function GameResults({
         <Button size="xl" variant="secondary" asChild>
           <Link href="/">Return home</Link>
         </Button>
-        <Button
+        <LoadingButton
           size="xl"
-          disabled={isStartingReplay}
+          isLoading={isStartingReplay}
+          preserveContentWidth
+          contentClassName="tabular-nums"
           className="disabled:opacity-100"
           onClick={() => void handlePlayAgain()}
         >
-          <span className="grid place-items-center">
-            <span
-              className={
-                isStartingReplay
-                  ? "invisible col-start-1 row-start-1 tabular-nums"
-                  : "col-start-1 row-start-1 tabular-nums"
-              }
-            >
-              {playAgainLabel}
-            </span>
-            {isStartingReplay && (
-              <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
-            )}
-          </span>
-        </Button>
+          {playAgainLabel}
+        </LoadingButton>
       </PageFooter>
     </AppShell>
   );

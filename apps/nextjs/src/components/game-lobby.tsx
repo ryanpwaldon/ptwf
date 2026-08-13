@@ -3,12 +3,11 @@
 import type { FunctionReturnType } from "convex/server";
 import { useState } from "react";
 import { useSessionMutation } from "convex-helpers/react/sessions";
-import { CheckIcon, LoaderCircleIcon } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 
 import { api, getCharacterByValue } from "@acme/convex";
 import { AvatarBadge } from "@acme/ui/avatar";
 import { Badge } from "@acme/ui/badge";
-import { Button } from "@acme/ui/button";
 import {
   Card,
   CardContent,
@@ -18,6 +17,7 @@ import {
 } from "@acme/ui/card";
 
 import { GameInviteField } from "~/components/game-invite-field";
+import { LoadingButton } from "~/components/loading-button";
 import { PageHeader } from "~/components/page-header";
 import { AppShell, PageContainer } from "./app-shell";
 import { CareTopicPicker } from "./care-topic-picker";
@@ -220,29 +220,17 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             }
           />
         </div>
-        <Button
+        <LoadingButton
           size="xl"
           aria-pressed={players.length > 1 ? me.isReady : undefined}
-          disabled={isUpdatingReady}
+          isLoading={isUpdatingReady}
+          preserveContentWidth
           className="transition-none disabled:opacity-100"
           onClick={() => void handleReadyToggle()}
           variant={players.length > 1 && me.isReady ? "outline" : "default"}
         >
-          <span className="grid place-items-center">
-            <span
-              className={
-                isUpdatingReady
-                  ? "invisible col-start-1 row-start-1"
-                  : "col-start-1 row-start-1"
-              }
-            >
-              {readyButtonLabel}
-            </span>
-            {isUpdatingReady && (
-              <LoaderCircleIcon className="col-start-1 row-start-1 animate-spin" />
-            )}
-          </span>
-        </Button>
+          {readyButtonLabel}
+        </LoadingButton>
       </PageFooter>
     </AppShell>
   );
