@@ -50,7 +50,7 @@ interface Geometry {
   };
 }
 
-export interface PawTrailBackgroundProps {
+interface PawTrailBackgroundProps {
   className?: string;
   showControls?: boolean;
   controlsDefaultCollapsed?: boolean;

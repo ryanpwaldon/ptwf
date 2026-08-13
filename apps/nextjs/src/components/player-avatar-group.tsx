@@ -14,7 +14,7 @@ type AvatarSize = "2xs" | "xs" | "sm" | "default" | "md" | "lg";
 
 const STAGGER_DELAY = 0.06;
 
-export function PlayerGroup({
+export function PlayerAvatarGroup({
   characters,
   avatarSize = "sm",
   maxVisible = 3,

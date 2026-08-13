@@ -17,15 +17,15 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
-import { Header } from "~/components/header";
-import { InviteCodeField } from "~/components/invite-code-field";
-import { AnimalInput } from "./animal-input";
+import { GameInviteField } from "~/components/game-invite-field";
+import { PageHeader } from "~/components/page-header";
 import { AppShell, PageContainer } from "./app-shell";
-import { AvatarInput } from "./avatar-input";
-import { Footer } from "./footer";
-import { GameSettingsInput } from "./game-settings-input";
-import { PlayerGroup } from "./player-group";
-import { ThemeInput } from "./theme-input";
+import { CareTopicPicker } from "./care-topic-picker";
+import { CharacterPicker } from "./character-picker";
+import { GameFormatControls } from "./game-format-controls";
+import { PageFooter } from "./page-footer";
+import { PetPicker } from "./pet-picker";
+import { PlayerAvatarGroup } from "./player-avatar-group";
 
 type Game = NonNullable<FunctionReturnType<typeof api.games.byCode>>;
 type Player = FunctionReturnType<typeof api.players.allByGameId>[number];
@@ -90,7 +90,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
 
   return (
     <AppShell>
-      <Header title="Game lobby" />
+      <PageHeader title="Game lobby" />
       <PageContainer className="flex flex-1 flex-col">
         <main className="flex-1 px-4 pb-16">
           <div className="mt-8 space-y-1">
@@ -108,7 +108,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
                 <CardDescription>Choose your character.</CardDescription>
               </CardHeader>
               <CardContent className="flex h-full items-center">
-                <AvatarInput
+                <CharacterPicker
                   value={me.character}
                   takenValues={takenCharacterValues}
                   onChange={(character) => {
@@ -125,7 +125,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center">
-                <InviteCodeField code={game.code} />
+                <GameInviteField code={game.code} />
               </CardContent>
             </Card>
           </div>
@@ -137,7 +137,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex h-full items-center">
-              <AnimalInput
+              <PetPicker
                 value={game.quizAnimal}
                 onChange={(quizAnimal) => {
                   void updateQuizAnimal({
@@ -156,7 +156,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex h-full items-center">
-              <ThemeInput
+              <CareTopicPicker
                 value={game.quizTheme}
                 onChange={(quizTheme) => {
                   void updateQuizTheme({ gameId: game._id, quizTheme });
@@ -170,7 +170,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               <CardDescription>Fine-tune the length and pace.</CardDescription>
             </CardHeader>
             <CardContent className="divide-y">
-              <GameSettingsInput
+              <GameFormatControls
                 questionCount={game.questionCount}
                 timeLimitSeconds={game.timeLimitSeconds}
                 onQuestionCountChange={(questionCount) => {
@@ -190,7 +190,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
           </Card>
         </main>
       </PageContainer>
-      <Footer contentClassName="justify-between">
+      <PageFooter contentClassName="justify-between">
         <div className="flex flex-col items-start gap-2">
           <div className="flex items-center gap-2">
             <p className="font-medium">Players</p>
@@ -207,7 +207,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
                 : `${readyPlayerCount}/${players.length} ready`}
             </Badge>
           </div>
-          <PlayerGroup
+          <PlayerAvatarGroup
             maxVisible={8}
             avatarSize="default"
             characters={characters}
@@ -243,7 +243,7 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
             )}
           </span>
         </Button>
-      </Footer>
+      </PageFooter>
     </AppShell>
   );
 }

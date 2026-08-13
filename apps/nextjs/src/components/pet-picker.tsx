@@ -19,12 +19,12 @@ import {
 
 import { ImageWithFallback } from "~/components/image-with-fallback";
 
-interface AnimalInputProps {
+interface PetPickerProps {
   value: QuizAnimal;
   onChange: (value: QuizAnimal) => void;
 }
 
-export function AnimalInput({ value, onChange }: AnimalInputProps) {
+export function PetPicker({ value, onChange }: PetPickerProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const selected = getQuizAnimalByValue(value);

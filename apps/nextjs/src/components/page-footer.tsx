@@ -4,16 +4,16 @@ import { cn } from "@acme/ui";
 
 import { PageContainer } from "./app-shell";
 
-interface FooterProps extends ComponentProps<"footer"> {
+interface PageFooterProps extends ComponentProps<"footer"> {
   contentClassName?: string;
 }
 
-export function Footer({
+export function PageFooter({
   children,
   className,
   contentClassName,
   ...props
-}: FooterProps) {
+}: PageFooterProps) {
   return (
     <footer
       className={cn(

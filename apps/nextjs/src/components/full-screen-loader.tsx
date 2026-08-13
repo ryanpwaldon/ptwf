@@ -1,7 +1,7 @@
 "use client";
 
 import { AppShell, PageContainer } from "./app-shell";
-import { Loader } from "./loader";
+import { PawLoader } from "./paw-loader";
 import { PawTrailBackground } from "./paw-trail-background";
 
 interface FullScreenLoaderProps {
@@ -20,7 +20,7 @@ export function FullScreenLoader({
       {showPawTrail && <PawTrailBackground />}
       <PageContainer className="relative z-10 flex flex-1 flex-col">
         <main className="flex flex-1 flex-col items-center justify-center">
-          <Loader />
+          <PawLoader />
           {title && description && (
             <div className="mt-4 flex flex-col items-center gap-1 text-center">
               <h1 className="text-xl font-semibold">{title}</h1>

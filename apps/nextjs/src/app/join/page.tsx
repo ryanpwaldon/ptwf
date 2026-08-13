@@ -14,7 +14,7 @@ import { Field, FieldError, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 
 import { AppShell, PageContainer } from "~/components/app-shell";
-import { Header } from "~/components/header";
+import { PageHeader } from "~/components/page-header";
 
 export default function JoinPage() {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function JoinPage() {
 
   return (
     <AppShell>
-      <Header title="Join game" />
+      <PageHeader title="Join game" />
       <PageContainer className="flex flex-1 flex-col">
         <main className="flex-1 px-4">
           <div className="mt-8 space-y-1">

@@ -1,8 +1,6 @@
 import type { Variants } from "motion/react";
 
-export const gameTransitionEase: [number, number, number, number] = [
-  0.33, 1, 0.68, 1,
-];
+const gameTransitionEase: [number, number, number, number] = [0.33, 1, 0.68, 1];
 
 const questionExitDuration = 0.24;
 

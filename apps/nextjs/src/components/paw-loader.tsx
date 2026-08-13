@@ -10,7 +10,7 @@ const PAW_TRANSFORMS = [
   "translate(138 10) translate(25 0) rotate(90)",
 ] as const;
 
-export function Loader({ className }: { className?: string }) {
+export function PawLoader({ className }: { className?: string }) {
   return (
     <svg
       aria-label="Loading"
