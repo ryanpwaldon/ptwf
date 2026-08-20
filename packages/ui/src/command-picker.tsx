@@ -116,7 +116,7 @@ function CommandPickerList({
   return (
     <CommandList
       className={cn(
-        "h-0! max-h-none! min-h-0! flex-1 px-2 pb-12 sm:h-auto! sm:max-h-[calc(100dvh-8rem)]! sm:flex-none sm:pb-4",
+        "h-0! max-h-none! min-h-0! flex-1 px-2 pb-12 sm:h-auto! sm:max-h-[calc(100dvh-8rem)]! sm:flex-none sm:pb-0",
         className,
       )}
       {...props}
@@ -129,7 +129,10 @@ function CommandPickerGroup({
   ...props
 }: React.ComponentProps<typeof CommandGroup>) {
   return (
-    <CommandGroup className={cn("px-0 pt-2 pb-4", className)} {...props} />
+    <CommandGroup
+      className={cn("px-0 pt-2 pb-4 sm:pb-2", className)}
+      {...props}
+    />
   );
 }
 
