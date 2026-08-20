@@ -12,9 +12,9 @@ import {
 } from "@acme/convex";
 import { ToggleGroup, ToggleGroupItem } from "@acme/ui/toggle-group";
 
-const toggleGroupClassName = "bg-control-track gap-0.5 rounded-full! p-[3px]";
+const toggleGroupClassName = "bg-control-track gap-0.5 rounded-md! p-[3px]";
 const toggleGroupItemClassName =
-  "text-muted-foreground/60 hover:bg-transparent hover:text-muted-foreground/60 data-[state=on]:bg-transparent data-[state=on]:text-foreground data-[state=on]:hover:bg-transparent relative z-10 h-7 min-w-9 rounded-full px-2.5 text-xs font-medium transition-[color] duration-200";
+  "text-muted-foreground/60 hover:bg-transparent hover:text-muted-foreground/60 data-[state=on]:bg-transparent data-[state=on]:text-foreground data-[state=on]:hover:bg-transparent relative z-10 h-7 min-w-9 rounded-sm px-2.5 text-xs font-medium transition-[color] duration-200";
 
 function getIndicatorTransform(index: number) {
   const safeIndex = Math.max(index, 0);
@@ -69,7 +69,7 @@ export function GameFormatControls({
           <motion.span
             aria-hidden
             initial={false}
-            className="border-border bg-card pointer-events-none absolute inset-y-[3px] left-[3px] z-0 w-[calc((100%_-_10px)/3)] rounded-full border"
+            className="border-border bg-card pointer-events-none absolute inset-y-[3px] left-[3px] z-0 w-[calc((100%_-_10px)/3)] rounded-sm border"
             animate={{
               transform: getIndicatorTransform(questionCountIndex),
             }}
@@ -107,7 +107,7 @@ export function GameFormatControls({
           <motion.span
             aria-hidden
             initial={false}
-            className="border-border bg-card pointer-events-none absolute inset-y-[3px] left-[3px] z-0 w-[calc((100%_-_10px)/3)] rounded-full border"
+            className="border-border bg-card pointer-events-none absolute inset-y-[3px] left-[3px] z-0 w-[calc((100%_-_10px)/3)] rounded-sm border"
             animate={{ transform: getIndicatorTransform(timeLimitIndex) }}
             transition={indicatorTransition}
           />
