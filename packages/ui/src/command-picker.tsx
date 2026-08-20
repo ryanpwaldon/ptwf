@@ -99,7 +99,7 @@ function CommandPickerInput({
             size="icon"
             variant="ghost"
             aria-label="Close"
-            className="size-12"
+            className="hover:bg-option-highlight size-12"
           >
             <X className="size-5" />
           </Button>
@@ -116,7 +116,7 @@ function CommandPickerList({
   return (
     <CommandList
       className={cn(
-        "h-0! max-h-none! min-h-0! flex-1 px-4 pb-12 sm:h-auto! sm:max-h-[calc(100dvh-8rem)]! sm:flex-none sm:pb-4",
+        "h-0! max-h-none! min-h-0! flex-1 px-2 pb-12 sm:h-auto! sm:max-h-[calc(100dvh-8rem)]! sm:flex-none sm:pb-4",
         className,
       )}
       {...props}
@@ -128,14 +128,16 @@ function CommandPickerGroup({
   className,
   ...props
 }: React.ComponentProps<typeof CommandGroup>) {
-  return <CommandGroup className={cn("px-0 py-4", className)} {...props} />;
+  return (
+    <CommandGroup className={cn("px-0 pt-2 pb-4", className)} {...props} />
+  );
 }
 
 function CommandPickerItem({
   className,
   ...props
 }: React.ComponentProps<typeof CommandItem>) {
-  return <CommandItem className={cn("gap-3 p-3", className)} {...props} />;
+  return <CommandItem className={cn("gap-3 p-3 pr-4", className)} {...props} />;
 }
 
 const CommandPickerEmpty = CommandEmpty;
