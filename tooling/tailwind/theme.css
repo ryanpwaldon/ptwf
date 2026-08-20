@@ -58,8 +58,13 @@
 
   --color-correct: var(--correct);
   --color-correct-foreground: var(--correct-foreground);
+  --color-control: var(--control);
+  --color-control-hover: var(--control-hover);
+  --color-control-track: var(--control-track);
+  --color-control-track-hover: var(--control-track-hover);
   --color-incorrect: var(--incorrect);
   --color-incorrect-foreground: var(--incorrect-foreground);
+  --color-option-highlight: var(--option-highlight);
   --color-sticker-surface: var(--sticker-surface);
   --color-sticker-foreground: var(--sticker-foreground);
 }
@@ -99,8 +104,13 @@
   --sidebar-ring: oklch(0.708 0 0);
   --correct: var(--color-lime-500);
   --correct-foreground: var(--color-lime-900);
+  --control: var(--card);
+  --control-hover: color-mix(in oklch, var(--control), var(--foreground) 4%);
+  --control-track: var(--background);
+  --control-track-hover: var(--muted);
   --incorrect: var(--color-red-400);
   --incorrect-foreground: var(--color-red-900);
+  --option-highlight: var(--background);
   --sticker-surface: #fff;
   --sticker-foreground: #000;
 }
@@ -139,8 +149,11 @@
   --sidebar-ring: oklch(0.556 0 0);
   --correct: var(--color-lime-500);
   --correct-foreground: var(--color-lime-300);
+  --control-track: var(--muted);
+  --control-track-hover: var(--control-hover);
   --incorrect: var(--color-red-500);
   --incorrect-foreground: var(--color-red-300);
+  --option-highlight: var(--control-hover);
   --sticker-surface: #dcdce7;
   --sticker-foreground: #17151d;
 }

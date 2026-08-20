@@ -34,7 +34,7 @@ export function GameFormatControls({
           size="sm"
           value={String(questionCount)}
           aria-label="Question count"
-          className="bg-muted gap-0.5 p-[3px]"
+          className="bg-control-track gap-[3px] p-[3px]"
           onValueChange={(value) => {
             const nextQuestionCount = Number(value);
             if (!isQuestionCount(nextQuestionCount)) return;
@@ -46,7 +46,7 @@ export function GameFormatControls({
               key={count}
               value={String(count)}
               aria-label={`${count} questions`}
-              className="data-[state=on]:bg-card h-7 min-w-9 rounded-[5px] px-2 data-[state=on]:shadow-sm"
+              className="hover:bg-control-track-hover data-[state=on]:bg-card data-[state=on]:hover:bg-card h-7 min-w-9 rounded-[5px] px-2 data-[state=on]:shadow-sm"
             >
               {count}
             </ToggleGroupItem>
@@ -63,7 +63,7 @@ export function GameFormatControls({
           size="sm"
           value={String(timeLimitSeconds)}
           aria-label="Time per question"
-          className="bg-muted gap-0.5 p-[3px]"
+          className="bg-control-track gap-[3px] p-[3px]"
           onValueChange={(value) => {
             const nextTimeLimitSeconds = Number(value);
             if (!isTimeLimitSeconds(nextTimeLimitSeconds)) return;
@@ -75,7 +75,7 @@ export function GameFormatControls({
               key={seconds}
               value={String(seconds)}
               aria-label={`${seconds} seconds per question`}
-              className="data-[state=on]:bg-card h-7 min-w-9 rounded-[5px] px-2 data-[state=on]:shadow-sm"
+              className="hover:bg-control-track-hover data-[state=on]:bg-card data-[state=on]:hover:bg-card h-7 min-w-9 rounded-[5px] px-2 data-[state=on]:shadow-sm"
             >
               {seconds}s
             </ToggleGroupItem>
