@@ -1,6 +1,11 @@
 "use client";
 
-import { Clock3Icon, ListChecksIcon } from "lucide-react";
+import {
+  Clock3Icon,
+  InfoIcon,
+  ListChecksIcon,
+  SparklesIcon,
+} from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 
 import type { QuestionCount, TimeLimitSeconds } from "@acme/convex";
@@ -10,7 +15,18 @@ import {
   QUESTION_COUNT_OPTIONS,
   TIME_LIMIT_SECONDS_OPTIONS,
 } from "@acme/convex";
+import { Button } from "@acme/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@acme/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@acme/ui/toggle-group";
+
+import { ModelPicker } from "~/components/model-picker";
 
 const toggleGroupClassName = "bg-control-track gap-0.5 rounded-md! p-[3px]";
 const toggleGroupItemClassName =
@@ -69,7 +85,7 @@ export function GameFormatControls({
           <motion.span
             aria-hidden
             initial={false}
-            className="border-border bg-card pointer-events-none absolute inset-y-[3px] left-[3px] z-0 w-[calc((100%_-_10px)/3)] rounded-sm border"
+            className="border-border bg-card pointer-events-none absolute inset-y-[3px] left-[3px] z-0 w-[calc((100%-10px)/3)] rounded-sm border"
             animate={{
               transform: getIndicatorTransform(questionCountIndex),
             }}
@@ -107,7 +123,7 @@ export function GameFormatControls({
           <motion.span
             aria-hidden
             initial={false}
-            className="border-border bg-card pointer-events-none absolute inset-y-[3px] left-[3px] z-0 w-[calc((100%_-_10px)/3)] rounded-sm border"
+            className="border-border bg-card pointer-events-none absolute inset-y-[3px] left-[3px] z-0 w-[calc((100%-10px)/3)] rounded-sm border"
             animate={{ transform: getIndicatorTransform(timeLimitIndex) }}
             transition={indicatorTransition}
           />
@@ -122,6 +138,39 @@ export function GameFormatControls({
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
+      </div>
+      <div className="flex min-h-14 items-center gap-3">
+        <SparklesIcon className="text-muted-foreground size-4" />
+        <div className="flex min-w-0 flex-1 items-center gap-1">
+          <span className="text-sm font-medium">Model</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                aria-label="About model selection"
+                className="text-muted-foreground hover:bg-control-hover hover:text-foreground aria-expanded:bg-control-hover aria-expanded:text-foreground dark:hover:bg-control-hover"
+              >
+                <InfoIcon />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              side="top"
+              align="start"
+              sideOffset={8}
+              className="w-64"
+            >
+              <PopoverHeader>
+                <PopoverTitle>Choose a model</PopoverTitle>
+                <PopoverDescription>
+                  Choose which AI model generates the questions for your game.
+                </PopoverDescription>
+              </PopoverHeader>
+            </PopoverContent>
+          </Popover>
+        </div>
+        <ModelPicker />
       </div>
     </>
   );

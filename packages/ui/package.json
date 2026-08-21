@@ -15,6 +15,7 @@
     "./radio-group": "./src/radio-group.tsx",
     "./avatar": "./src/avatar.tsx",
     "./tooltip": "./src/tooltip.tsx",
+    "./popover": "./src/popover.tsx",
     "./table": "./src/table.tsx",
     "./card": "./src/card.tsx",
     "./input-otp": "./src/input-otp.tsx",
