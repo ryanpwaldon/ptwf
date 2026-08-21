@@ -22,10 +22,12 @@ import { PageHeader } from "~/components/page-header";
 import { AppShell, PageContainer } from "./app-shell";
 import { CareTopicPicker } from "./care-topic-picker";
 import { CharacterPicker } from "./character-picker";
-import { GameFormatControls } from "./game-format-controls";
+import { ModelPicker } from "./model-picker";
 import { PageFooter } from "./page-footer";
 import { PetPicker } from "./pet-picker";
 import { PlayerAvatarGroup } from "./player-avatar-group";
+import { QuestionCountPicker } from "./question-count-picker";
+import { TimeLimitPicker } from "./time-limit-picker";
 
 interface GameLobbyProps {
   game: Game;
@@ -166,22 +168,25 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
               <CardDescription>Fine-tune the length and pace.</CardDescription>
             </CardHeader>
             <CardContent className="divide-y">
-              <GameFormatControls
-                questionCount={game.questionCount}
-                timeLimitSeconds={game.timeLimitSeconds}
-                onQuestionCountChange={(questionCount) => {
+              <QuestionCountPicker
+                value={game.questionCount}
+                onChange={(questionCount) => {
                   void updateQuestionCount({
                     gameId: game._id,
                     questionCount,
                   });
                 }}
-                onTimeLimitSecondsChange={(timeLimitSeconds) => {
+              />
+              <TimeLimitPicker
+                value={game.timeLimitSeconds}
+                onChange={(timeLimitSeconds) => {
                   void updateTimeLimitSeconds({
                     gameId: game._id,
                     timeLimitSeconds,
                   });
                 }}
               />
+              <ModelPicker />
             </CardContent>
           </Card>
         </main>

@@ -1,53 +1,74 @@
 "use client";
 
-import type { VariantProps } from "class-variance-authority";
+import type { Transition } from "motion/react";
 import * as React from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { ToggleGroup as ToggleGroupPrimitive } from "radix-ui";
 
 import { cn } from "@acme/ui";
 import { toggleVariants } from "@acme/ui/toggle";
 
-const ToggleGroupContext = React.createContext<
-  VariantProps<typeof toggleVariants> & {
-    spacing?: number;
-    orientation?: "horizontal" | "vertical";
-  }
->({
-  size: "default",
-  variant: "default",
-  spacing: 2,
-  orientation: "horizontal",
-});
+interface ToggleGroupContextValue {
+  indicatorLayoutId: string;
+  indicatorTransition: Transition;
+  value: string;
+}
+
+const ToggleGroupContext = React.createContext<ToggleGroupContextValue | null>(
+  null,
+);
+
+type ToggleGroupProps = Omit<
+  React.ComponentProps<typeof ToggleGroupPrimitive.Root>,
+  "defaultValue" | "onValueChange" | "type" | "value"
+> & {
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  value?: string;
+};
 
 function ToggleGroup({
   className,
-  variant,
-  size,
-  spacing = 2,
-  orientation = "horizontal",
+  defaultValue = "",
+  value,
+  onValueChange,
   children,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
-  VariantProps<typeof toggleVariants> & {
-    spacing?: number;
-    orientation?: "horizontal" | "vertical";
-  }) {
+}: ToggleGroupProps) {
+  const [uncontrolledValue, setUncontrolledValue] =
+    React.useState(defaultValue);
+  const indicatorLayoutId = React.useId();
+  const shouldReduceMotion = useReducedMotion();
+  const selectedValue = value ?? uncontrolledValue;
+  const indicatorTransition: Transition = shouldReduceMotion
+    ? { duration: 0 }
+    : {
+        type: "tween",
+        duration: 0.25,
+        ease: [0.4, 0, 0.2, 1],
+      };
+
   return (
     <ToggleGroupPrimitive.Root
+      type="single"
+      value={selectedValue}
       data-slot="toggle-group"
-      data-variant={variant}
-      data-size={size}
-      data-spacing={spacing}
-      data-orientation={orientation}
-      style={{ "--gap": spacing } as React.CSSProperties}
       className={cn(
-        "group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-lg data-vertical:flex-col data-vertical:items-stretch data-[size=sm]:rounded-[min(var(--radius-md),10px)]",
+        "bg-control-track relative grid w-fit auto-cols-fr grid-flow-col items-center gap-0.5 rounded-md p-[3px]",
         className,
       )}
+      onValueChange={(nextValue) => {
+        if (value === undefined) setUncontrolledValue(nextValue);
+        onValueChange?.(nextValue);
+      }}
       {...props}
     >
       <ToggleGroupContext.Provider
-        value={{ variant, size, spacing, orientation }}
+        value={{
+          indicatorLayoutId,
+          indicatorTransition,
+          value: selectedValue,
+        }}
       >
         {children}
       </ToggleGroupContext.Provider>
@@ -58,30 +79,34 @@ function ToggleGroup({
 function ToggleGroupItem({
   className,
   children,
-  variant = "default",
-  size = "default",
+  value,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
-  VariantProps<typeof toggleVariants>) {
+}: React.ComponentProps<typeof ToggleGroupPrimitive.Item>) {
   const context = React.useContext(ToggleGroupContext);
+  const isSelected = context?.value === value;
 
   return (
     <ToggleGroupPrimitive.Item
+      value={value}
       data-slot="toggle-group-item"
-      data-variant={context.variant ?? variant}
-      data-size={context.size ?? size}
-      data-spacing={context.spacing}
       className={cn(
-        "shrink-0 group-data-[spacing=0]/toggle-group:rounded-none group-data-[spacing=0]/toggle-group:px-2 focus:z-10 focus-visible:z-10 group-data-[spacing=0]/toggle-group:has-data-[icon=inline-end]:pr-1.5 group-data-[spacing=0]/toggle-group:has-data-[icon=inline-start]:pl-1.5 group-data-horizontal/toggle-group:data-[spacing=0]:first:rounded-l-lg group-data-vertical/toggle-group:data-[spacing=0]:first:rounded-t-lg group-data-horizontal/toggle-group:data-[spacing=0]:last:rounded-r-lg group-data-vertical/toggle-group:data-[spacing=0]:last:rounded-b-lg group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:border-l-0 group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:border-t-0 group-data-horizontal/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-l group-data-vertical/toggle-group:data-[spacing=0]:data-[variant=outline]:first:border-t",
-        toggleVariants({
-          variant: context.variant ?? variant,
-          size: context.size ?? size,
-        }),
+        toggleVariants({ size: "sm" }),
+        "text-muted-foreground/60 hover:text-muted-foreground/60 data-[state=on]:text-foreground relative h-7 min-w-9 rounded-sm bg-transparent px-2.5 text-xs font-medium transition-[color] duration-200 hover:bg-transparent data-[state=on]:bg-transparent data-[state=on]:hover:bg-transparent",
         className,
       )}
       {...props}
     >
-      {children}
+      {isSelected ? (
+        <motion.span
+          aria-hidden
+          layoutId={context.indicatorLayoutId}
+          className="border-border bg-card pointer-events-none absolute inset-0 z-0 rounded-sm border"
+          transition={context.indicatorTransition}
+        />
+      ) : null}
+      <span className="relative z-10 flex items-center justify-center gap-1">
+        {children}
+      </span>
     </ToggleGroupPrimitive.Item>
   );
 }
