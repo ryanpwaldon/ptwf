@@ -16,6 +16,7 @@ async function setupFinishedGame(t: ReturnType<typeof convexTest>) {
       code: "FINISH",
       status: "finished",
       quizAnimal: "cats",
+      quizModel: "anthropic/claude-sonnet-5",
       quizTone: "wholesome",
       quizTheme: "health-and-wellbeing",
       questionCount: 5,
@@ -46,6 +47,7 @@ describe("games", () => {
         code: "3PS28N",
         status: "lobby",
         quizAnimal: "dogs",
+        quizModel: "openai/gpt-5.6-luna",
         quizTone: "standard",
         quizTheme: "diet-and-nutrition",
         questionCount: 5,
@@ -60,13 +62,14 @@ describe("games", () => {
     expect(game?.code).toBe("3PS28N");
   });
 
-  it("creates a game with dogs selected by default", async () => {
+  it("creates a game with the default animal and model", async () => {
     const t = convexTest(schema, modules);
 
     const code = await t.mutation(api.games.create, { sessionId: SESSION_1 });
     const game = await t.query(api.games.byCode, { code });
 
     expect(game?.quizAnimal).toBe("dogs");
+    expect(game?.quizModel).toBe("openai/gpt-5.6-luna");
   });
 
   it("stores only the selected animal value", async () => {
@@ -84,6 +87,23 @@ describe("games", () => {
 
     const updatedGame = await t.query(api.games.byCode, { code });
     expect(updatedGame?.quizAnimal).toBe("cats");
+  });
+
+  it("stores the selected quiz model", async () => {
+    const t = convexTest(schema, modules);
+
+    const code = await t.mutation(api.games.create, { sessionId: SESSION_1 });
+    const game = await t.query(api.games.byCode, { code });
+    if (!game) throw new Error("Game not found.");
+
+    await t.mutation(api.games.updateQuizModel, {
+      sessionId: SESSION_1,
+      gameId: game._id,
+      quizModel: "google/gemini-2.5-flash-lite",
+    });
+
+    const updatedGame = await t.query(api.games.byCode, { code });
+    expect(updatedGame?.quizModel).toBe("google/gemini-2.5-flash-lite");
   });
 
   it("updates game settings for a participant", async () => {
@@ -132,6 +152,13 @@ describe("games", () => {
         timeLimitSeconds: 45 as 30,
       }),
     ).rejects.toThrow();
+    await expect(
+      t.mutation(api.games.updateQuizModel, {
+        sessionId: SESSION_1,
+        gameId: game._id,
+        quizModel: "unsupported/model" as "openai/gpt-5.6-luna",
+      }),
+    ).rejects.toThrow();
   });
 
   it("rejects game setting updates from non-participants", async () => {
@@ -165,6 +192,7 @@ describe("games.playAgain", () => {
     expect(replayGame).toMatchObject({
       status: "lobby",
       quizAnimal: "cats",
+      quizModel: "anthropic/claude-sonnet-5",
       quizTone: "wholesome",
       quizTheme: "health-and-wellbeing",
       questionCount: 5,

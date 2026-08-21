@@ -18,6 +18,7 @@ async function setupActiveGameWithPlayers(t: ReturnType<typeof convexTest>) {
       status: "active",
       phase: "answering",
       quizAnimal: "dogs",
+      quizModel: "openai/gpt-5.6-luna",
       quizTone: "standard",
       quizTheme: "diet-and-nutrition",
       questionCount: 5,

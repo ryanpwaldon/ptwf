@@ -16,6 +16,7 @@ const BASE_GAME = {
   code: GAME_CODE,
   status: "lobby",
   quizAnimal: "dogs",
+  quizModel: "openai/gpt-5.6-luna",
   quizTone: "standard",
   quizTheme: "diet-and-nutrition",
   questionCount: 5,

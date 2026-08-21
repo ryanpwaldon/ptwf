@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { ChevronDownIcon, InfoIcon, SparklesIcon } from "lucide-react";
 
+import type { QuizModel, QuizModelOption } from "@acme/convex";
+import { getQuizModelByValue, QUIZ_MODEL_OPTIONS } from "@acme/convex";
 import { Button } from "@acme/ui/button";
 import {
   CommandPicker,
@@ -23,67 +25,17 @@ import {
   PopoverTrigger,
 } from "@acme/ui/popover";
 
-type ModelSpeed = "Fast" | "Moderate" | "Slow";
-
-interface ModelOption {
-  value: string;
-  label: string;
-  provider: string;
-  speed: ModelSpeed;
-  iconSrc: string;
-}
-
-const MODEL_OPTIONS = [
-  {
-    value: "gpt-5.6-sol",
-    label: "GPT-5.6 Sol",
-    provider: "OpenAI",
-    speed: "Fast",
-    iconSrc: "/models/openai.svg",
-  },
-  {
-    value: "claude-sonnet-5",
-    label: "Claude Sonnet 5",
-    provider: "Anthropic",
-    speed: "Moderate",
-    iconSrc: "/models/anthropic.svg",
-  },
-  {
-    value: "gemini-3.7-flash",
-    label: "Gemini 3.7 Flash",
-    provider: "Google",
-    speed: "Fast",
-    iconSrc: "/models/google.svg",
-  },
-  {
-    value: "deepseek-v4-pro",
-    label: "DeepSeek-V4-Pro",
-    provider: "DeepSeek",
-    speed: "Slow",
-    iconSrc: "/models/deepseek.svg",
-  },
-  {
-    value: "kimi-k3",
-    label: "Kimi K3",
-    provider: "Moonshot",
-    speed: "Moderate",
-    iconSrc: "/models/moonshot.svg",
-  },
-] as const satisfies readonly ModelOption[];
-
-type ModelValue = (typeof MODEL_OPTIONS)[number]["value"];
-
-function ModelIcon({ model }: { model: ModelOption }) {
+function ModelIcon({ model }: { model: QuizModelOption }) {
   return (
     <span
       aria-hidden
-      className="block size-4 shrink-0 bg-current"
+      className="bg-muted-foreground block size-4 shrink-0"
       style={{
-        maskImage: `url(${model.iconSrc})`,
+        maskImage: `url(${model.iconPath})`,
         maskPosition: "center",
         maskRepeat: "no-repeat",
         maskSize: "contain",
-        WebkitMaskImage: `url(${model.iconSrc})`,
+        WebkitMaskImage: `url(${model.iconPath})`,
         WebkitMaskPosition: "center",
         WebkitMaskRepeat: "no-repeat",
         WebkitMaskSize: "contain",
@@ -92,19 +44,14 @@ function ModelIcon({ model }: { model: ModelOption }) {
   );
 }
 
-function ModelOptionIcon({ model }: { model: ModelOption }) {
-  return (
-    <span className="bg-muted text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-lg">
-      <ModelIcon model={model} />
-    </span>
-  );
+interface ModelPickerProps {
+  value: QuizModel;
+  onChange: (value: QuizModel) => void;
 }
 
-export function ModelPicker() {
+export function ModelPicker({ value, onChange }: ModelPickerProps) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<ModelValue>(MODEL_OPTIONS[0].value);
-  const model =
-    MODEL_OPTIONS.find((option) => option.value === value) ?? MODEL_OPTIONS[0];
+  const model = getQuizModelByValue(value);
 
   return (
     <div className="flex min-h-14 items-center gap-3">
@@ -145,9 +92,7 @@ export function ModelPicker() {
             aria-label={`Model: ${model.label}`}
             className="min-w-40 cursor-pointer justify-start"
           >
-            <span className="text-muted-foreground">
-              <ModelIcon model={model} />
-            </span>
+            <ModelIcon model={model} />
             <span className="min-w-0 flex-1 truncate text-left">
               {model.label}
             </span>
@@ -159,24 +104,19 @@ export function ModelPicker() {
           <CommandPickerList>
             <CommandPickerEmpty>No models found.</CommandPickerEmpty>
             <CommandPickerGroup>
-              {MODEL_OPTIONS.map((option) => (
+              {QUIZ_MODEL_OPTIONS.map((option) => (
                 <CommandPickerItem
                   key={option.value}
-                  value={`${option.label} ${option.provider} ${option.speed}`}
+                  value={`${option.label} ${option.provider}`}
                   data-checked={value === option.value}
                   onSelect={() => {
-                    setValue(option.value);
+                    onChange(option.value);
                     setOpen(false);
                   }}
                 >
-                  <ModelOptionIcon model={option} />
-                  <span className="flex min-w-0 flex-col">
-                    <span className="truncate text-sm font-medium">
-                      {option.label}
-                    </span>
-                    <span className="text-muted-foreground text-xs">
-                      {option.speed}
-                    </span>
+                  <ModelIcon model={option} />
+                  <span className="min-w-0 truncate text-sm font-medium">
+                    {option.label}
                   </span>
                 </CommandPickerItem>
               ))}

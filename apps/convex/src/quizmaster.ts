@@ -11,13 +11,10 @@ import type { QuizTone } from "./fields/quizTone";
 import { internal } from "./_generated/api";
 import { internalAction } from "./_generated/server";
 import { getQuizAnimalByValue } from "./fields/quizAnimal";
+import { getQuizModelByValue } from "./fields/quizModel";
 import { getQuizThemeByValue } from "./fields/quizTheme";
 
 const openrouter = createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
-
-const model = openrouter("google/gemini-3.6-flash", {
-  plugins: [{ id: "response-healing" }],
-});
 
 export const generateQuestions = internalAction({
   args: { gameId: v.id("games") },
@@ -33,6 +30,11 @@ export const generateQuestions = internalAction({
         quizToneValue: gameConfig.quizTone,
       });
 
+      const quizModel = getQuizModelByValue(gameConfig.quizModel);
+      const model = openrouter(quizModel.value, {
+        plugins: [{ id: "response-healing" }],
+        reasoning: { effort: quizModel.reasoningEffort },
+      });
       const schema = buildQuestionSchema(gameConfig.questionCount);
       const { output } = await generateText({
         model,

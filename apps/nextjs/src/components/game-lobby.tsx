@@ -37,6 +37,7 @@ interface GameLobbyProps {
 
 export function GameLobby({ game, players, me }: GameLobbyProps) {
   const updateQuizAnimal = useSessionMutation(api.games.updateQuizAnimal);
+  const updateQuizModel = useSessionMutation(api.games.updateQuizModel);
   const updateQuizTheme = useSessionMutation(api.games.updateQuizTheme);
   const updateCharacter = useSessionMutation(api.players.updateCharacter);
   const updateIsReady = useSessionMutation(api.players.updateIsReady);
@@ -186,7 +187,12 @@ export function GameLobby({ game, players, me }: GameLobbyProps) {
                   });
                 }}
               />
-              <ModelPicker />
+              <ModelPicker
+                value={game.quizModel}
+                onChange={(quizModel) => {
+                  void updateQuizModel({ gameId: game._id, quizModel });
+                }}
+              />
             </CardContent>
           </Card>
         </main>

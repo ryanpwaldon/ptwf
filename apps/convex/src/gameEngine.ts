@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalMutation, internalQuery } from "./_generated/server";
 import { quizAnimalValidator } from "./fields/quizAnimal";
+import { quizModelValidator } from "./fields/quizModel";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
 
@@ -11,6 +12,7 @@ export const getGameConfig = internalQuery({
   returns: v.object({
     questionCount: v.number(),
     quizAnimal: quizAnimalValidator,
+    quizModel: quizModelValidator,
     quizTheme: quizThemeValidator,
     quizTone: quizToneValidator,
   }),
@@ -20,6 +22,7 @@ export const getGameConfig = internalQuery({
     return {
       questionCount: game.questionCount,
       quizAnimal: game.quizAnimal,
+      quizModel: game.quizModel,
       quizTheme: game.quizTheme,
       quizTone: game.quizTone,
     };

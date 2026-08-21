@@ -9,6 +9,7 @@ import {
   timeLimitSecondsValidator,
 } from "./fields/gameSettings";
 import { quizAnimalValidator } from "./fields/quizAnimal";
+import { quizModelValidator } from "./fields/quizModel";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
 import { addPlayerToLobby, createGameWithPlayer } from "./gameHelpers";
@@ -63,6 +64,7 @@ export const playAgain = mutation({
       const replayGame = await createGameWithPlayer(ctx, args.sessionId, {
         settings: {
           quizAnimal: game.quizAnimal,
+          quizModel: game.quizModel,
           quizTone: game.quizTone,
           quizTheme: game.quizTheme,
           questionCount: game.questionCount,
@@ -125,6 +127,19 @@ export const updateQuizAnimal = mutation({
   handler: async (ctx, args) => {
     await requireParticipant(ctx, args.gameId, args.sessionId);
     await ctx.db.patch(args.gameId, { quizAnimal: args.quizAnimal });
+  },
+});
+
+export const updateQuizModel = mutation({
+  args: {
+    ...SessionIdArg,
+    gameId: v.id("games"),
+    quizModel: quizModelValidator,
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await requireParticipant(ctx, args.gameId, args.sessionId);
+    await ctx.db.patch(args.gameId, { quizModel: args.quizModel });
   },
 });
 

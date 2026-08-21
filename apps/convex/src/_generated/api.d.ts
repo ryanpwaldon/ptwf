@@ -13,6 +13,7 @@ import type * as fields_character from "../fields/character.js";
 import type * as fields_gameCode from "../fields/gameCode.js";
 import type * as fields_gameSettings from "../fields/gameSettings.js";
 import type * as fields_quizAnimal from "../fields/quizAnimal.js";
+import type * as fields_quizModel from "../fields/quizModel.js";
 import type * as fields_quizTheme from "../fields/quizTheme.js";
 import type * as fields_quizTone from "../fields/quizTone.js";
 import type * as gameEngine from "../gameEngine.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   "fields/gameCode": typeof fields_gameCode;
   "fields/gameSettings": typeof fields_gameSettings;
   "fields/quizAnimal": typeof fields_quizAnimal;
+  "fields/quizModel": typeof fields_quizModel;
   "fields/quizTheme": typeof fields_quizTheme;
   "fields/quizTone": typeof fields_quizTone;
   gameEngine: typeof gameEngine;

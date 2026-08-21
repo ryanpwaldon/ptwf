@@ -9,7 +9,12 @@ import { findPlayerBySession } from "./playerHelpers";
 
 type GameSettings = Pick<
   Doc<"games">,
-  "quizAnimal" | "quizTone" | "quizTheme" | "questionCount" | "timeLimitSeconds"
+  | "quizAnimal"
+  | "quizModel"
+  | "quizTone"
+  | "quizTheme"
+  | "questionCount"
+  | "timeLimitSeconds"
 >;
 
 interface CreateGameOptions {
@@ -36,6 +41,7 @@ export async function createGameWithPlayer(
     code,
     status: "lobby",
     quizAnimal: options.settings?.quizAnimal ?? "dogs",
+    quizModel: options.settings?.quizModel ?? "openai/gpt-5.6-luna",
     quizTone: options.settings?.quizTone ?? "standard",
     quizTheme: options.settings?.quizTheme ?? "diet-and-nutrition",
     questionCount: options.settings?.questionCount ?? 10,

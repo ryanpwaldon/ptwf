@@ -4,6 +4,7 @@ import { v } from "convex/values";
 import { characterValidator } from "./fields/character";
 import { gameCodeValidator } from "./fields/gameCode";
 import { quizAnimalValidator } from "./fields/quizAnimal";
+import { quizModelValidator } from "./fields/quizModel";
 import { quizThemeValidator } from "./fields/quizTheme";
 import { quizToneValidator } from "./fields/quizTone";
 
@@ -17,6 +18,7 @@ const schema = defineSchema({
       v.literal("finished"),
     ),
     quizAnimal: quizAnimalValidator,
+    quizModel: quizModelValidator,
     quizTone: quizToneValidator,
     quizTheme: quizThemeValidator,
     questionCount: v.number(),
