@@ -1,6 +1,6 @@
 # All about pets!
 
-A real-time multiplayer game about responsible pet care. Invite your friends, choose a pet and care topic, then play timed rounds of AI-generated trivia.
+A multiplayer trivia game about responsible pet care. Choose a pet and care topic, invite your friends, and compete in timed rounds of AI-generated questions.
 
 ## Development
 
