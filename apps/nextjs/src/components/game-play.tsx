@@ -14,11 +14,7 @@ import { RadioGroup } from "@acme/ui/radio-group";
 
 import type { Answer, Game, Me, Player, Question } from "~/lib/game-data";
 import { AnswerChoice } from "~/components/answer-choice";
-import {
-  gameHeaderVariants,
-  questionContentVariants,
-  questionExit,
-} from "~/components/game-transition";
+import { questionExit } from "~/components/game-transition";
 import { PlayerAvatarGroup } from "~/components/player-avatar-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
 import { TimeRemainingBar } from "~/components/time-remaining-bar";
@@ -152,10 +148,7 @@ function GamePlayInner({
   return (
     <AppShell>
       <PageContainer className="flex flex-1 flex-col">
-        <motion.header
-          variants={gameHeaderVariants}
-          className="flex h-16 items-center justify-between"
-        >
+        <motion.header className="flex h-16 items-center justify-between">
           <div className="flex h-full w-20 items-center justify-center">
             <div className="bg-secondary text-muted-foreground flex size-7 items-center justify-center rounded-md text-center text-sm font-medium">
               Q{game.currentQuestionIndex + 1}
@@ -186,10 +179,7 @@ function GamePlayInner({
             </div>
           </div>
         </motion.header>
-        <motion.main
-          variants={questionContentVariants}
-          className="flex-1 px-4 pb-16"
-        >
+        <motion.main className="flex-1 px-4 pb-16">
           <AnimatePresence mode="wait">
             <motion.div
               key={game.currentQuestionIndex}
