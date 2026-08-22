@@ -66,19 +66,47 @@ const QUIZ_GENERATION_TIMEOUT_MS = 30_000;
 
 export function transformQuestions(
   output: z.infer<ReturnType<typeof buildQuestionSchema>>,
+  random: () => number = Math.random,
 ): {
   text: string;
   choices: { label: string; text: string }[];
   correctLabel: string;
 }[] {
-  return output.questions.map((q) => ({
-    text: q.question,
-    choices: q.choices.map((answer, i) => ({
-      label: labelAt(i),
-      text: answer,
-    })),
-    correctLabel: labelAt(q.correctIndex),
-  }));
+  return output.questions.map((q) => {
+    const answers = shuffle(
+      [
+        { text: q.correctAnswer, isCorrect: true },
+        ...q.incorrectAnswers.map((text) => ({ text, isCorrect: false })),
+      ],
+      random,
+    );
+
+    return {
+      text: q.question,
+      choices: answers.map((answer, i) => ({
+        label: labelAt(i),
+        text: answer.text,
+      })),
+      correctLabel: labelAt(answers.findIndex((answer) => answer.isCorrect)),
+    };
+  });
+}
+
+function shuffle<T>(items: readonly T[], random: () => number): T[] {
+  const shuffled = [...items];
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    const item = shuffled[i];
+    const swap = shuffled[j];
+    if (item === undefined || swap === undefined) {
+      throw new Error("Invalid shuffle index.");
+    }
+    shuffled[i] = swap;
+    shuffled[j] = item;
+  }
+
+  return shuffled;
 }
 
 export function labelAt(i: number): "A" | "B" | "C" | "D" {
@@ -94,13 +122,8 @@ function buildQuestionSchema(questionCount: number) {
       .array(
         z.object({
           question: z.string(),
-          choices: z.array(z.string()).length(4),
-          correctIndex: z.union([
-            z.literal(0),
-            z.literal(1),
-            z.literal(2),
-            z.literal(3),
-          ]),
+          correctAnswer: z.string(),
+          incorrectAnswers: z.array(z.string()).length(3),
         }),
       )
       .length(questionCount),
@@ -142,10 +165,8 @@ export function buildPrompt(config: {
     `- Questions must be clearly and simply worded. Avoid awkward or confusing phrasing.`,
     `- Every question must end with a question mark.`,
     `- Try to keep each question under 120 characters. Prefer concise phrasing.`,
-    `- Each question must have exactly 4 answer choices.`,
-    `- Exactly one choice must be correct. Set correctIndex to its 0-based position (0 = first choice, 1 = second, 2 = third, 3 = fourth).`,
+    `- Provide exactly 1 correct answer and exactly 3 incorrect answers for each question.`,
     `- The 3 incorrect choices must be plausible but unambiguously wrong.`,
-    `- Randomize the position of the correct answer across questions — do not always place it in the same slot.`,
     `- Try to keep each answer choice under 100 characters.`,
     `- Every answer choice must end with a full stop, unless ending with a full stop would be grammatically inappropriate (e.g. a proper name or a short numeric answer).`,
   ].join("\n");

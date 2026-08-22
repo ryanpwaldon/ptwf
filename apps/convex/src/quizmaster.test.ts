@@ -28,29 +28,29 @@ describe("labelAt", () => {
 });
 
 describe("transformQuestions", () => {
-  it("maps question fields to the expected output shape", () => {
+  it("shuffles answers and tracks the correct label", () => {
     const input = {
       questions: [
         {
           question: "Which activity gives a dog mental enrichment?",
-          choices: ["Foraging", "Overfeeding", "Isolation", "Inactivity"],
-          correctIndex: 0 as const,
+          correctAnswer: "Foraging",
+          incorrectAnswers: ["Overfeeding", "Isolation", "Inactivity"],
         },
       ],
     };
 
-    const result = transformQuestions(input);
+    const result = transformQuestions(input, () => 0);
 
     expect(result).toEqual([
       {
         text: "Which activity gives a dog mental enrichment?",
         choices: [
-          { label: "A", text: "Foraging" },
-          { label: "B", text: "Overfeeding" },
-          { label: "C", text: "Isolation" },
-          { label: "D", text: "Inactivity" },
+          { label: "A", text: "Overfeeding" },
+          { label: "B", text: "Isolation" },
+          { label: "C", text: "Inactivity" },
+          { label: "D", text: "Foraging" },
         ],
-        correctLabel: "A",
+        correctLabel: "D",
       },
     ]);
   });
