@@ -7,32 +7,6 @@ function defineOpenRouterSettings(settings: OpenRouterChatSettings) {
 
 export const QUIZ_MODEL_OPTIONS = [
   {
-    value: "openai/gpt-5.6-luna",
-    label: "GPT-5.6 Luna",
-    provider: "OpenAI",
-    iconPath: "/models/openai.svg",
-    openRouterSettings: defineOpenRouterSettings({
-      reasoning: { enabled: false, effort: "none" },
-      provider: {
-        ignore: ["phala"],
-        require_parameters: true,
-      },
-    }),
-  },
-  {
-    value: "anthropic/claude-sonnet-5",
-    label: "Claude Sonnet 5",
-    provider: "Anthropic",
-    iconPath: "/models/anthropic.svg",
-    openRouterSettings: defineOpenRouterSettings({
-      reasoning: { enabled: false, effort: "none" },
-      provider: {
-        ignore: ["phala"],
-        require_parameters: true,
-      },
-    }),
-  },
-  {
     value: "google/gemini-3.7-flash",
     label: "Gemini 3.7 Flash",
     provider: "Google",
@@ -50,6 +24,32 @@ export const QUIZ_MODEL_OPTIONS = [
     label: "Gemini 2.5 Flash Lite",
     provider: "Google",
     iconPath: "/models/google.svg",
+    openRouterSettings: defineOpenRouterSettings({
+      reasoning: { enabled: false, effort: "none" },
+      provider: {
+        ignore: ["phala"],
+        require_parameters: true,
+      },
+    }),
+  },
+  {
+    value: "openai/gpt-5.6-luna",
+    label: "GPT-5.6 Luna",
+    provider: "OpenAI",
+    iconPath: "/models/openai.svg",
+    openRouterSettings: defineOpenRouterSettings({
+      reasoning: { enabled: false, effort: "none" },
+      provider: {
+        ignore: ["phala"],
+        require_parameters: true,
+      },
+    }),
+  },
+  {
+    value: "anthropic/claude-sonnet-5",
+    label: "Claude Sonnet 5",
+    provider: "Anthropic",
+    iconPath: "/models/anthropic.svg",
     openRouterSettings: defineOpenRouterSettings({
       reasoning: { enabled: false, effort: "none" },
       provider: {

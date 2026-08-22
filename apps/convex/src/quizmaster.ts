@@ -130,30 +130,6 @@ function buildQuestionSchema(questionCount: number) {
   });
 }
 
-interface BadQuestionExample {
-  question: string;
-  choices: readonly [string, string, string, string];
-  whyItIsBad: string;
-  generalLesson: string;
-}
-
-const BAD_QUESTION_EXAMPLES = [
-  {
-    question:
-      "Which treat is generally safest for a dog when prepared appropriately?",
-    choices: [
-      "Chocolate-coated biscuits.",
-      "Grapes or raisins.",
-      "A small piece of plain, cooked, boneless chicken.",
-      "Macadamia nuts seasoned with salt.",
-    ],
-    whyItIsBad:
-      "This question frames several toxic foods as merely “less safe” alternatives. Asking which option is “generally safest” implies that the other choices may still be acceptable in some circumstances, rather than clearly communicating that they can seriously harm a dog.",
-    generalLesson:
-      "Do not use mild comparative wording when the real distinction is between safe and dangerous. If an incorrect answer involves poisoning, injury, or another significant danger, the question must describe it as unsafe. Avoid wording such as “safer,” “better,” or “preferred” when it could minimise the severity of harmful pet-care practices.",
-  },
-] satisfies readonly BadQuestionExample[];
-
 export function buildPrompt(config: {
   questionCount: number;
   quizAnimalValue: QuizAnimal;
@@ -197,6 +173,30 @@ export function buildPrompt(config: {
     formatBadQuestionExamples(),
   ].join("\n");
 }
+
+interface BadQuestionExample {
+  question: string;
+  choices: readonly [string, string, string, string];
+  whyItIsBad: string;
+  generalLesson: string;
+}
+
+const BAD_QUESTION_EXAMPLES = [
+  {
+    question:
+      "Which treat is generally safest for a dog when prepared appropriately?",
+    choices: [
+      "Chocolate-coated biscuits.",
+      "Grapes or raisins.",
+      "A small piece of plain, cooked, boneless chicken.",
+      "Macadamia nuts seasoned with salt.",
+    ],
+    whyItIsBad:
+      "This question frames several toxic foods as merely “less safe” alternatives. Asking which option is “generally safest” implies that the other choices may still be acceptable in some circumstances, rather than clearly communicating that they can seriously harm a dog.",
+    generalLesson:
+      "Do not use mild comparative wording when the real distinction is between safe and dangerous. If an incorrect answer involves poisoning, injury, or another significant danger, the question must describe it as unsafe. Avoid wording such as “safer,” “better,” or “preferred” when it could minimise the severity of harmful pet-care practices.",
+  },
+] satisfies readonly BadQuestionExample[];
 
 function formatBadQuestionExamples(): string {
   const examples = BAD_QUESTION_EXAMPLES.flatMap((example, index) => [

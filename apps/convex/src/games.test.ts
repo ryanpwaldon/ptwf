@@ -69,7 +69,7 @@ describe("games", () => {
     const game = await t.query(api.games.byCode, { code });
 
     expect(game?.quizAnimal).toBe("dogs");
-    expect(game?.quizModel).toBe("openai/gpt-5.6-luna");
+    expect(game?.quizModel).toBe("google/gemini-3.7-flash");
   });
 
   it("stores only the selected animal value", async () => {

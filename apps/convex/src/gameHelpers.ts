@@ -41,7 +41,7 @@ export async function createGameWithPlayer(
     code,
     status: "lobby",
     quizAnimal: options.settings?.quizAnimal ?? "dogs",
-    quizModel: options.settings?.quizModel ?? "openai/gpt-5.6-luna",
+    quizModel: options.settings?.quizModel ?? "google/gemini-3.7-flash",
     quizTone: options.settings?.quizTone ?? "standard",
     quizTheme: options.settings?.quizTheme ?? "diet-and-nutrition",
     questionCount: options.settings?.questionCount ?? 10,
