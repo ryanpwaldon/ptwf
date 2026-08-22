@@ -130,6 +130,30 @@ function buildQuestionSchema(questionCount: number) {
   });
 }
 
+interface BadQuestionExample {
+  question: string;
+  choices: readonly [string, string, string, string];
+  whyItIsBad: string;
+  generalLesson: string;
+}
+
+const BAD_QUESTION_EXAMPLES = [
+  {
+    question:
+      "Which treat is generally safest for a dog when prepared appropriately?",
+    choices: [
+      "Chocolate-coated biscuits.",
+      "Grapes or raisins.",
+      "A small piece of plain, cooked, boneless chicken.",
+      "Macadamia nuts seasoned with salt.",
+    ],
+    whyItIsBad:
+      "This question frames several toxic foods as merely “less safe” alternatives. Asking which option is “generally safest” implies that the other choices may still be acceptable in some circumstances, rather than clearly communicating that they can seriously harm a dog.",
+    generalLesson:
+      "Do not use mild comparative wording when the real distinction is between safe and dangerous. If an incorrect answer involves poisoning, injury, or another significant danger, the question must describe it as unsafe. Avoid wording such as “safer,” “better,” or “preferred” when it could minimise the severity of harmful pet-care practices.",
+  },
+] satisfies readonly BadQuestionExample[];
+
 export function buildPrompt(config: {
   questionCount: number;
   quizAnimalValue: QuizAnimal;
@@ -169,5 +193,34 @@ export function buildPrompt(config: {
     `- The 3 incorrect choices must be plausible but unambiguously wrong.`,
     `- Try to keep each answer choice under 100 characters.`,
     `- Every answer choice must end with a full stop, unless ending with a full stop would be grammatically inappropriate (e.g. a proper name or a short numeric answer).`,
+    ``,
+    formatBadQuestionExamples(),
+  ].join("\n");
+}
+
+function formatBadQuestionExamples(): string {
+  const examples = BAD_QUESTION_EXAMPLES.flatMap((example, index) => [
+    `### Bad example ${index + 1}`,
+    ``,
+    example.question,
+    ``,
+    ...example.choices.map(
+      (choice, choiceIndex) => `${labelAt(choiceIndex)}. ${choice}`,
+    ),
+    ``,
+    `Why it is bad:`,
+    example.whyItIsBad,
+    ``,
+    `General lesson:`,
+    example.generalLesson,
+    ``,
+  ]);
+
+  return [
+    `## Examples of bad questions`,
+    ``,
+    `Use the following examples to understand the reasoning behind what makes a question unsuitable. Do not merely avoid or reword the specific questions shown; apply the general lessons to every question you generate.`,
+    ``,
+    ...examples,
   ].join("\n");
 }

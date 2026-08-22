@@ -75,4 +75,18 @@ describe("buildPrompt", () => {
     expect(prompt).toContain(DIET_THEME.label);
     expect(prompt).toContain(DIET_THEME.promptGuidance);
   });
+
+  it("includes bad question examples and their lessons", () => {
+    const prompt = buildPrompt(BASE_CONFIG);
+
+    expect(prompt).toContain("## Examples of bad questions");
+    expect(prompt).toContain(
+      "Which treat is generally safest for a dog when prepared appropriately?",
+    );
+    expect(prompt).toContain("Why it is bad:");
+    expect(prompt).toContain("General lesson:");
+    expect(prompt).toContain(
+      "Do not merely avoid or reword the specific questions shown",
+    );
+  });
 });
