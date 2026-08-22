@@ -70,7 +70,11 @@ export function PetPicker({ value, onChange }: PetPickerProps) {
         </Button>
       </CommandPickerTrigger>
 
-      <CommandPickerContent title="Choose a pet" shouldFilter={false}>
+      <CommandPickerContent
+        title="Choose a pet"
+        description="Search and select a pet for the quiz."
+        shouldFilter={false}
+      >
         <CommandPickerInput
           placeholder="Search pets..."
           value={search}

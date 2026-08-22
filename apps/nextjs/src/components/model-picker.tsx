@@ -99,7 +99,10 @@ export function ModelPicker({ value, onChange }: ModelPickerProps) {
             <ChevronDownIcon className="text-muted-foreground size-4" />
           </Button>
         </CommandPickerTrigger>
-        <CommandPickerContent title="Choose a model">
+        <CommandPickerContent
+          title="Choose a model"
+          description="Search and select the AI model that generates the questions."
+        >
           <CommandPickerInput placeholder="Search models..." />
           <CommandPickerList>
             <CommandPickerEmpty>No models found.</CommandPickerEmpty>

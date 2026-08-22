@@ -53,7 +53,10 @@ export function CareTopicPicker({ value, onChange }: CareTopicPickerProps) {
           <ChevronDownIcon className="text-muted-foreground mr-3 size-4 shrink-0" />
         </Button>
       </CommandPickerTrigger>
-      <CommandPickerContent title="Choose a care topic">
+      <CommandPickerContent
+        title="Choose a care topic"
+        description="Search and select a care topic for the quiz."
+      >
         <CommandPickerInput placeholder="Search care topics..." />
         <CommandPickerList>
           <CommandPickerEmpty>No care topics found.</CommandPickerEmpty>

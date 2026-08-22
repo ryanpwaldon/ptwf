@@ -21,6 +21,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
@@ -31,11 +32,13 @@ const CommandPickerTrigger = DialogTrigger;
 
 function CommandPickerContent({
   title,
+  description,
   className,
   children,
   ...commandProps
 }: React.ComponentProps<typeof Command> & {
   title: string;
+  description: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -68,6 +71,7 @@ function CommandPickerContent({
       className="bg-muted sm:bg-card inset-0 h-(--visual-viewport-height,100dvh) max-h-none w-full max-w-full! translate-0 rounded-none p-0 ring-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:w-[calc(100%-2rem)] sm:max-w-[34rem]! sm:-translate-x-1/2 sm:-translate-y-1/2 sm:overflow-hidden sm:rounded-xl sm:ring-1"
     >
       <DialogTitle className="sr-only">{title}</DialogTitle>
+      <DialogDescription className="sr-only">{description}</DialogDescription>
       <div className="mx-auto flex h-full min-h-0 w-full max-w-xl min-w-0 flex-col sm:h-auto">
         <Command
           className={cn(

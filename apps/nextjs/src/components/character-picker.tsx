@@ -49,7 +49,10 @@ export function CharacterPicker({
           <ChevronDownIcon className="text-muted-foreground size-4" />
         </Button>
       </CommandPickerTrigger>
-      <CommandPickerContent title="Choose a character">
+      <CommandPickerContent
+        title="Choose a character"
+        description="Search and select your character."
+      >
         <CommandPickerInput placeholder="Search characters..." />
         <CommandPickerList>
           <CommandPickerEmpty>No characters found.</CommandPickerEmpty>
