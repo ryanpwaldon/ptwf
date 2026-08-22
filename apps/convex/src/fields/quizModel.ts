@@ -1,4 +1,9 @@
+import type { OpenRouterChatSettings } from "@openrouter/ai-sdk-provider";
 import { v } from "convex/values";
+
+function defineOpenRouterSettings(settings: OpenRouterChatSettings) {
+  return settings;
+}
 
 export const QUIZ_MODEL_OPTIONS = [
   {
@@ -6,42 +11,78 @@ export const QUIZ_MODEL_OPTIONS = [
     label: "GPT-5.6 Luna",
     provider: "OpenAI",
     iconPath: "/models/openai.svg",
-    reasoningEffort: "none",
+    openRouterSettings: defineOpenRouterSettings({
+      reasoning: { enabled: false, effort: "none" },
+      provider: {
+        ignore: ["phala"],
+        require_parameters: true,
+      },
+    }),
   },
   {
     value: "anthropic/claude-sonnet-5",
     label: "Claude Sonnet 5",
     provider: "Anthropic",
     iconPath: "/models/anthropic.svg",
-    reasoningEffort: "none",
+    openRouterSettings: defineOpenRouterSettings({
+      reasoning: { enabled: false, effort: "none" },
+      provider: {
+        ignore: ["phala"],
+        require_parameters: true,
+      },
+    }),
   },
   {
     value: "google/gemini-3.7-flash",
     label: "Gemini 3.7 Flash",
     provider: "Google",
     iconPath: "/models/google.svg",
-    reasoningEffort: "low",
+    openRouterSettings: defineOpenRouterSettings({
+      reasoning: { enabled: true, effort: "low" },
+      provider: {
+        ignore: ["phala"],
+        require_parameters: true,
+      },
+    }),
   },
   {
     value: "google/gemini-2.5-flash-lite",
     label: "Gemini 2.5 Flash Lite",
     provider: "Google",
     iconPath: "/models/google.svg",
-    reasoningEffort: "none",
+    openRouterSettings: defineOpenRouterSettings({
+      reasoning: { enabled: false, effort: "none" },
+      provider: {
+        ignore: ["phala"],
+        require_parameters: true,
+      },
+    }),
   },
   {
     value: "deepseek/deepseek-v4-pro-0813",
     label: "DeepSeek V4 Pro 0813",
     provider: "DeepSeek",
     iconPath: "/models/deepseek.svg",
-    reasoningEffort: "none",
+    openRouterSettings: defineOpenRouterSettings({
+      reasoning: { enabled: false, effort: "none" },
+      provider: {
+        ignore: ["phala"],
+        require_parameters: true,
+      },
+    }),
   },
   {
     value: "moonshotai/kimi-k2.6",
     label: "Kimi K2.6",
     provider: "Moonshot AI",
     iconPath: "/models/moonshot.svg",
-    reasoningEffort: "none",
+    openRouterSettings: defineOpenRouterSettings({
+      reasoning: { enabled: false, effort: "none" },
+      provider: {
+        ignore: ["phala"],
+        require_parameters: true,
+      },
+    }),
   },
 ] as const;
 

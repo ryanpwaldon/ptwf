@@ -109,7 +109,10 @@ export const updateIsReady = mutation({
       );
       if (!allReady) return;
       // Generate questions.
-      await ctx.db.patch(args.gameId, { status: "generating" });
+      await ctx.db.patch(args.gameId, {
+        status: "generating",
+        quizGenerationFailedAt: undefined,
+      });
       await ctx.scheduler.runAfter(0, internal.quizmaster.generateQuestions, {
         gameId: args.gameId,
       });

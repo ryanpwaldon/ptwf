@@ -132,11 +132,26 @@ export const advanceQuestion = internalMutation({
   },
 });
 
-export const resetStatus = internalMutation({
+export const recoverFromGenerationFailure = internalMutation({
   args: { gameId: v.id("games") },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.gameId, { status: "lobby" });
+    const game = await ctx.db.get(args.gameId);
+    if (game?.status !== "generating") return null;
+
+    const players = await ctx.db
+      .query("players")
+      .withIndex("by_gameId", (q) => q.eq("gameId", args.gameId))
+      .collect();
+
+    for (const player of players) {
+      await ctx.db.patch(player._id, { isReady: false });
+    }
+
+    await ctx.db.patch(args.gameId, {
+      status: "lobby",
+      quizGenerationFailedAt: Date.now(),
+    });
   },
 });
 

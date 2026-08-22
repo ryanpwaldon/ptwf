@@ -32,14 +32,15 @@ export const generateQuestions = internalAction({
 
       const quizModel = getQuizModelByValue(gameConfig.quizModel);
       const model = openrouter(quizModel.value, {
+        ...quizModel.openRouterSettings,
         plugins: [{ id: "response-healing" }],
-        reasoning: { effort: quizModel.reasoningEffort },
       });
       const schema = buildQuestionSchema(gameConfig.questionCount);
       const { output } = await generateText({
         model,
         prompt,
         output: Output.object({ schema }),
+        timeout: QUIZ_GENERATION_TIMEOUT_MS,
       });
 
       const questions = transformQuestions(output);
@@ -49,7 +50,7 @@ export const generateQuestions = internalAction({
         questions,
       });
     } catch (error) {
-      await ctx.runMutation(internal.gameEngine.resetStatus, {
+      await ctx.runMutation(internal.gameEngine.recoverFromGenerationFailure, {
         gameId: args.gameId,
       });
       throw error;
@@ -60,6 +61,8 @@ export const generateQuestions = internalAction({
 // ========================================================================================
 // Helpers
 // ========================================================================================
+
+const QUIZ_GENERATION_TIMEOUT_MS = 30_000;
 
 export function transformQuestions(
   output: z.infer<ReturnType<typeof buildQuestionSchema>>,

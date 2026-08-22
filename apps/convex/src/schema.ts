@@ -26,6 +26,7 @@ const schema = defineSchema({
     currentQuestionIndex: v.number(),
     roundEndsAt: v.optional(v.number()),
     phase: v.optional(v.union(v.literal("answering"), v.literal("results"))),
+    quizGenerationFailedAt: v.optional(v.number()),
     replayGameId: v.optional(v.id("games")),
   })
     .index("by_code", ["code"])

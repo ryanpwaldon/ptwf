@@ -267,6 +267,9 @@ describe("players.updateIsReady", () => {
   it("schedules generateQuestions and sets status to generating when last player marks ready", async () => {
     const t = convexTest(schema, modules);
     const { gameId } = await setupLobbyGameWithPlayers(t);
+    await t.run((ctx) =>
+      ctx.db.patch(gameId, { quizGenerationFailedAt: Date.now() }),
+    );
 
     // Intercept the 0ms scheduler timer before it fires.
     vi.useFakeTimers();
@@ -291,6 +294,7 @@ describe("players.updateIsReady", () => {
 
       const game = await t.run((ctx) => ctx.db.get(gameId));
       expect(game?.status).toBe("generating");
+      expect(game?.quizGenerationFailedAt).toBeUndefined();
     } finally {
       vi.clearAllTimers();
       vi.useRealTimers();

@@ -11,6 +11,7 @@ import { ConvexError } from "convex/values";
 import { AnimatePresence, motion } from "motion/react";
 
 import { api } from "@acme/convex";
+import { toast } from "@acme/ui/toast";
 
 import { FullScreenError } from "~/components/full-screen-error";
 import { FullScreenLoader } from "~/components/full-screen-loader";
@@ -35,6 +36,7 @@ export default function GamePage() {
   const joinGame = useSessionMutation(api.players.join);
   const [joinError, setJoinError] = useState<string | null>(null);
   const hasAttemptedJoin = useRef(false);
+  const lastQuizGenerationFailure = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (game && me === null && !hasAttemptedJoin.current) {
@@ -48,6 +50,13 @@ export default function GamePage() {
       });
     }
   }, [game, joinGame, me]);
+
+  useEffect(() => {
+    const failedAt = game?.quizGenerationFailedAt;
+    if (!failedAt || lastQuizGenerationFailure.current === failedAt) return;
+    lastQuizGenerationFailure.current = failedAt;
+    toast.error("Quiz generation failed. Please try again.");
+  }, [game?.quizGenerationFailedAt]);
 
   if (game === null) {
     return (

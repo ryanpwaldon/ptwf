@@ -404,6 +404,54 @@ describe("gameEngine.saveQuestions", () => {
   });
 });
 
+describe("gameEngine.recoverFromGenerationFailure", () => {
+  it("returns the game to the lobby and resets every player", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await t.run(async (ctx) => {
+      const gameId = await ctx.db.insert("games", {
+        code: "XXXXXX",
+        status: "generating",
+        quizAnimal: "dogs",
+        quizModel: "openai/gpt-5.6-luna",
+        quizTone: "standard",
+        quizTheme: "diet-and-nutrition",
+        questionCount: 2,
+        timeLimitSeconds: 30,
+        currentQuestionIndex: 0,
+      });
+      await ctx.db.insert("players", {
+        gameId,
+        sessionId: "session-1",
+        character: "apricot",
+        isReady: true,
+      });
+      await ctx.db.insert("players", {
+        gameId,
+        sessionId: "session-2",
+        character: "aqua",
+        isReady: true,
+      });
+      return { gameId };
+    });
+
+    await t.mutation(internal.gameEngine.recoverFromGenerationFailure, {
+      gameId,
+    });
+
+    const game = await t.run((ctx) => ctx.db.get(gameId));
+    const players = await t.run((ctx) =>
+      ctx.db
+        .query("players")
+        .withIndex("by_gameId", (q) => q.eq("gameId", gameId))
+        .collect(),
+    );
+
+    expect(game?.status).toBe("lobby");
+    expect(game?.quizGenerationFailedAt).toEqual(expect.any(Number));
+    expect(players.every((player) => !player.isReady)).toBe(true);
+  });
+});
+
 describe("gameEngine integration", () => {
   it("completes a two-question game end-to-end", async () => {
     const t = convexTest(schema, modules);
