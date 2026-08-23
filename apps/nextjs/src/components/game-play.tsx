@@ -11,10 +11,13 @@ import { api, getCharacterByValue } from "@acme/convex";
 import { cn } from "@acme/ui";
 import { AvatarBadge } from "@acme/ui/avatar";
 import { RadioGroup } from "@acme/ui/radio-group";
+import { toast } from "@acme/ui/toast";
 
 import type { Answer, Game, Me, Player, Question } from "~/lib/game-data";
 import { AnswerChoice } from "~/components/answer-choice";
 import { questionExit } from "~/components/game-transition";
+import { NextQuestionButton } from "~/components/next-question-button";
+import { PageFooter } from "~/components/page-footer";
 import { PlayerAvatarGroup } from "~/components/player-avatar-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
 import { TimeRemainingBar } from "~/components/time-remaining-bar";
@@ -37,6 +40,21 @@ export function GamePlay({
   answers,
 }: GamePlayProps) {
   const submitAnswer = useSessionMutation(api.answers.submit);
+  const markReadyForNextQuestion = useSessionMutation(
+    api.players.markReadyForNextQuestion,
+  ).withOptimisticUpdate((localStore, args) => {
+    const currentPlayers = localStore.getQuery(api.players.allByGameId, { gameId: args.gameId }); // prettier-ignore
+    if (!currentPlayers) return;
+    localStore.setQuery(
+      api.players.allByGameId,
+      { gameId: args.gameId },
+      currentPlayers.map(
+        (player) =>
+        player._id === me._id ? { ...player, readyForNextQuestionIndex: args.expectedIndex } : player, // prettier-ignore
+      ),
+    );
+  });
+
   const answerIndex = useMemo(() => createAnswerIndex(answers), [answers]);
   const phase = game.phase;
   if (!phase) return null;
@@ -95,6 +113,9 @@ export function GamePlay({
       playerCharacters={playerCharacters}
       answerCorrectness={answerCorrectness}
       submitAnswer={(label: string) => submitAnswer({ gameId: game._id, selectedLabel: label })} // prettier-ignore
+      markReadyForNextQuestion={(expectedIndex: number) => markReadyForNextQuestion({ gameId: game._id, expectedIndex })} // prettier-ignore
+      meReadyForNextQuestionIndex={players.find((player) => player._id === me._id)?.readyForNextQuestionIndex} // prettier-ignore
+      readyForNextQuestionCount={players.filter((player) => player.readyForNextQuestionIndex === game.currentQuestionIndex).length} // prettier-ignore
     />
   );
 }
@@ -111,6 +132,9 @@ function GamePlayInner({
   playerCharacters,
   answerCorrectness,
   submitAnswer,
+  markReadyForNextQuestion,
+  meReadyForNextQuestionIndex,
+  readyForNextQuestionCount,
 }: {
   game: Game;
   phase: "answering" | "results";
@@ -128,6 +152,9 @@ function GamePlayInner({
   playerCharacters: Character[];
   answerCorrectness: Map<string, boolean>;
   submitAnswer: (label: string) => void;
+  markReadyForNextQuestion: (expectedIndex: number) => Promise<null>;
+  meReadyForNextQuestionIndex: number | undefined;
+  readyForNextQuestionCount: number;
 }) {
   // Track the local pick with the question index it belongs to. When the
   // question advances, the index won't match and we fall through to the
@@ -138,11 +165,21 @@ function GamePlayInner({
   const secondsLeft = phase === "answering" ? Math.ceil(timeRemaining / 1000) : 0; // prettier-ignore
   const showResults = phase === "results";
   const isAnswering = phase === "answering";
+  const hasMarkedReadyForNext = meReadyForNextQuestionIndex === game.currentQuestionIndex; // prettier-ignore
+  const isLastQuestion = game.currentQuestionIndex >= questionCount - 1;
+  const nextActionLabel = isLastQuestion ? "Finish" : "Next";
+  const nextButtonLabel = playerCharacters.length === 1 ? nextActionLabel : `${nextActionLabel} ${readyForNextQuestionCount}/${playerCharacters.length}`; // prettier-ignore
 
   const handleSelect = (label: string) => {
     if (phase !== "answering") return;
     setLocalPick({ index: game.currentQuestionIndex, label });
     void submitAnswer(label);
+  };
+
+  const handleNext = () => {
+    void markReadyForNextQuestion(game.currentQuestionIndex).catch(() => {
+      toast.error("Could not mark you ready for the next question.");
+    });
   };
 
   return (
@@ -263,6 +300,16 @@ function GamePlayInner({
           </AnimatePresence>
         </motion.main>
       </PageContainer>
+      {showResults && game.roundEndsAt !== undefined && (
+        <PageFooter>
+          <NextQuestionButton
+            disabled={hasMarkedReadyForNext}
+            label={nextButtonLabel}
+            roundEndsAt={game.roundEndsAt}
+            onClick={handleNext}
+          />
+        </PageFooter>
+      )}
     </AppShell>
   );
 }

@@ -37,6 +37,7 @@ const schema = defineSchema({
     sessionId: v.string(),
     character: characterValidator,
     isReady: v.boolean(),
+    readyForNextQuestionIndex: v.optional(v.number()),
     replayRequested: v.optional(v.boolean()),
   })
     .index("by_gameId", ["gameId"])

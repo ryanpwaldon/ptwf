@@ -2,6 +2,7 @@ import { convexTest } from "convex-test";
 import { describe, expect, it, vi } from "vitest";
 
 import { internal } from "./_generated/api";
+import { RESULTS_DURATION_SECONDS } from "./fields/gameSettings";
 import schema from "./schema";
 import { modules } from "./test.setup";
 
@@ -55,6 +56,7 @@ async function setupActiveGameInResultsPhase(t: ReturnType<typeof convexTest>) {
       questionCount: 2,
       timeLimitSeconds: 30,
       currentQuestionIndex: 0,
+      roundEndsAt: Date.now() + RESULTS_DURATION_SECONDS * 1000,
     });
     const questionId = await ctx.db.insert("questions", {
       ...BASE_QUESTION,
@@ -119,18 +121,25 @@ describe("gameEngine.endAnswering", () => {
     expect(result).toBeNull();
   });
 
-  it("sets phase to results and clears roundEndsAt", async () => {
+  it("sets phase to results with a results deadline", async () => {
     const t = convexTest(schema, modules);
     const { gameId } = await setupActiveGameInAnsweringPhase(t);
+    const beforeMutation = Date.now();
 
     await t.mutation(internal.gameEngine.endAnswering, {
       gameId,
       expectedIndex: 0,
     });
 
+    const afterMutation = Date.now();
     const game = await t.run((ctx) => ctx.db.get(gameId));
     expect(game?.phase).toBe("results");
-    expect(game?.roundEndsAt).toBeUndefined();
+    expect(game?.roundEndsAt).toBeGreaterThanOrEqual(
+      beforeMutation + RESULTS_DURATION_SECONDS * 1000,
+    );
+    expect(game?.roundEndsAt).toBeLessThanOrEqual(
+      afterMutation + RESULTS_DURATION_SECONDS * 1000,
+    );
   });
 
   it("schedules advanceQuestion", async () => {
@@ -239,6 +248,7 @@ describe("gameEngine.advanceQuestion", () => {
     const game = await t.run((ctx) => ctx.db.get(gameId));
     expect(game?.status).toBe("finished");
     expect(game?.phase).toBeUndefined();
+    expect(game?.roundEndsAt).toBeUndefined();
 
     const scheduled = await t.run((ctx) =>
       ctx.db.system.query("_scheduled_functions").collect(),

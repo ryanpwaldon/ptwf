@@ -7,7 +7,7 @@ import { mutation, query } from "./_generated/server";
 import { characterValidator } from "./fields/character";
 import { gameCodeValidator, parseGameCode } from "./fields/gameCode";
 import { addPlayerToLobby } from "./gameHelpers";
-import { findPlayerBySession } from "./playerHelpers";
+import { findPlayerBySession, requireParticipant } from "./playerHelpers";
 import schema from "./schema";
 
 // ========================================================================================
@@ -117,6 +117,45 @@ export const updateIsReady = mutation({
         gameId: args.gameId,
       });
     }
+  },
+});
+
+export const markReadyForNextQuestion = mutation({
+  args: {
+    ...SessionIdArg,
+    gameId: v.id("games"),
+    expectedIndex: v.number(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const player = await requireParticipant(ctx, args.gameId, args.sessionId);
+    const game = await ctx.db.get(args.gameId);
+    if (!game) throw new ConvexError("Game not found.");
+    if (game.status !== "active" || game.phase !== "results") return null;
+    if (game.currentQuestionIndex !== args.expectedIndex) return null;
+    if (player.readyForNextQuestionIndex === args.expectedIndex) return null;
+
+    await ctx.db.patch(player._id, {
+      readyForNextQuestionIndex: args.expectedIndex,
+    });
+
+    const players = await ctx.db
+      .query("players")
+      .withIndex("by_gameId", (q) => q.eq("gameId", args.gameId))
+      .collect();
+    const readyPlayerCount = players.filter(
+      (candidate) =>
+        candidate._id === player._id ||
+        candidate.readyForNextQuestionIndex === args.expectedIndex,
+    ).length;
+
+    if (readyPlayerCount >= players.length) {
+      await ctx.scheduler.runAfter(0, internal.gameEngine.advanceQuestion, {
+        gameId: args.gameId,
+        expectedIndex: args.expectedIndex,
+      });
+    }
+    return null;
   },
 });
 

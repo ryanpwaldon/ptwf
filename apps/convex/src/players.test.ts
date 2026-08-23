@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { api } from "./_generated/api";
 import { CHARACTER_OPTIONS } from "./fields/character";
+import { RESULTS_DURATION_SECONDS } from "./fields/gameSettings";
 import schema from "./schema";
 import { modules } from "./test.setup";
 
@@ -49,6 +50,31 @@ async function setupLobbyGameWithPlayers(t: ReturnType<typeof convexTest>) {
       isReady: false,
     });
     return { gameId, player1Id };
+  });
+}
+
+// Creates one active results game with two players.
+async function setupResultsGameWithPlayers(t: ReturnType<typeof convexTest>) {
+  return t.run(async (ctx) => {
+    const gameId = await ctx.db.insert("games", {
+      ...BASE_GAME,
+      status: "active",
+      phase: "results",
+      roundEndsAt: Date.now() + RESULTS_DURATION_SECONDS * 1000,
+    });
+    const player1Id = await ctx.db.insert("players", {
+      gameId,
+      sessionId: SESSION_1,
+      character: "apricot",
+      isReady: true,
+    });
+    const player2Id = await ctx.db.insert("players", {
+      gameId,
+      sessionId: SESSION_2,
+      character: "aqua",
+      isReady: true,
+    });
+    return { gameId, player1Id, player2Id };
   });
 }
 
@@ -295,6 +321,171 @@ describe("players.updateIsReady", () => {
       const game = await t.run((ctx) => ctx.db.get(gameId));
       expect(game?.status).toBe("generating");
       expect(game?.quizGenerationFailedAt).toBeUndefined();
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("players.markReadyForNextQuestion", () => {
+  it("throws when the session is not a participant", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupResultsGameWithPlayers(t);
+
+    await expect(
+      t.mutation(api.players.markReadyForNextQuestion, {
+        sessionId: STRANGER,
+        gameId,
+        expectedIndex: 0,
+      }),
+    ).rejects.toThrowError("Not a participant.");
+  });
+
+  it("ignores a vote outside the results phase", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId, player1Id } = await setupResultsGameWithPlayers(t);
+    await t.run((ctx) => ctx.db.patch(gameId, { phase: "answering" }));
+
+    await t.mutation(api.players.markReadyForNextQuestion, {
+      sessionId: SESSION_1,
+      gameId,
+      expectedIndex: 0,
+    });
+
+    const player = await t.run((ctx) => ctx.db.get(player1Id));
+    expect(player?.readyForNextQuestionIndex).toBeUndefined();
+  });
+
+  it("ignores a vote for a stale question index", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId, player1Id } = await setupResultsGameWithPlayers(t);
+
+    await t.mutation(api.players.markReadyForNextQuestion, {
+      sessionId: SESSION_1,
+      gameId,
+      expectedIndex: 1,
+    });
+
+    const player = await t.run((ctx) => ctx.db.get(player1Id));
+    expect(player?.readyForNextQuestionIndex).toBeUndefined();
+  });
+
+  it("stores an indexed vote without advancing early", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId, player1Id } = await setupResultsGameWithPlayers(t);
+
+    await t.mutation(api.players.markReadyForNextQuestion, {
+      sessionId: SESSION_1,
+      gameId,
+      expectedIndex: 0,
+    });
+
+    const player = await t.run((ctx) => ctx.db.get(player1Id));
+    const scheduled = await t.run((ctx) =>
+      ctx.db.system.query("_scheduled_functions").collect(),
+    );
+    expect(player?.readyForNextQuestionIndex).toBe(0);
+    expect(scheduled).toHaveLength(0);
+  });
+
+  it("schedules advancement when every player has voted", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupResultsGameWithPlayers(t);
+    vi.useFakeTimers();
+
+    try {
+      await t.mutation(api.players.markReadyForNextQuestion, {
+        sessionId: SESSION_1,
+        gameId,
+        expectedIndex: 0,
+      });
+      await t.mutation(api.players.markReadyForNextQuestion, {
+        sessionId: SESSION_2,
+        gameId,
+        expectedIndex: 0,
+      });
+
+      const scheduled = await t.run((ctx) =>
+        ctx.db.system.query("_scheduled_functions").collect(),
+      );
+      expect(scheduled).toHaveLength(1);
+      expect(scheduled[0]?.state.kind).toBe("pending");
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not schedule twice when the last player repeats a vote", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupResultsGameWithPlayers(t);
+    vi.useFakeTimers();
+
+    try {
+      await t.mutation(api.players.markReadyForNextQuestion, {
+        sessionId: SESSION_1,
+        gameId,
+        expectedIndex: 0,
+      });
+      await t.mutation(api.players.markReadyForNextQuestion, {
+        sessionId: SESSION_2,
+        gameId,
+        expectedIndex: 0,
+      });
+      await t.mutation(api.players.markReadyForNextQuestion, {
+        sessionId: SESSION_2,
+        gameId,
+        expectedIndex: 0,
+      });
+
+      const scheduled = await t.run((ctx) =>
+        ctx.db.system.query("_scheduled_functions").collect(),
+      );
+      expect(scheduled).toHaveLength(1);
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not count a vote from an earlier question", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId, player1Id } = await setupResultsGameWithPlayers(t);
+    await t.run((ctx) =>
+      ctx.db.patch(player1Id, { readyForNextQuestionIndex: -1 }),
+    );
+
+    await t.mutation(api.players.markReadyForNextQuestion, {
+      sessionId: SESSION_2,
+      gameId,
+      expectedIndex: 0,
+    });
+
+    const scheduled = await t.run((ctx) =>
+      ctx.db.system.query("_scheduled_functions").collect(),
+    );
+    expect(scheduled).toHaveLength(0);
+  });
+
+  it("schedules immediate advancement for a solo player", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId, player2Id } = await setupResultsGameWithPlayers(t);
+    await t.run((ctx) => ctx.db.delete(player2Id));
+    vi.useFakeTimers();
+
+    try {
+      await t.mutation(api.players.markReadyForNextQuestion, {
+        sessionId: SESSION_1,
+        gameId,
+        expectedIndex: 0,
+      });
+
+      const scheduled = await t.run((ctx) =>
+        ctx.db.system.query("_scheduled_functions").collect(),
+      );
+      expect(scheduled).toHaveLength(1);
+      expect(scheduled[0]?.state.kind).toBe("pending");
     } finally {
       vi.clearAllTimers();
       vi.useRealTimers();

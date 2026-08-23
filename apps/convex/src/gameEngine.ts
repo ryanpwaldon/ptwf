@@ -2,6 +2,7 @@ import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { internalMutation, internalQuery } from "./_generated/server";
+import { RESULTS_DURATION_SECONDS } from "./fields/gameSettings";
 import { quizAnimalValidator } from "./fields/quizAnimal";
 import { quizModelValidator } from "./fields/quizModel";
 import { quizThemeValidator } from "./fields/quizTheme";
@@ -76,11 +77,12 @@ export const endAnswering = internalMutation({
     if (!game) return null;
     if (game.status !== "active" || game.phase !== "answering") return null;
     if (game.currentQuestionIndex !== args.expectedIndex) return null;
+    const roundEndsAt = Date.now() + RESULTS_DURATION_MS;
 
     // Start the results phase.
     await ctx.db.patch(args.gameId, {
       phase: "results",
-      roundEndsAt: undefined,
+      roundEndsAt,
     });
 
     // Advance to the next question after the results phase.
@@ -113,6 +115,7 @@ export const advanceQuestion = internalMutation({
       await ctx.db.patch(args.gameId, {
         status: "finished",
         phase: undefined,
+        roundEndsAt: undefined,
       });
     } else {
       // Advance to the next question answering phase.
@@ -159,4 +162,4 @@ export const recoverFromGenerationFailure = internalMutation({
 // Helpers
 // ========================================================================================
 
-const RESULTS_DURATION_MS = 5000;
+const RESULTS_DURATION_MS = RESULTS_DURATION_SECONDS * 1000;
