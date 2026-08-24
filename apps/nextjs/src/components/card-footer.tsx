@@ -18,10 +18,8 @@ export function CardFooter({
   return (
     <footer className={cn("sticky bottom-0 z-10 mt-4", className)} {...props}>
       <PageContainer>
-        <div
-          className={cn("flex items-center gap-4 px-2 py-4", contentClassName)}
-        >
-          <Card className="bg-card/75 dark:bg-card/75 w-full p-4 shadow-[0_0_32px_16px_var(--background)] backdrop-blur-xl backdrop-saturate-150">
+        <div className={cn("flex items-center gap-4 p-2", contentClassName)}>
+          <Card className="bg-card/75 dark:bg-card/75 w-full gap-0 p-4 shadow-[0_0_32px_16px_var(--background)] backdrop-blur-xl backdrop-saturate-150">
             {children}
           </Card>
         </div>

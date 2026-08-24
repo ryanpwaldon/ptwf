@@ -16,6 +16,14 @@ export const stickerAssets = {
     height: 620,
     maskSrc: "/stickers/toilet-paper-cat-mask.svg",
   },
+  why: {
+    id: "why",
+    lightSrc: "/stickers/why.svg",
+    darkSrc: "/stickers/why-dark.svg",
+    width: 512,
+    height: 272,
+    maskSrc: "",
+  },
   ball: {
     id: "ball",
     lightSrc: "/stickers/ball.svg",

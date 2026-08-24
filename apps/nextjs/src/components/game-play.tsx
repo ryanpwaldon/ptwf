@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import NumberFlow from "@number-flow/react";
 import { useSessionMutation } from "convex-helpers/react/sessions";
 import { CheckIcon, CircleSmallIcon, XIcon } from "lucide-react";
@@ -11,6 +12,7 @@ import { api, getCharacterByValue } from "@acme/convex";
 import { cn } from "@acme/ui";
 import { AvatarBadge } from "@acme/ui/avatar";
 import { RadioGroup } from "@acme/ui/radio-group";
+import { useTheme } from "@acme/ui/theme";
 import { toast } from "@acme/ui/toast";
 
 import type { Answer, Game, Me, Player, Question } from "~/lib/game-data";
@@ -22,6 +24,7 @@ import { PlayerAvatarGroup } from "~/components/player-avatar-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
 import { TimeRemainingBar } from "~/components/time-remaining-bar";
 import { createAnswerIndex } from "~/lib/game-data";
+import { getStickerSource, stickerAssets } from "~/lib/sticker-assets";
 import { AppShell, PageContainer } from "./app-shell";
 
 interface GamePlayProps {
@@ -156,6 +159,7 @@ function GamePlayInner({
   meReadyForNextQuestionIndex: number | undefined;
   readyForNextQuestionCount: number;
 }) {
+  const { resolvedTheme } = useTheme();
   // Track the local pick with the question index it belongs to. When the
   // question advances, the index won't match and we fall through to the
   // server answer, eliminating the need for effects to reset/sync state.
@@ -302,7 +306,18 @@ function GamePlayInner({
       </PageContainer>
       {showResults && game.roundEndsAt !== undefined && (
         <CardFooter>
-          <p className="text-muted-foreground text-center text-sm text-balance">
+          <div className="flex justify-center">
+            <Image
+              className="mt-2 h-auto w-32 drop-shadow-md"
+              src={getStickerSource(stickerAssets.why, resolvedTheme)}
+              width={stickerAssets.why.width}
+              height={stickerAssets.why.height}
+              sizes="8rem"
+              alt=""
+              draggable={false}
+            />
+          </div>
+          <p className="text-muted-foreground mt-4 text-center text-sm text-balance">
             Xylitol triggers a sudden insulin release in dogs, causing
             dangerously low blood sugar. At higher doses, it can also cause
             liver failure and may be fatal.
@@ -312,6 +327,7 @@ function GamePlayInner({
             label={nextButtonLabel}
             roundEndsAt={game.roundEndsAt}
             onClick={handleNext}
+            className="mt-5"
           />
         </CardFooter>
       )}

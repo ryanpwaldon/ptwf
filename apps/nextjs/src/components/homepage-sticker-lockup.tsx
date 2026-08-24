@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 
 import { cn } from "@acme/ui";
 
+import { stickerAssets } from "~/lib/sticker-assets";
 import {
   HolographicPointerProvider,
   HolographicSticker,
@@ -14,7 +15,6 @@ import {
   homepageStickerStagger,
 } from "./homepage-entrance";
 import { PetCareTriviaBadge } from "./pet-care-trivia-badge";
-import { stickerAssets } from "./sticker-assets";
 
 const heroSticker = stickerAssets["toilet-paper-cat"];
 

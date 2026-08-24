@@ -24,8 +24,8 @@ import {
 import { cn } from "@acme/ui";
 import { useTheme } from "@acme/ui/theme";
 
-import type { StickerAsset } from "./sticker-assets";
-import { getStickerSource } from "./sticker-assets";
+import type { StickerAsset } from "~/lib/sticker-assets";
+import { getStickerSource } from "~/lib/sticker-assets";
 
 interface HolographicStickerProps {
   asset: StickerAsset;

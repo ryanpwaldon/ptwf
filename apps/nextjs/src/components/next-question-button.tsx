@@ -4,9 +4,11 @@ import { useEffect } from "react";
 import { animate, motion, useMotionValue } from "motion/react";
 
 import { RESULTS_DURATION_SECONDS } from "@acme/convex";
+import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 
 interface NextQuestionButtonProps {
+  className?: string;
   disabled: boolean;
   label: string;
   roundEndsAt: number;
@@ -14,6 +16,7 @@ interface NextQuestionButtonProps {
 }
 
 export function NextQuestionButton({
+  className,
   disabled,
   label,
   roundEndsAt,
@@ -34,7 +37,10 @@ export function NextQuestionButton({
   return (
     <Button
       size="xl"
-      className="hover:bg-primary after:bg-background/0 hover:after:bg-background/15 relative w-full overflow-hidden text-base after:pointer-events-none after:absolute after:inset-0 after:z-10 after:transition-colors after:content-['']"
+      className={cn(
+        "hover:bg-primary after:bg-background/0 hover:after:bg-background/15 relative w-full overflow-hidden text-base after:pointer-events-none after:absolute after:inset-0 after:z-10 after:transition-colors after:content-['']",
+        className,
+      )}
       aria-pressed={disabled}
       disabled={disabled}
       onClick={onClick}
