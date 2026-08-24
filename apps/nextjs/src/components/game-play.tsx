@@ -343,7 +343,7 @@ function GamePlayInner({
               </motion.div>
             )}
             <motion.p
-              className="text-muted-foreground mt-2 text-center text-sm text-balance"
+              className="text-muted-foreground mt-2 text-center text-sm text-pretty"
               variants={getExplanationItemVariants(shouldReduceMotion)}
             >
               Xylitol triggers a sudden insulin release in dogs, causing
