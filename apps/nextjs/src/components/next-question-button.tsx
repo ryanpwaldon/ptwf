@@ -34,12 +34,12 @@ export function NextQuestionButton({
   return (
     <Button
       size="xl"
-      className="relative w-full overflow-hidden text-base disabled:opacity-100"
+      className="hover:bg-primary after:bg-background/0 hover:after:bg-background/15 relative w-full overflow-hidden text-base after:pointer-events-none after:absolute after:inset-0 after:z-10 after:transition-colors after:content-['']"
       aria-pressed={disabled}
       disabled={disabled}
       onClick={onClick}
     >
-      <span className="relative z-10 tabular-nums">{label}</span>
+      <span className="relative z-20 tabular-nums">{label}</span>
       <motion.span
         aria-hidden="true"
         className="bg-primary-progress absolute inset-0 origin-left"
