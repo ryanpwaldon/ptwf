@@ -226,13 +226,13 @@ function GamePlayInner({
           <AnimatePresence mode="wait">
             <motion.div
               key={game.currentQuestionIndex}
-              variants={questionVariants}
+              variants={getQuestionVariants(shouldReduceMotion)}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
               <motion.div
-                variants={itemVariants}
+                variants={getQuestionItemVariants(shouldReduceMotion)}
                 className="mt-8 flex justify-center"
               >
                 <PlayerAvatarGroup
@@ -271,13 +271,13 @@ function GamePlayInner({
                 />
               </motion.div>
               <motion.h2
-                variants={itemVariants}
+                variants={getQuestionItemVariants(shouldReduceMotion)}
                 className="text-muted-foreground mt-3 text-center text-sm font-medium"
               >
                 Question {game.currentQuestionIndex + 1} of {questionCount}
               </motion.h2>
               <motion.h1
-                variants={itemVariants}
+                variants={getQuestionItemVariants(shouldReduceMotion)}
                 className="mt-1 text-center text-2xl leading-8 font-bold tracking-tight"
               >
                 {currentQuestion.text}
@@ -288,7 +288,10 @@ function GamePlayInner({
                   onValueChange={isAnswering ? handleSelect : undefined}
                 >
                   {answerSummary.map((choice) => (
-                    <motion.div key={choice.label} variants={itemVariants}>
+                    <motion.div
+                      key={choice.label}
+                      variants={getQuestionItemVariants(shouldReduceMotion)}
+                    >
                       <AnswerChoice
                         id={`choice-${choice.label.toLowerCase()}`}
                         value={choice.label}
@@ -358,16 +361,67 @@ function GamePlayInner({
 // Helpers
 // ========================================================================================
 
-const questionVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } },
-  exit: questionExit,
+const gameplayEntranceTransition = {
+  type: "spring" as const,
+  visualDuration: 0.3,
+  bounce: 0.05,
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0 },
-};
+const gameplayEntranceStagger = 0.06;
+const reducedMotionTransition = { duration: 0.12 };
+
+function getQuestionVariants(shouldReduceMotion: boolean | null) {
+  if (shouldReduceMotion) {
+    return {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          ...reducedMotionTransition,
+          staggerChildren: 0,
+        },
+      },
+      exit: { opacity: 0, transition: reducedMotionTransition },
+    };
+  }
+
+  return {
+    hidden: {
+      opacity: 0,
+      transform: "translate3d(0, 20px, 0)",
+    },
+    visible: {
+      opacity: 1,
+      transform: "translate3d(0, 0, 0)",
+      transition: {
+        ...gameplayEntranceTransition,
+        staggerChildren: gameplayEntranceStagger,
+      },
+    },
+    exit: questionExit,
+  };
+}
+
+function getQuestionItemVariants(shouldReduceMotion: boolean | null) {
+  if (shouldReduceMotion) {
+    return {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: reducedMotionTransition },
+    };
+  }
+
+  return {
+    hidden: {
+      opacity: 0,
+      transform: "translate3d(0, 10px, 0)",
+    },
+    visible: {
+      opacity: 1,
+      transform: "translate3d(0, 0, 0)",
+      transition: gameplayEntranceTransition,
+    },
+  };
+}
 
 function getExplanationCardVariants(shouldReduceMotion: boolean | null) {
   if (shouldReduceMotion) {
@@ -376,7 +430,7 @@ function getExplanationCardVariants(shouldReduceMotion: boolean | null) {
       visible: {
         opacity: 1,
         transition: {
-          duration: 0.12,
+          ...reducedMotionTransition,
           delayChildren: 0,
           staggerChildren: 0,
         },
@@ -393,11 +447,9 @@ function getExplanationCardVariants(shouldReduceMotion: boolean | null) {
       opacity: 1,
       transform: "translate3d(0, 0, 0)",
       transition: {
-        type: "spring" as const,
-        visualDuration: 0.3,
-        bounce: 0.05,
-        delayChildren: 0.06,
-        staggerChildren: 0.06,
+        ...gameplayEntranceTransition,
+        delayChildren: gameplayEntranceStagger,
+        staggerChildren: gameplayEntranceStagger,
       },
     },
   };
@@ -407,7 +459,7 @@ function getExplanationItemVariants(shouldReduceMotion: boolean | null) {
   if (shouldReduceMotion) {
     return {
       hidden: { opacity: 0 },
-      visible: { opacity: 1, transition: { duration: 0.12 } },
+      visible: { opacity: 1, transition: reducedMotionTransition },
     };
   }
 
@@ -419,11 +471,7 @@ function getExplanationItemVariants(shouldReduceMotion: boolean | null) {
     visible: {
       opacity: 1,
       transform: "translate3d(0, 0, 0)",
-      transition: {
-        type: "spring" as const,
-        visualDuration: 0.3,
-        bounce: 0.05,
-      },
+      transition: gameplayEntranceTransition,
     },
   };
 }
