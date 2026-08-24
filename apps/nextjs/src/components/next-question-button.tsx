@@ -40,15 +40,11 @@ export function NextQuestionButton({
       onClick={onClick}
     >
       <span className="relative z-10 tabular-nums">{label}</span>
-      <span
+      <motion.span
         aria-hidden="true"
-        className="bg-primary-foreground/25 absolute inset-x-0 bottom-0 h-1.5"
-      >
-        <motion.span
-          className="bg-primary-foreground block h-full origin-left"
-          style={{ scaleX: progress }}
-        />
-      </span>
+        className="bg-primary-progress absolute inset-0 origin-left"
+        style={{ scaleX: progress }}
+      />
     </Button>
   );
 }

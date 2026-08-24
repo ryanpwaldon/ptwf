@@ -15,9 +15,9 @@ import { toast } from "@acme/ui/toast";
 
 import type { Answer, Game, Me, Player, Question } from "~/lib/game-data";
 import { AnswerChoice } from "~/components/answer-choice";
+import { CardFooter } from "~/components/card-footer";
 import { questionExit } from "~/components/game-transition";
 import { NextQuestionButton } from "~/components/next-question-button";
-import { PageFooter } from "~/components/page-footer";
 import { PlayerAvatarGroup } from "~/components/player-avatar-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
 import { TimeRemainingBar } from "~/components/time-remaining-bar";
@@ -167,7 +167,7 @@ function GamePlayInner({
   const isAnswering = phase === "answering";
   const hasMarkedReadyForNext = meReadyForNextQuestionIndex === game.currentQuestionIndex; // prettier-ignore
   const isLastQuestion = game.currentQuestionIndex >= questionCount - 1;
-  const nextActionLabel = isLastQuestion ? "Finish" : "Next";
+  const nextActionLabel = isLastQuestion ? "End game" : "Next question";
   const nextButtonLabel = playerCharacters.length === 1 ? nextActionLabel : `${nextActionLabel} ${readyForNextQuestionCount}/${playerCharacters.length}`; // prettier-ignore
 
   const handleSelect = (label: string) => {
@@ -301,14 +301,19 @@ function GamePlayInner({
         </motion.main>
       </PageContainer>
       {showResults && game.roundEndsAt !== undefined && (
-        <PageFooter>
+        <CardFooter>
+          <p className="text-muted-foreground text-center text-sm text-balance">
+            Xylitol triggers a sudden insulin release in dogs, causing
+            dangerously low blood sugar. At higher doses, it can also cause
+            liver failure and may be fatal.
+          </p>
           <NextQuestionButton
             disabled={hasMarkedReadyForNext}
             label={nextButtonLabel}
             roundEndsAt={game.roundEndsAt}
             onClick={handleNext}
           />
-        </PageFooter>
+        </CardFooter>
       )}
     </AppShell>
   );
