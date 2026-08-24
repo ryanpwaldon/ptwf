@@ -18,7 +18,6 @@ import { toast } from "@acme/ui/toast";
 import type { Answer, Game, Me, Player, Question } from "~/lib/game-data";
 import { AnswerChoice } from "~/components/answer-choice";
 import { CardFooter } from "~/components/card-footer";
-import { questionExit } from "~/components/game-transition";
 import { NextQuestionButton } from "~/components/next-question-button";
 import { PlayerAvatarGroup } from "~/components/player-avatar-group";
 import { QuestionStatusTrack } from "~/components/question-status-track";
@@ -224,147 +223,158 @@ function GamePlayInner({
           </div>
         </PageContainer>
       </motion.header>
-      <PageContainer className="flex flex-1 flex-col">
-        <motion.main className="flex-1 px-4 pb-16">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={game.currentQuestionIndex}
-              variants={getQuestionVariants(shouldReduceMotion)}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
+      <AnimatePresence
+        initial={false}
+        mode="wait"
+        onExitComplete={() => window.scrollTo(0, 0)}
+      >
+        <motion.div
+          key={game.currentQuestionIndex}
+          className="flex flex-1 flex-col"
+          variants={getRoundVariants(shouldReduceMotion)}
+          initial={false}
+          animate="visible"
+          exit="exit"
+        >
+          <PageContainer className="flex flex-1 flex-col">
+            <motion.main className="flex-1 px-4 pb-16">
               <motion.div
-                variants={getQuestionItemVariants(shouldReduceMotion)}
-                className="mt-8 flex justify-center"
+                variants={getQuestionVariants(shouldReduceMotion)}
+                initial="hidden"
+                animate="visible"
               >
-                <PlayerAvatarGroup
-                  maxVisible={10}
-                  avatarSize="md"
-                  characters={playerCharacters}
-                  renderBadge={(character) => {
-                    if (!answerCorrectness.has(character.value)) return null;
-                    if (phase === "answering") {
+                <motion.div
+                  variants={getQuestionItemVariants(shouldReduceMotion)}
+                  className="mt-8 flex justify-center"
+                >
+                  <PlayerAvatarGroup
+                    maxVisible={10}
+                    avatarSize="md"
+                    characters={playerCharacters}
+                    renderBadge={(character) => {
+                      if (!answerCorrectness.has(character.value)) return null;
+                      if (phase === "answering") {
+                        return (
+                          <AvatarBadge
+                            position="top-left"
+                            className="bg-background border-primary/20 size-3! border"
+                          >
+                            <CircleSmallIcon className="fill-primary" />
+                          </AvatarBadge>
+                        );
+                      }
+                      const isCorrect = answerCorrectness.get(character.value);
                       return (
                         <AvatarBadge
                           position="top-left"
-                          className="bg-background border-primary/20 size-3! border"
+                          className={cn(
+                            "size-3!",
+                            isCorrect ? "bg-correct" : "bg-incorrect",
+                          )}
                         >
-                          <CircleSmallIcon className="fill-primary" />
+                          {isCorrect ? (
+                            <CheckIcon className="stroke-black stroke-5" />
+                          ) : (
+                            <XIcon className="stroke-black stroke-5" />
+                          )}
                         </AvatarBadge>
                       );
-                    }
-                    const isCorrect = answerCorrectness.get(character.value);
-                    return (
-                      <AvatarBadge
-                        position="top-left"
-                        className={cn(
-                          "size-3!",
-                          isCorrect ? "bg-correct" : "bg-incorrect",
-                        )}
-                      >
-                        {isCorrect ? (
-                          <CheckIcon className="stroke-black stroke-5" />
-                        ) : (
-                          <XIcon className="stroke-black stroke-5" />
-                        )}
-                      </AvatarBadge>
-                    );
-                  }}
-                />
-              </motion.div>
-              <motion.h2
-                variants={getQuestionItemVariants(shouldReduceMotion)}
-                className="text-muted-foreground mt-3 text-center text-sm font-medium"
-              >
-                Question {game.currentQuestionIndex + 1} of {questionCount}
-              </motion.h2>
-              <motion.h1
-                variants={getQuestionItemVariants(shouldReduceMotion)}
-                className="mt-1 text-center text-2xl leading-8 font-bold tracking-tight"
-              >
-                {currentQuestion.text}
-              </motion.h1>
-              <div className="mt-8">
-                <RadioGroup
-                  value={selectedLabel ?? ""}
-                  onValueChange={isAnswering ? handleSelect : undefined}
+                    }}
+                  />
+                </motion.div>
+                <motion.h2
+                  variants={getQuestionItemVariants(shouldReduceMotion)}
+                  className="text-muted-foreground mt-3 text-center text-sm font-medium"
                 >
-                  {answerSummary.map((choice) => (
-                    <motion.div
-                      key={choice.label}
-                      variants={getQuestionItemVariants(shouldReduceMotion)}
-                    >
-                      <AnswerChoice
-                        id={`choice-${choice.label.toLowerCase()}`}
-                        value={choice.label}
-                        description={choice.text}
-                        disabled={!isAnswering}
-                        showResults={showResults}
-                        isCorrectAnswer={choice.isCorrect}
-                        voters={choice.voters}
-                      />
-                    </motion.div>
-                  ))}
-                </RadioGroup>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </motion.main>
-      </PageContainer>
-      <AnimatePresence>
-        {showExplanation && game.roundEndsAt !== undefined && (
-          <CardFooter
-            key="explanation-footer"
-            initial="hidden"
-            animate="visible"
-            variants={getExplanationCardVariants(shouldReduceMotion)}
-          >
-            <motion.div
-              className="flex justify-center"
-              variants={getExplanationItemVariants(shouldReduceMotion)}
-            >
-              <Image
-                className="mt-2 h-auto w-32 drop-shadow-md"
-                src={getStickerSource(stickerAssets.why, resolvedTheme)}
-                width={stickerAssets.why.width}
-                height={stickerAssets.why.height}
-                sizes="8rem"
-                alt=""
-                draggable={false}
-              />
-            </motion.div>
-            {correctAnswer && (
-              <motion.div
-                className="mt-4 flex min-w-0 justify-center"
-                variants={getExplanationItemVariants(shouldReduceMotion)}
-              >
-                <p className="max-w-full truncate text-sm font-medium">
-                  {correctAnswer.label}. {correctAnswer.text}
-                </p>
+                  Question {game.currentQuestionIndex + 1} of {questionCount}
+                </motion.h2>
+                <motion.h1
+                  variants={getQuestionItemVariants(shouldReduceMotion)}
+                  className="mt-1 text-center text-2xl leading-8 font-bold tracking-tight"
+                >
+                  {currentQuestion.text}
+                </motion.h1>
+                <div className="mt-8">
+                  <RadioGroup
+                    value={selectedLabel ?? ""}
+                    onValueChange={isAnswering ? handleSelect : undefined}
+                  >
+                    {answerSummary.map((choice) => (
+                      <motion.div
+                        key={choice.label}
+                        variants={getQuestionItemVariants(shouldReduceMotion)}
+                      >
+                        <AnswerChoice
+                          id={`choice-${choice.label.toLowerCase()}`}
+                          value={choice.label}
+                          description={choice.text}
+                          disabled={!isAnswering}
+                          showResults={showResults}
+                          isCorrectAnswer={choice.isCorrect}
+                          voters={choice.voters}
+                        />
+                      </motion.div>
+                    ))}
+                  </RadioGroup>
+                </div>
               </motion.div>
+            </motion.main>
+          </PageContainer>
+          <AnimatePresence>
+            {showExplanation && game.roundEndsAt !== undefined && (
+              <CardFooter
+                key="explanation-footer"
+                initial="hidden"
+                animate="visible"
+                variants={getExplanationCardVariants(shouldReduceMotion)}
+              >
+                <motion.div
+                  className="flex justify-center"
+                  variants={getExplanationItemVariants(shouldReduceMotion)}
+                >
+                  <Image
+                    className="mt-2 h-auto w-32 drop-shadow-md"
+                    src={getStickerSource(stickerAssets.why, resolvedTheme)}
+                    width={stickerAssets.why.width}
+                    height={stickerAssets.why.height}
+                    sizes="8rem"
+                    alt=""
+                    draggable={false}
+                  />
+                </motion.div>
+                {correctAnswer && (
+                  <motion.div
+                    className="mt-4 flex min-w-0 justify-center"
+                    variants={getExplanationItemVariants(shouldReduceMotion)}
+                  >
+                    <p className="max-w-full truncate text-sm font-medium">
+                      {correctAnswer.label}. {correctAnswer.text}
+                    </p>
+                  </motion.div>
+                )}
+                <motion.p
+                  className="text-muted-foreground mt-2 text-center text-sm text-pretty"
+                  variants={getExplanationItemVariants(shouldReduceMotion)}
+                >
+                  Xylitol triggers a sudden insulin release in dogs, causing
+                  dangerously low blood sugar. At higher doses, it can also
+                  cause liver failure and may be fatal.
+                </motion.p>
+                <motion.div
+                  variants={getExplanationItemVariants(shouldReduceMotion)}
+                >
+                  <NextQuestionButton
+                    disabled={hasMarkedReadyForNext}
+                    label={nextButtonLabel}
+                    roundEndsAt={game.roundEndsAt}
+                    onClick={handleNext}
+                    className="mt-5"
+                  />
+                </motion.div>
+              </CardFooter>
             )}
-            <motion.p
-              className="text-muted-foreground mt-2 text-center text-sm text-pretty"
-              variants={getExplanationItemVariants(shouldReduceMotion)}
-            >
-              Xylitol triggers a sudden insulin release in dogs, causing
-              dangerously low blood sugar. At higher doses, it can also cause
-              liver failure and may be fatal.
-            </motion.p>
-            <motion.div
-              variants={getExplanationItemVariants(shouldReduceMotion)}
-            >
-              <NextQuestionButton
-                disabled={hasMarkedReadyForNext}
-                label={nextButtonLabel}
-                roundEndsAt={game.roundEndsAt}
-                onClick={handleNext}
-                className="mt-5"
-              />
-            </motion.div>
-          </CardFooter>
-        )}
+          </AnimatePresence>
+        </motion.div>
       </AnimatePresence>
     </AppShell>
   );
@@ -382,6 +392,22 @@ const gameplayEntranceTransition = {
 
 const gameplayEntranceStagger = 0.06;
 const reducedMotionTransition = { duration: 0.12 };
+const gameplayExitTransition = {
+  duration: 0.18,
+  ease: [0.33, 1, 0.68, 1] as const,
+};
+
+function getRoundVariants(shouldReduceMotion: boolean | null) {
+  return {
+    visible: { opacity: 1 },
+    exit: {
+      opacity: 0,
+      transition: shouldReduceMotion
+        ? reducedMotionTransition
+        : gameplayExitTransition,
+    },
+  };
+}
 
 function getQuestionVariants(shouldReduceMotion: boolean | null) {
   if (shouldReduceMotion) {
@@ -394,7 +420,6 @@ function getQuestionVariants(shouldReduceMotion: boolean | null) {
           staggerChildren: 0,
         },
       },
-      exit: { opacity: 0, transition: reducedMotionTransition },
     };
   }
 
@@ -411,7 +436,6 @@ function getQuestionVariants(shouldReduceMotion: boolean | null) {
         staggerChildren: gameplayEntranceStagger,
       },
     },
-    exit: questionExit,
   };
 }
 
