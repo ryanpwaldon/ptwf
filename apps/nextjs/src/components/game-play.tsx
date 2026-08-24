@@ -5,7 +5,7 @@ import Image from "next/image";
 import NumberFlow from "@number-flow/react";
 import { useSessionMutation } from "convex-helpers/react/sessions";
 import { CheckIcon, CircleSmallIcon, XIcon } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import type { Character } from "@acme/convex";
 import { api, getCharacterByValue } from "@acme/convex";
@@ -160,6 +160,7 @@ function GamePlayInner({
   readyForNextQuestionCount: number;
 }) {
   const { resolvedTheme } = useTheme();
+  const shouldReduceMotion = useReducedMotion();
   // Track the local pick with the question index it belongs to. When the
   // question advances, the index won't match and we fall through to the
   // server answer, eliminating the need for effects to reset/sync state.
@@ -305,33 +306,50 @@ function GamePlayInner({
           </AnimatePresence>
         </motion.main>
       </PageContainer>
-      {showExplanation && game.roundEndsAt !== undefined && (
-        <CardFooter>
-          <div className="flex justify-center">
-            <Image
-              className="mt-2 h-auto w-32 drop-shadow-md"
-              src={getStickerSource(stickerAssets.why, resolvedTheme)}
-              width={stickerAssets.why.width}
-              height={stickerAssets.why.height}
-              sizes="8rem"
-              alt=""
-              draggable={false}
-            />
-          </div>
-          <p className="text-muted-foreground mt-4 text-center text-sm text-balance">
-            Xylitol triggers a sudden insulin release in dogs, causing
-            dangerously low blood sugar. At higher doses, it can also cause
-            liver failure and may be fatal.
-          </p>
-          <NextQuestionButton
-            disabled={hasMarkedReadyForNext}
-            label={nextButtonLabel}
-            roundEndsAt={game.roundEndsAt}
-            onClick={handleNext}
-            className="mt-5"
-          />
-        </CardFooter>
-      )}
+      <AnimatePresence>
+        {showExplanation && game.roundEndsAt !== undefined && (
+          <CardFooter
+            key="explanation-footer"
+            initial="hidden"
+            animate="visible"
+            variants={getExplanationCardVariants(shouldReduceMotion)}
+          >
+            <motion.div
+              className="flex justify-center"
+              variants={getExplanationItemVariants(shouldReduceMotion)}
+            >
+              <Image
+                className="mt-2 h-auto w-32 drop-shadow-md"
+                src={getStickerSource(stickerAssets.why, resolvedTheme)}
+                width={stickerAssets.why.width}
+                height={stickerAssets.why.height}
+                sizes="8rem"
+                alt=""
+                draggable={false}
+              />
+            </motion.div>
+            <motion.p
+              className="text-muted-foreground mt-4 text-center text-sm text-balance"
+              variants={getExplanationItemVariants(shouldReduceMotion)}
+            >
+              Xylitol triggers a sudden insulin release in dogs, causing
+              dangerously low blood sugar. At higher doses, it can also cause
+              liver failure and may be fatal.
+            </motion.p>
+            <motion.div
+              variants={getExplanationItemVariants(shouldReduceMotion)}
+            >
+              <NextQuestionButton
+                disabled={hasMarkedReadyForNext}
+                label={nextButtonLabel}
+                roundEndsAt={game.roundEndsAt}
+                onClick={handleNext}
+                className="mt-5"
+              />
+            </motion.div>
+          </CardFooter>
+        )}
+      </AnimatePresence>
     </AppShell>
   );
 }
@@ -350,6 +368,65 @@ const itemVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0 },
 };
+
+function getExplanationCardVariants(shouldReduceMotion: boolean | null) {
+  if (shouldReduceMotion) {
+    return {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          duration: 0.12,
+          delayChildren: 0,
+          staggerChildren: 0,
+        },
+      },
+    };
+  }
+
+  return {
+    hidden: {
+      opacity: 0,
+      transform: "translate3d(0, 16px, 0)",
+    },
+    visible: {
+      opacity: 1,
+      transform: "translate3d(0, 0, 0)",
+      transition: {
+        type: "spring" as const,
+        visualDuration: 0.3,
+        bounce: 0.05,
+        delayChildren: 0.06,
+        staggerChildren: 0.06,
+      },
+    },
+  };
+}
+
+function getExplanationItemVariants(shouldReduceMotion: boolean | null) {
+  if (shouldReduceMotion) {
+    return {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: { duration: 0.12 } },
+    };
+  }
+
+  return {
+    hidden: {
+      opacity: 0,
+      transform: "translate3d(0, 12px, 0)",
+    },
+    visible: {
+      opacity: 1,
+      transform: "translate3d(0, 0, 0)",
+      transition: {
+        type: "spring" as const,
+        visualDuration: 0.3,
+        bounce: 0.05,
+      },
+    },
+  };
+}
 
 function useCountdown(roundEndsAt: number | undefined, active: boolean) {
   const [timeRemaining, setTimeRemaining] = useState(0);
