@@ -127,8 +127,13 @@ export function GameResults({
           ))}
         </main>
       </PageContainer>
-      <PageFooter contentClassName="justify-end">
-        <Button size="xl" variant="secondary" asChild>
+      <PageFooter contentClassName="grid grid-cols-2 sm:flex sm:justify-end">
+        <Button
+          className="w-full sm:w-auto"
+          size="xl"
+          variant="secondary"
+          asChild
+        >
           <Link href="/">Return home</Link>
         </Button>
         <LoadingButton
@@ -136,7 +141,7 @@ export function GameResults({
           isLoading={isStartingReplay}
           preserveContentWidth
           contentClassName="tabular-nums"
-          className="disabled:opacity-100"
+          className="w-full disabled:opacity-100 sm:w-auto"
           onClick={() => void handlePlayAgain()}
         >
           {playAgainLabel}
