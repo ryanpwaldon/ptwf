@@ -131,7 +131,7 @@ export const markReadyForNextQuestion = mutation({
     const player = await requireParticipant(ctx, args.gameId, args.sessionId);
     const game = await ctx.db.get(args.gameId);
     if (!game) throw new ConvexError("Game not found.");
-    if (game.status !== "active" || game.phase !== "results") return null;
+    if (game.status !== "active" || game.phase !== "explanation") return null;
     if (game.currentQuestionIndex !== args.expectedIndex) return null;
     if (player.readyForNextQuestionIndex === args.expectedIndex) return null;
 

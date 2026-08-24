@@ -82,14 +82,14 @@ export function GamePlay({
       text: choice.text,
       count: choiceAnswers.length,
       isCorrect: choice.label === currentQuestion.correctLabel,
-      voters: phase === "results" ? voters : [],
+      voters: phase !== "answering" ? voters : [],
     };
   });
 
   // Build question results for the status track.
   const questionResults = questions.map((q) => {
     if (q.index > game.currentQuestionIndex) return "incomplete" as const;
-    if (q.index === game.currentQuestionIndex && phase !== "results") return "incomplete" as const; // prettier-ignore
+    if (q.index === game.currentQuestionIndex && phase === "answering") return "incomplete" as const; // prettier-ignore
     // For past questions and current during results, check player's answer.
     const ans = answerIndex.byQuestionId.get(q._id)?.byPlayerId.get(me._id);
     if (!ans) return "skipped" as const;
@@ -140,7 +140,7 @@ function GamePlayInner({
   readyForNextQuestionCount,
 }: {
   game: Game;
-  phase: "answering" | "results";
+  phase: "answering" | "results" | "explanation";
   currentQuestion: Question;
   myAnswer: string | null;
   answerSummary: {
@@ -167,7 +167,8 @@ function GamePlayInner({
   const selectedLabel = localPick !== null && localPick.index === game.currentQuestionIndex && phase === "answering" ? localPick.label : (myAnswer ?? null); // prettier-ignore
   const timeRemaining = useCountdown(game.roundEndsAt, phase === "answering");
   const secondsLeft = phase === "answering" ? Math.ceil(timeRemaining / 1000) : 0; // prettier-ignore
-  const showResults = phase === "results";
+  const showResults = phase !== "answering";
+  const showExplanation = phase === "explanation";
   const isAnswering = phase === "answering";
   const hasMarkedReadyForNext = meReadyForNextQuestionIndex === game.currentQuestionIndex; // prettier-ignore
   const isLastQuestion = game.currentQuestionIndex >= questionCount - 1;
@@ -304,7 +305,7 @@ function GamePlayInner({
           </AnimatePresence>
         </motion.main>
       </PageContainer>
-      {showResults && game.roundEndsAt !== undefined && (
+      {showExplanation && game.roundEndsAt !== undefined && (
         <CardFooter>
           <div className="flex justify-center">
             <Image

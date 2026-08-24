@@ -2,7 +2,10 @@ import { convexTest } from "convex-test";
 import { describe, expect, it, vi } from "vitest";
 
 import { internal } from "./_generated/api";
-import { RESULTS_DURATION_SECONDS } from "./fields/gameSettings";
+import {
+  EXPLANATION_DURATION_SECONDS,
+  RESULTS_DURATION_SECONDS,
+} from "./fields/gameSettings";
 import schema from "./schema";
 import { modules } from "./test.setup";
 
@@ -57,6 +60,32 @@ async function setupActiveGameInResultsPhase(t: ReturnType<typeof convexTest>) {
       timeLimitSeconds: 30,
       currentQuestionIndex: 0,
       roundEndsAt: Date.now() + RESULTS_DURATION_SECONDS * 1000,
+    });
+    const questionId = await ctx.db.insert("questions", {
+      ...BASE_QUESTION,
+      gameId,
+    });
+    return { gameId, questionId };
+  });
+}
+
+// Creates one active/explanation game with one question.
+async function setupActiveGameInExplanationPhase(
+  t: ReturnType<typeof convexTest>,
+) {
+  return t.run(async (ctx) => {
+    const gameId = await ctx.db.insert("games", {
+      code: "XXXXXX",
+      status: "active",
+      phase: "explanation",
+      quizAnimal: "dogs",
+      quizModel: "openai/gpt-5.6-luna",
+      quizTone: "standard",
+      quizTheme: "diet-and-nutrition",
+      questionCount: 2,
+      timeLimitSeconds: 30,
+      currentQuestionIndex: 0,
+      roundEndsAt: Date.now() + EXPLANATION_DURATION_SECONDS * 1000,
     });
     const questionId = await ctx.db.insert("questions", {
       ...BASE_QUESTION,
@@ -142,7 +171,7 @@ describe("gameEngine.endAnswering", () => {
     );
   });
 
-  it("schedules advanceQuestion", async () => {
+  it("schedules showExplanation", async () => {
     const t = convexTest(schema, modules);
     const { gameId } = await setupActiveGameInAnsweringPhase(t);
 
@@ -166,14 +195,14 @@ describe("gameEngine.endAnswering", () => {
   });
 });
 
-describe("gameEngine.advanceQuestion", () => {
+describe("gameEngine.showExplanation", () => {
   it("returns null when game not found", async () => {
     const t = convexTest(schema, modules);
     const { gameId } = await setupActiveGameInResultsPhase(t);
 
     await t.run((ctx) => ctx.db.delete(gameId));
 
-    const result = await t.mutation(internal.gameEngine.advanceQuestion, {
+    const result = await t.mutation(internal.gameEngine.showExplanation, {
       gameId,
       expectedIndex: 0,
     });
@@ -187,7 +216,7 @@ describe("gameEngine.advanceQuestion", () => {
 
     await t.run((ctx) => ctx.db.patch(gameId, { status: "lobby" }));
 
-    const result = await t.mutation(internal.gameEngine.advanceQuestion, {
+    const result = await t.mutation(internal.gameEngine.showExplanation, {
       gameId,
       expectedIndex: 0,
     });
@@ -201,7 +230,7 @@ describe("gameEngine.advanceQuestion", () => {
 
     await t.run((ctx) => ctx.db.patch(gameId, { phase: "answering" }));
 
-    const result = await t.mutation(internal.gameEngine.advanceQuestion, {
+    const result = await t.mutation(internal.gameEngine.showExplanation, {
       gameId,
       expectedIndex: 0,
     });
@@ -212,6 +241,106 @@ describe("gameEngine.advanceQuestion", () => {
   it("returns null when expectedIndex does not match currentQuestionIndex", async () => {
     const t = convexTest(schema, modules);
     const { gameId } = await setupActiveGameInResultsPhase(t);
+
+    const result = await t.mutation(internal.gameEngine.showExplanation, {
+      gameId,
+      expectedIndex: 1,
+    });
+
+    expect(result).toBeNull();
+  });
+
+  it("sets phase to explanation with an explanation deadline", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupActiveGameInResultsPhase(t);
+    const beforeMutation = Date.now();
+
+    await t.mutation(internal.gameEngine.showExplanation, {
+      gameId,
+      expectedIndex: 0,
+    });
+
+    const afterMutation = Date.now();
+    const game = await t.run((ctx) => ctx.db.get(gameId));
+    expect(game?.phase).toBe("explanation");
+    expect(game?.roundEndsAt).toBeGreaterThanOrEqual(
+      beforeMutation + EXPLANATION_DURATION_SECONDS * 1000,
+    );
+    expect(game?.roundEndsAt).toBeLessThanOrEqual(
+      afterMutation + EXPLANATION_DURATION_SECONDS * 1000,
+    );
+  });
+
+  it("schedules advanceQuestion", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupActiveGameInResultsPhase(t);
+
+    vi.useFakeTimers();
+
+    try {
+      await t.mutation(internal.gameEngine.showExplanation, {
+        gameId,
+        expectedIndex: 0,
+      });
+
+      const scheduled = await t.run((ctx) =>
+        ctx.db.system.query("_scheduled_functions").collect(),
+      );
+      expect(scheduled).toHaveLength(1);
+      expect(scheduled[0]?.state.kind).toBe("pending");
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("gameEngine.advanceQuestion", () => {
+  it("returns null when game not found", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupActiveGameInExplanationPhase(t);
+
+    await t.run((ctx) => ctx.db.delete(gameId));
+
+    const result = await t.mutation(internal.gameEngine.advanceQuestion, {
+      gameId,
+      expectedIndex: 0,
+    });
+
+    expect(result).toBeNull();
+  });
+
+  it("returns null when status is not active", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupActiveGameInExplanationPhase(t);
+
+    await t.run((ctx) => ctx.db.patch(gameId, { status: "lobby" }));
+
+    const result = await t.mutation(internal.gameEngine.advanceQuestion, {
+      gameId,
+      expectedIndex: 0,
+    });
+
+    expect(result).toBeNull();
+  });
+
+  it("returns null when phase is not explanation", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupActiveGameInExplanationPhase(t);
+
+    await t.run((ctx) => ctx.db.patch(gameId, { phase: "results" }));
+
+    const result = await t.mutation(internal.gameEngine.advanceQuestion, {
+      gameId,
+      expectedIndex: 0,
+    });
+
+    expect(result).toBeNull();
+  });
+
+  it("returns null when expectedIndex does not match currentQuestionIndex", async () => {
+    const t = convexTest(schema, modules);
+    const { gameId } = await setupActiveGameInExplanationPhase(t);
 
     const result = await t.mutation(internal.gameEngine.advanceQuestion, {
       gameId,
@@ -227,7 +356,7 @@ describe("gameEngine.advanceQuestion", () => {
       const gameId = await ctx.db.insert("games", {
         code: "XXXXXX",
         status: "active",
-        phase: "results",
+        phase: "explanation",
         quizAnimal: "dogs",
         quizModel: "openai/gpt-5.6-luna",
         quizTone: "standard",
@@ -262,7 +391,7 @@ describe("gameEngine.advanceQuestion", () => {
       const gameId = await ctx.db.insert("games", {
         code: "XXXXXX",
         status: "active",
-        phase: "results",
+        phase: "explanation",
         quizAnimal: "dogs",
         quizModel: "openai/gpt-5.6-luna",
         quizTone: "standard",

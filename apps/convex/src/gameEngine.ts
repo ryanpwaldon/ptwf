@@ -2,7 +2,10 @@ import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { internalMutation, internalQuery } from "./_generated/server";
-import { RESULTS_DURATION_SECONDS } from "./fields/gameSettings";
+import {
+  EXPLANATION_DURATION_SECONDS,
+  RESULTS_DURATION_SECONDS,
+} from "./fields/gameSettings";
 import { quizAnimalValidator } from "./fields/quizAnimal";
 import { quizModelValidator } from "./fields/quizModel";
 import { quizThemeValidator } from "./fields/quizTheme";
@@ -85,9 +88,34 @@ export const endAnswering = internalMutation({
       roundEndsAt,
     });
 
-    // Advance to the next question after the results phase.
+    // Show the explanation after the results phase.
     await ctx.scheduler.runAfter(
       RESULTS_DURATION_MS,
+      internal.gameEngine.showExplanation,
+      { gameId: args.gameId, expectedIndex: args.expectedIndex },
+    );
+  },
+});
+
+export const showExplanation = internalMutation({
+  args: { gameId: v.id("games"), expectedIndex: v.number() },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) return null;
+    if (game.status !== "active" || game.phase !== "results") return null;
+    if (game.currentQuestionIndex !== args.expectedIndex) return null;
+    const roundEndsAt = Date.now() + EXPLANATION_DURATION_MS;
+
+    // Start the explanation phase.
+    await ctx.db.patch(args.gameId, {
+      phase: "explanation",
+      roundEndsAt,
+    });
+
+    // Advance to the next question after the explanation phase.
+    await ctx.scheduler.runAfter(
+      EXPLANATION_DURATION_MS,
       internal.gameEngine.advanceQuestion,
       { gameId: args.gameId, expectedIndex: args.expectedIndex },
     );
@@ -100,7 +128,7 @@ export const advanceQuestion = internalMutation({
   handler: async (ctx, args) => {
     const game = await ctx.db.get(args.gameId);
     if (!game) return null;
-    if (game.status !== "active" || game.phase !== "results") return null;
+    if (game.status !== "active" || game.phase !== "explanation") return null;
     if (game.currentQuestionIndex !== args.expectedIndex) return null;
 
     // Count total questions for this game.
@@ -163,3 +191,4 @@ export const recoverFromGenerationFailure = internalMutation({
 // ========================================================================================
 
 const RESULTS_DURATION_MS = RESULTS_DURATION_SECONDS * 1000;
+const EXPLANATION_DURATION_MS = EXPLANATION_DURATION_SECONDS * 1000;

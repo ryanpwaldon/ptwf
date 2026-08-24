@@ -78,20 +78,23 @@ describe("answers.submit", () => {
     expect(answerCount).toBe(0);
   });
 
-  it("returns null when game phase is not answering", async () => {
-    const t = convexTest(schema, modules);
-    const { gameId } = await setupActiveGameWithPlayers(t);
+  it.each(["results", "explanation"] as const)(
+    "returns null when game phase is %s",
+    async (phase) => {
+      const t = convexTest(schema, modules);
+      const { gameId } = await setupActiveGameWithPlayers(t);
 
-    await t.run((ctx) => ctx.db.patch(gameId, { phase: "results" }));
+      await t.run((ctx) => ctx.db.patch(gameId, { phase }));
 
-    const result = await t.mutation(api.answers.submit, {
-      sessionId: SESSION_1,
-      gameId,
-      selectedLabel: "A",
-    });
+      const result = await t.mutation(api.answers.submit, {
+        sessionId: SESSION_1,
+        gameId,
+        selectedLabel: "A",
+      });
 
-    expect(result).toBeNull();
-  });
+      expect(result).toBeNull();
+    },
+  );
 
   it("throws when game is not found", async () => {
     const t = convexTest(schema, modules);

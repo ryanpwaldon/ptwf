@@ -25,7 +25,13 @@ const schema = defineSchema({
     timeLimitSeconds: v.number(),
     currentQuestionIndex: v.number(),
     roundEndsAt: v.optional(v.number()),
-    phase: v.optional(v.union(v.literal("answering"), v.literal("results"))),
+    phase: v.optional(
+      v.union(
+        v.literal("answering"),
+        v.literal("results"),
+        v.literal("explanation"),
+      ),
+    ),
     quizGenerationFailedAt: v.optional(v.number()),
     replayGameId: v.optional(v.id("games")),
   })

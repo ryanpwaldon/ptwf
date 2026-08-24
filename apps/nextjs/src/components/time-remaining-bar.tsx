@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { animate, motion, useMotionValue } from "motion/react";
 
 interface TimeRemainingBarProps {
-  phase: "answering" | "results";
+  phase: "answering" | "results" | "explanation";
   durationSeconds: number;
 }
 

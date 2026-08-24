@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { animate, motion, useMotionValue } from "motion/react";
 
-import { RESULTS_DURATION_SECONDS } from "@acme/convex";
+import { EXPLANATION_DURATION_SECONDS } from "@acme/convex";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 
@@ -56,7 +56,7 @@ export function NextQuestionButton({
 }
 
 function getProgress(roundEndsAt: number) {
-  const durationMs = RESULTS_DURATION_SECONDS * 1000;
+  const durationMs = EXPLANATION_DURATION_SECONDS * 1000;
   const remainingMs = Math.max(0, roundEndsAt - Date.now());
   return Math.min(1, Math.max(0, 1 - remainingMs / durationMs));
 }

@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { api } from "./_generated/api";
 import { CHARACTER_OPTIONS } from "./fields/character";
-import { RESULTS_DURATION_SECONDS } from "./fields/gameSettings";
+import { EXPLANATION_DURATION_SECONDS } from "./fields/gameSettings";
 import schema from "./schema";
 import { modules } from "./test.setup";
 
@@ -53,14 +53,16 @@ async function setupLobbyGameWithPlayers(t: ReturnType<typeof convexTest>) {
   });
 }
 
-// Creates one active results game with two players.
-async function setupResultsGameWithPlayers(t: ReturnType<typeof convexTest>) {
+// Creates one active explanation game with two players.
+async function setupExplanationGameWithPlayers(
+  t: ReturnType<typeof convexTest>,
+) {
   return t.run(async (ctx) => {
     const gameId = await ctx.db.insert("games", {
       ...BASE_GAME,
       status: "active",
-      phase: "results",
-      roundEndsAt: Date.now() + RESULTS_DURATION_SECONDS * 1000,
+      phase: "explanation",
+      roundEndsAt: Date.now() + EXPLANATION_DURATION_SECONDS * 1000,
     });
     const player1Id = await ctx.db.insert("players", {
       gameId,
@@ -331,7 +333,7 @@ describe("players.updateIsReady", () => {
 describe("players.markReadyForNextQuestion", () => {
   it("throws when the session is not a participant", async () => {
     const t = convexTest(schema, modules);
-    const { gameId } = await setupResultsGameWithPlayers(t);
+    const { gameId } = await setupExplanationGameWithPlayers(t);
 
     await expect(
       t.mutation(api.players.markReadyForNextQuestion, {
@@ -342,10 +344,10 @@ describe("players.markReadyForNextQuestion", () => {
     ).rejects.toThrowError("Not a participant.");
   });
 
-  it("ignores a vote outside the results phase", async () => {
+  it("ignores a vote outside the explanation phase", async () => {
     const t = convexTest(schema, modules);
-    const { gameId, player1Id } = await setupResultsGameWithPlayers(t);
-    await t.run((ctx) => ctx.db.patch(gameId, { phase: "answering" }));
+    const { gameId, player1Id } = await setupExplanationGameWithPlayers(t);
+    await t.run((ctx) => ctx.db.patch(gameId, { phase: "results" }));
 
     await t.mutation(api.players.markReadyForNextQuestion, {
       sessionId: SESSION_1,
@@ -359,7 +361,7 @@ describe("players.markReadyForNextQuestion", () => {
 
   it("ignores a vote for a stale question index", async () => {
     const t = convexTest(schema, modules);
-    const { gameId, player1Id } = await setupResultsGameWithPlayers(t);
+    const { gameId, player1Id } = await setupExplanationGameWithPlayers(t);
 
     await t.mutation(api.players.markReadyForNextQuestion, {
       sessionId: SESSION_1,
@@ -373,7 +375,7 @@ describe("players.markReadyForNextQuestion", () => {
 
   it("stores an indexed vote without advancing early", async () => {
     const t = convexTest(schema, modules);
-    const { gameId, player1Id } = await setupResultsGameWithPlayers(t);
+    const { gameId, player1Id } = await setupExplanationGameWithPlayers(t);
 
     await t.mutation(api.players.markReadyForNextQuestion, {
       sessionId: SESSION_1,
@@ -391,7 +393,7 @@ describe("players.markReadyForNextQuestion", () => {
 
   it("schedules advancement when every player has voted", async () => {
     const t = convexTest(schema, modules);
-    const { gameId } = await setupResultsGameWithPlayers(t);
+    const { gameId } = await setupExplanationGameWithPlayers(t);
     vi.useFakeTimers();
 
     try {
@@ -419,7 +421,7 @@ describe("players.markReadyForNextQuestion", () => {
 
   it("does not schedule twice when the last player repeats a vote", async () => {
     const t = convexTest(schema, modules);
-    const { gameId } = await setupResultsGameWithPlayers(t);
+    const { gameId } = await setupExplanationGameWithPlayers(t);
     vi.useFakeTimers();
 
     try {
@@ -451,7 +453,7 @@ describe("players.markReadyForNextQuestion", () => {
 
   it("does not count a vote from an earlier question", async () => {
     const t = convexTest(schema, modules);
-    const { gameId, player1Id } = await setupResultsGameWithPlayers(t);
+    const { gameId, player1Id } = await setupExplanationGameWithPlayers(t);
     await t.run((ctx) =>
       ctx.db.patch(player1Id, { readyForNextQuestionIndex: -1 }),
     );
@@ -470,7 +472,7 @@ describe("players.markReadyForNextQuestion", () => {
 
   it("schedules immediate advancement for a solo player", async () => {
     const t = convexTest(schema, modules);
-    const { gameId, player2Id } = await setupResultsGameWithPlayers(t);
+    const { gameId, player2Id } = await setupExplanationGameWithPlayers(t);
     await t.run((ctx) => ctx.db.delete(player2Id));
     vi.useFakeTimers();
 
