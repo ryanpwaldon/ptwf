@@ -191,8 +191,8 @@ function GamePlayInner({
 
   return (
     <AppShell>
-      <PageContainer className="flex flex-1 flex-col">
-        <motion.header className="flex h-16 items-center justify-between">
+      <motion.header className="bg-background/75 sticky top-0 z-10 backdrop-blur-xl backdrop-saturate-150">
+        <PageContainer className="flex h-16 items-center justify-between border-b">
           <div className="flex h-full w-20 items-center justify-center">
             <div className="bg-secondary text-muted-foreground flex size-7 items-center justify-center rounded-md text-center text-sm font-medium">
               Q{game.currentQuestionIndex + 1}
@@ -222,7 +222,9 @@ function GamePlayInner({
               <NumberFlow value={secondsLeft} />
             </div>
           </div>
-        </motion.header>
+        </PageContainer>
+      </motion.header>
+      <PageContainer className="flex flex-1 flex-col">
         <motion.main className="flex-1 px-4 pb-16">
           <AnimatePresence mode="wait">
             <motion.div
