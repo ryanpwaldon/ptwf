@@ -5,6 +5,7 @@ import { ChevronDownIcon, InfoIcon, SparklesIcon } from "lucide-react";
 
 import type { QuizModel, QuizModelOption } from "@acme/convex";
 import { getQuizModelByValue, QUIZ_MODEL_OPTIONS } from "@acme/convex";
+import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import {
   CommandPicker,
@@ -118,8 +119,11 @@ export function ModelPicker({ value, onChange }: ModelPickerProps) {
                   }}
                 >
                   <ModelIcon model={option} />
-                  <span className="min-w-0 truncate text-sm font-medium">
-                    {option.label}
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="min-w-0 truncate text-sm font-medium">
+                      {option.label}
+                    </span>
+                    {"badge" in option ? <Badge>{option.badge}</Badge> : null}
                   </span>
                 </CommandPickerItem>
               ))}

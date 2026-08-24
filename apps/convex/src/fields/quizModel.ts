@@ -9,6 +9,7 @@ export const QUIZ_MODEL_OPTIONS = [
   {
     value: "google/gemini-3.7-flash",
     label: "Gemini 3.7 Flash",
+    badge: "Recommended",
     provider: "Google",
     iconPath: "/models/google.svg",
     openRouterSettings: defineOpenRouterSettings({
