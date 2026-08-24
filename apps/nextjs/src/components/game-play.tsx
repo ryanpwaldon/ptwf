@@ -175,6 +175,7 @@ function GamePlayInner({
   const isLastQuestion = game.currentQuestionIndex >= questionCount - 1;
   const nextActionLabel = isLastQuestion ? "End game" : "Next question";
   const nextButtonLabel = playerCharacters.length === 1 ? nextActionLabel : `${nextActionLabel} ${readyForNextQuestionCount}/${playerCharacters.length}`; // prettier-ignore
+  const correctAnswer = answerSummary.find((choice) => choice.isCorrect);
 
   const handleSelect = (label: string) => {
     if (phase !== "answering") return;
@@ -331,8 +332,18 @@ function GamePlayInner({
                 draggable={false}
               />
             </motion.div>
+            {correctAnswer && (
+              <motion.div
+                className="mt-4 flex min-w-0 justify-center"
+                variants={getExplanationItemVariants(shouldReduceMotion)}
+              >
+                <p className="max-w-full truncate text-sm font-medium">
+                  {correctAnswer.label}. {correctAnswer.text}
+                </p>
+              </motion.div>
+            )}
             <motion.p
-              className="text-muted-foreground mt-4 text-center text-sm text-balance"
+              className="text-muted-foreground mt-2 text-center text-sm text-balance"
               variants={getExplanationItemVariants(shouldReduceMotion)}
             >
               Xylitol triggers a sudden insulin release in dogs, causing
