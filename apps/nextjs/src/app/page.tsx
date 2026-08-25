@@ -43,7 +43,7 @@ export default function HomePage() {
           <div className="flex w-full flex-col items-center text-center">
             <h1 className="sr-only">Pet Care Trivia</h1>
             <HomepageStickerLockup
-              className="mt-[4.5rem] h-40"
+              className="mt-18 h-40"
               entranceDelay={homepageEntranceDelays.first}
             />
             <motion.h2
@@ -56,14 +56,14 @@ export default function HomePage() {
               All about pets!
             </motion.h2>
             <motion.p
-              className="text-muted-foreground mt-6 max-w-[25rem] text-lg leading-relaxed text-pretty sm:max-w-md sm:text-xl"
+              className="text-muted-foreground mt-6 max-w-100 text-lg leading-relaxed text-pretty sm:max-w-md sm:text-xl"
               {...getHomepageEntrance(
                 homepageEntranceDelays.description,
                 shouldReduceMotion,
               )}
             >
-              Challenge your friends and learn interesting pet-care facts over a
-              game of trivia.
+              Test your pet-care knowledge and learn interesting facts. Play
+              solo or challenge your friends.
             </motion.p>
             <motion.div
               className="mt-6 flex w-full max-w-68 flex-col gap-3 sm:max-w-md sm:flex-row"

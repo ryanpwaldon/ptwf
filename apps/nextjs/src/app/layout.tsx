@@ -18,7 +18,7 @@ import { themeColors } from "~/lib/theme";
 
 const title = "All about pets!";
 const description =
-  "Challenge your friends and learn interesting pet-care facts together through trivia.";
+  "Test your pet-care knowledge and learn interesting facts. Play solo or challenge your friends.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ptwf.vercel.app"),
