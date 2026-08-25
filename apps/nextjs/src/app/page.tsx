@@ -62,8 +62,8 @@ export default function HomePage() {
                 shouldReduceMotion,
               )}
             >
-              Test your pet-care knowledge and learn interesting facts. Play
-              solo or challenge your friends.
+              Test your pet-care knowledge with a game of trivia. Play solo or
+              challenge your friends.
             </motion.p>
             <motion.div
               className="mt-6 flex w-full max-w-68 flex-col gap-3 sm:max-w-md sm:flex-row"
