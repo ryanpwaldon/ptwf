@@ -62,7 +62,7 @@ export const generateQuestions = internalAction({
 // Helpers
 // ========================================================================================
 
-const QUIZ_GENERATION_TIMEOUT_MS = 30_000;
+const QUIZ_GENERATION_TIMEOUT_MS = 60_000;
 
 export function transformQuestions(
   output: z.infer<ReturnType<typeof buildQuestionSchema>>,

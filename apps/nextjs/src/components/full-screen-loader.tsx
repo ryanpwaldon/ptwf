@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { AppShell, PageContainer } from "./app-shell";
 import { PawLoader } from "./paw-loader";
 import { PawTrailBackground } from "./paw-trail-background";
@@ -7,12 +9,14 @@ import { PawTrailBackground } from "./paw-trail-background";
 interface FullScreenLoaderProps {
   title?: string;
   description?: string;
+  status?: ReactNode;
   showPawTrail?: boolean;
 }
 
 export function FullScreenLoader({
   title,
   description,
+  status,
   showPawTrail = false,
 }: FullScreenLoaderProps) {
   return (
@@ -25,6 +29,7 @@ export function FullScreenLoader({
             <div className="mt-4 flex flex-col items-center gap-1 text-center">
               <h1 className="text-xl font-semibold">{title}</h1>
               <p className="text-muted-foreground text-sm">{description}</p>
+              {status}
             </div>
           )}
         </main>
