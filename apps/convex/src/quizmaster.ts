@@ -71,6 +71,7 @@ export function transformQuestions(
   text: string;
   choices: { label: string; text: string }[];
   correctLabel: string;
+  explanation: string;
 }[] {
   return output.questions.map((q) => {
     const answers = shuffle(
@@ -88,6 +89,7 @@ export function transformQuestions(
         text: answer.text,
       })),
       correctLabel: labelAt(answers.findIndex((answer) => answer.isCorrect)),
+      explanation: q.explanation,
     };
   });
 }
@@ -124,6 +126,7 @@ function buildQuestionSchema(questionCount: number) {
           question: z.string(),
           correctAnswer: z.string(),
           incorrectAnswers: z.array(z.string()).length(3),
+          explanation: z.string(),
         }),
       )
       .length(questionCount),
@@ -152,74 +155,144 @@ export function buildPrompt(config: {
     `## Task`,
     `Generate exactly ${questionCount} multiple-choice pet-care trivia questions about ${quizAnimal.label.toLocaleLowerCase()}.`,
     ``,
-    `## Rules`,
+    `## Content requirements`,
     `- Every question must be specifically about caring for ${quizAnimal.label.toLocaleLowerCase()} kept as pets.`,
     `- Every question must fall within the "${quizTheme.label}" care theme.`,
     `- Focus on practical, educational knowledge that helps people understand responsible pet care.`,
     `- Avoid self-evident questions that a person could answer from everyday common sense alone, such as why a pet needs fresh water or whether overfeeding is unhealthy. Instead, test a useful misconception, practical decision, likely consequence, meaningful comparison, or overlooked care habit.`,
-    `- Before keeping a question, silently ask: "Would a responsible adult with no pet-specific knowledge find the correct answer immediately obvious?" If yes, replace it with a more informative question within the same theme.`,
     `- Base questions and correct answers only on high-confidence, broadly accepted pet-care guidance. If uncertain about a fact or answer, choose a different question rather than guessing.`,
     `- Do not diagnose illness, prescribe treatment, or imply that trivia can replace advice from a qualified veterinarian.`,
     `- When care needs vary by species, breed, age, health, or location, avoid presenting one narrow recommendation as universal.`,
     `- Do not repeat questions or ask the same question worded differently.`,
+    ``,
+    `## Questions`,
     `- Questions must be clearly and simply worded. Avoid awkward or confusing phrasing.`,
     `- Every question must end with a question mark.`,
     `- Try to keep each question under 120 characters. Prefer concise phrasing.`,
+    `- Put the necessary context in the question so the answer choices can remain concise.`,
+    `- Favor questions that naturally support short, easy-to-scan answer choices.`,
+    ``,
+    `## Answer choices`,
     `- Provide exactly 1 correct answer and exactly 3 incorrect answers for each question.`,
     `- The 3 incorrect choices must be plausible but unambiguously wrong.`,
-    `- Try to keep each answer choice under 100 characters.`,
-    `- Every answer choice must end with a full stop, unless ending with a full stop would be grammatically inappropriate (e.g. a proper name or a short numeric answer).`,
+    `- Prefer answer choices of 1 to 4 words. Keep them short and easy to scan. Use a longer choice only when necessary for accuracy or clarity.`,
+    `- Avoid questions that require four long, sentence-like answer choices. Choose a more concise question instead.`,
+    `- Keep all four choices grammatically parallel and at a similar level of specificity. Do not make the correct answer conspicuous through its length or detail.`,
+    `- Answer choices should contain only the answer, not supporting reasoning or educational detail.`,
+    `- Use natural punctuation. Do not add full stops to short words or sentence fragments.`,
     ``,
-    formatBadQuestionExamples(),
+    `## Explanations`,
+    `- Provide one concise explanation for every question.`,
+    `- Teach something beyond merely restating the correct answer. Explain why it is correct, how it works, why it matters, or the practical lesson a pet owner should remember.`,
+    `- Aim for 1 or 2 short sentences and roughly 15 to 40 words.`,
+    `- The explanation may name the correct answer, but it must make sense as a standalone educational note.`,
+    `- Do not refer to answer labels such as "A" or "choice B", because the choices will be shuffled.`,
+    `- Keep explanations factual and clear. Do not add jokes, quiz-host commentary, or remarks about the player.`,
+    ``,
+    `## Final check`,
+    `Before returning the questions, verify that each one is useful rather than obvious, has one high-confidence correct answer, has four concise and parallel choices, and includes an explanation that adds meaningful knowledge.`,
+    ``,
+    formatGoodQuestionExamples(),
+    ``,
+    formatRejectedQuestionExamples(),
   ].join("\n");
 }
 
-interface BadQuestionExample {
+interface GoodQuestionExample {
   question: string;
-  choices: readonly [string, string, string, string];
-  whyItIsBad: string;
-  generalLesson: string;
+  correctAnswer: string;
+  incorrectAnswers: readonly [string, string, string];
+  explanation: string;
+  whyItIsGood: string;
 }
 
-const BAD_QUESTION_EXAMPLES = [
+const GOOD_QUESTION_EXAMPLES = [
   {
-    question:
-      "Which treat is generally safest for a dog when prepared appropriately?",
-    choices: [
-      "Chocolate-coated biscuits.",
-      "Grapes or raisins.",
-      "A small piece of plain, cooked, boneless chicken.",
-      "Macadamia nuts seasoned with salt.",
-    ],
-    whyItIsBad:
-      "This question frames several toxic foods as merely “less safe” alternatives. Asking which option is “generally safest” implies that the other choices may still be acceptable in some circumstances, rather than clearly communicating that they can seriously harm a dog.",
-    generalLesson:
-      "Do not use mild comparative wording when the real distinction is between safe and dangerous. If an incorrect answer involves poisoning, injury, or another significant danger, the question must describe it as unsafe. Avoid wording such as “safer,” “better,” or “preferred” when it could minimise the severity of harmful pet-care practices.",
+    question: "Which artificial sweetener is highly toxic to dogs?",
+    correctAnswer: "Xylitol",
+    incorrectAnswers: ["Stevia", "Saccharin", "Aspartame"],
+    explanation:
+      "Xylitol can trigger a rapid insulin release in dogs, causing dangerously low blood sugar. Larger amounts may also cause liver failure.",
+    whyItIsGood:
+      "The question carries the context, all four choices are concise and parallel, and the explanation adds useful information that does not belong in the answer choice.",
   },
-] satisfies readonly BadQuestionExample[];
+] satisfies readonly GoodQuestionExample[];
 
-function formatBadQuestionExamples(): string {
-  const examples = BAD_QUESTION_EXAMPLES.flatMap((example, index) => [
-    `### Bad example ${index + 1}`,
+function formatGoodQuestionExamples(): string {
+  const examples = GOOD_QUESTION_EXAMPLES.flatMap((example, index) => [
+    `### Good example ${index + 1}`,
     ``,
-    example.question,
+    `Question: ${example.question}`,
+    `Correct answer: ${example.correctAnswer}`,
+    `Incorrect answers: ${example.incorrectAnswers.join(", ")}`,
+    `Explanation: ${example.explanation}`,
     ``,
-    ...example.choices.map(
-      (choice, choiceIndex) => `${labelAt(choiceIndex)}. ${choice}`,
-    ),
-    ``,
-    `Why it is bad:`,
-    example.whyItIsBad,
-    ``,
-    `General lesson:`,
-    example.generalLesson,
+    `Why it is good:`,
+    example.whyItIsGood,
     ``,
   ]);
 
   return [
-    `## Examples of bad questions`,
+    `## Examples of good questions`,
     ``,
-    `Use the following examples to understand the reasoning behind what makes a question unsuitable. Do not merely avoid or reword the specific questions shown; apply the general lessons to every question you generate.`,
+    `These examples demonstrate the desired structure and writing style only. Do not copy or reword their subject matter. Always generate questions for the animal and care theme specified above.`,
+    ``,
+    ...examples,
+  ].join("\n");
+}
+
+interface RejectedQuestionExample {
+  question: string;
+  claimedCorrectAnswer: string;
+  claimedIncorrectAnswers: readonly [string, string, string];
+  problem: string;
+}
+
+const REJECTED_QUESTION_EXAMPLES = [
+  {
+    question:
+      "Which treat is generally safest for a dog when prepared appropriately?",
+    claimedCorrectAnswer: "Plain cooked chicken",
+    claimedIncorrectAnswers: [
+      "Chocolate biscuits",
+      "Grapes or raisins",
+      "Salted macadamia nuts",
+    ],
+    problem:
+      "The comparative wording frames several toxic foods as merely less safe alternatives and may imply that they are acceptable in some circumstances. When the real distinction is between safe and dangerous, the question must communicate that clearly.",
+  },
+  {
+    question:
+      "Why should outdoor dog kennels have raised flooring above bare concrete?",
+    claimedCorrectAnswer: "Prevents pressure sores",
+    claimedIncorrectAnswers: [
+      "Deters flying insects",
+      "Increases air humidity",
+      "Improves water drainage",
+    ],
+    problem:
+      "The claimed correct answer does not follow clearly from raised flooring, and “Improves water drainage” is also reasonably defensible. The question therefore does not have a single unambiguous answer.",
+  },
+] satisfies readonly RejectedQuestionExample[];
+
+function formatRejectedQuestionExamples(): string {
+  const examples = REJECTED_QUESTION_EXAMPLES.flatMap((example, index) => [
+    `### Rejected question ${index + 1}`,
+    ``,
+    `Question: ${example.question}`,
+    `Claimed correct answer: ${example.claimedCorrectAnswer}`,
+    `Answers marked incorrect:`,
+    ...example.claimedIncorrectAnswers.map((answer) => `- ${answer}`),
+    ``,
+    `Why it fails:`,
+    example.problem,
+    ``,
+  ]);
+
+  return [
+    `## Rejected questions`,
+    ``,
+    `These examples show questions that must not be returned. Study why each question fails, then avoid the same failure pattern. Do not copy or reword the examples.`,
     ``,
     ...examples,
   ].join("\n");

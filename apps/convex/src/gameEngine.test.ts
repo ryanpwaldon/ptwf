@@ -17,6 +17,7 @@ const BASE_QUESTION = {
     { label: "B", text: "Option B" },
   ],
   correctLabel: "A",
+  explanation: "This explains why option A is correct.",
 };
 
 // Creates one active/answering game with one question.
@@ -456,6 +457,7 @@ describe("gameEngine.saveQuestions", () => {
         { label: "B", text: "Option B" },
       ],
       correctLabel: "A",
+      explanation: "This explains why option A is correct.",
     },
     {
       text: "Second question?",
@@ -464,6 +466,7 @@ describe("gameEngine.saveQuestions", () => {
         { label: "B", text: "Option B" },
       ],
       correctLabel: "B",
+      explanation: "This explains why option B is correct.",
     },
   ];
 
@@ -491,6 +494,9 @@ describe("gameEngine.saveQuestions", () => {
     expect(questions[0]?.gameId).toBe(gameId);
     expect(questions[0]?.text).toBe("First question?");
     expect(questions[0]?.correctLabel).toBe("A");
+    expect(questions[0]?.explanation).toBe(
+      "This explains why option A is correct.",
+    );
     expect(questions[1]?.index).toBe(1);
     expect(questions[1]?.gameId).toBe(gameId);
     expect(questions[1]?.text).toBe("Second question?");
@@ -622,6 +628,7 @@ describe("gameEngine integration", () => {
               { label: "B", text: "Opt B" },
             ],
             correctLabel: "A",
+            explanation: "This explains why option A is correct.",
           },
           {
             text: "Q2?",
@@ -630,6 +637,7 @@ describe("gameEngine integration", () => {
               { label: "B", text: "Opt B" },
             ],
             correctLabel: "B",
+            explanation: "This explains why option B is correct.",
           },
         ],
       });

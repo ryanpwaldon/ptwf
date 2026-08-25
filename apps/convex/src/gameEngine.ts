@@ -41,6 +41,7 @@ export const saveQuestions = internalMutation({
         text: v.string(),
         choices: v.array(v.object({ label: v.string(), text: v.string() })),
         correctLabel: v.string(),
+        explanation: v.string(),
       }),
     ),
   },
@@ -53,6 +54,7 @@ export const saveQuestions = internalMutation({
         text: q.text,
         choices: q.choices,
         correctLabel: q.correctLabel,
+        explanation: q.explanation,
       });
     }
     const game = await ctx.db.get(args.gameId);

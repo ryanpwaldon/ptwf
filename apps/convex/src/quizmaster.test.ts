@@ -35,6 +35,8 @@ describe("transformQuestions", () => {
           question: "Which activity gives a dog mental enrichment?",
           correctAnswer: "Foraging",
           incorrectAnswers: ["Overfeeding", "Isolation", "Inactivity"],
+          explanation:
+            "Foraging exercises a dog's natural food-seeking instincts and provides mental stimulation.",
         },
       ],
     };
@@ -51,42 +53,33 @@ describe("transformQuestions", () => {
           { label: "D", text: "Foraging" },
         ],
         correctLabel: "D",
+        explanation:
+          "Foraging exercises a dog's natural food-seeking instincts and provides mental stimulation.",
       },
     ]);
   });
 });
 
 describe("buildPrompt", () => {
-  it("includes the animal label", () => {
-    const prompt = buildPrompt(BASE_CONFIG);
-
-    expect(prompt).toContain(QUIZ_ANIMAL_OPTIONS[0].label);
-  });
-
-  it("includes the question count", () => {
+  it("includes the selected quiz configuration", () => {
     const prompt = buildPrompt({ ...BASE_CONFIG, questionCount: 8 });
 
-    expect(prompt).toContain("8");
-  });
-
-  it("includes the theme label and instructions", () => {
-    const prompt = buildPrompt(BASE_CONFIG);
-
-    expect(prompt).toContain(DIET_THEME.label);
+    expect(prompt).toContain(`- Type: ${QUIZ_ANIMAL_OPTIONS[0].label}`);
+    expect(prompt).toContain(`## Care theme: ${DIET_THEME.label}`);
     expect(prompt).toContain(DIET_THEME.promptGuidance);
+    expect(prompt).toContain(
+      "Generate exactly 8 multiple-choice pet-care trivia questions",
+    );
   });
 
-  it("includes bad question examples and their lessons", () => {
+  it("includes the essential answer and explanation requirements", () => {
     const prompt = buildPrompt(BASE_CONFIG);
 
-    expect(prompt).toContain("## Examples of bad questions");
     expect(prompt).toContain(
-      "Which treat is generally safest for a dog when prepared appropriately?",
+      "Provide exactly 1 correct answer and exactly 3 incorrect answers",
     );
-    expect(prompt).toContain("Why it is bad:");
-    expect(prompt).toContain("General lesson:");
-    expect(prompt).toContain(
-      "Do not merely avoid or reword the specific questions shown",
-    );
+    expect(prompt).toContain("Prefer answer choices of 1 to 4 words");
+    expect(prompt).toContain("Provide one concise explanation");
+    expect(prompt).toContain("Teach something beyond merely restating");
   });
 });

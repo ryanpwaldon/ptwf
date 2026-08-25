@@ -352,14 +352,14 @@ function GamePlayInner({
                     </p>
                   </motion.div>
                 )}
-                <motion.p
-                  className="text-muted-foreground mt-2 text-center text-sm text-pretty"
-                  variants={getExplanationItemVariants(shouldReduceMotion)}
-                >
-                  Xylitol triggers a sudden insulin release in dogs, causing
-                  dangerously low blood sugar. At higher doses, it can also
-                  cause liver failure and may be fatal.
-                </motion.p>
+                {currentQuestion.explanation && (
+                  <motion.p
+                    className="text-muted-foreground mt-2 text-center text-sm text-pretty"
+                    variants={getExplanationItemVariants(shouldReduceMotion)}
+                  >
+                    {currentQuestion.explanation}
+                  </motion.p>
+                )}
                 <motion.div
                   variants={getExplanationItemVariants(shouldReduceMotion)}
                 >

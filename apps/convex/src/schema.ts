@@ -60,6 +60,7 @@ const schema = defineSchema({
       }),
     ),
     correctLabel: v.string(),
+    explanation: v.optional(v.string()),
   }).index("by_gameId_and_index", ["gameId", "index"]),
 
   answers: defineTable({
