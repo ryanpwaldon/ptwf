@@ -23,7 +23,7 @@ export function FullScreenLoader({
     <AppShell>
       {showPawTrail && <PawTrailBackground />}
       <PageContainer className="relative z-10 flex flex-1 flex-col">
-        <main className="flex flex-1 flex-col items-center justify-center">
+        <main className="flex flex-1 flex-col items-center justify-center px-4">
           <PawLoader />
           {title && description && (
             <div className="mt-4 flex flex-col items-center gap-1 text-center">
