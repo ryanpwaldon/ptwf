@@ -3,4 +3,8 @@ version = 1
 name = "ptwf"
 
 [setup]
-script = "fnm exec --using=.nvmrc corepack pnpm install --frozen-lockfile"
+script = '''
+export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+export PATH="$PNPM_HOME/bin:$PATH"
+fnm exec --version-file-strategy=recursive pnpm install --frozen-lockfile
+'''

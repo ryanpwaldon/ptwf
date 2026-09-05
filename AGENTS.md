@@ -31,8 +31,9 @@ pnpm ui-add           # Add shadcn/ui components interactively
 
 ## Codex Tooling
 
-- The repository pins Node.js in `.nvmrc` and pnpm in `package.json`. In Codex, run pnpm commands as `fnm exec --using=.nvmrc corepack pnpm ...` so fresh shells do not use stale global versions.
-- Run Codex shell commands with login-shell initialization disabled (`login: false`). This prevents fnm from trying to create sandboxed multishell cache symlinks.
+- Run pnpm commands as `fnm exec --version-file-strategy=recursive pnpm ...` with `login: false`. This selects the Node.js version in `.nvmrc` from either the root or a workspace directory without initializing interactive shell state.
+- Use standalone pnpm to select the release pinned in `package.json#packageManager`. Do not invoke Corepack.
+- Codex worktree setup exports `PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"` and prepends `$PNPM_HOME/bin` to PATH before running the frozen-lockfile install through fnm. Use the same exports if pnpm is missing from a non-interactive shell's PATH.
 
 ## Architecture
 
