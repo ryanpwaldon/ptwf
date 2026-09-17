@@ -1,6 +1,10 @@
+<img src="apps/nextjs/public/stickers/toilet-paper-cat.svg" alt="Playful cat sticker" width="240">
+
 # All about pets!
 
 A multiplayer trivia game about responsible pet care. Choose a pet and care topic, invite your friends, and compete in timed rounds of AI-generated questions.
+
+Adapted from an [earlier multiplayer trivia game](https://github.com/ryanpwaldon/mtwf) I built.
 
 ## Development
 
